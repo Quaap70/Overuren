@@ -1,0 +1,296 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use App\Models\Overuren;
+use App\Models\Saldo;
+use App\Models\Notificatie;
+use App\Services\SaldoService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
+
+class HRController extends Controller
+{
+    public function __construct(
+        private SaldoService $saldoService
+    ) {}
+
+    /**
+     * HR Dashboard
+     */
+    public function dashboard()
+    {
+        $huidigJaar = now()->year;
+
+        // Pending approvals count
+        $teBeoordelenCount = Overuren::where('status', 'INGEDIEND')->count();
+
+        // This week submissions
+        $dezeWeekStart = now()->startOfWeek();
+        $dezeWeekCount = Overuren::where('ingediend_op', '>=', $dezeWeekStart)->count();
+
+        // Active employees count
+        $medewerkersCount = User::where('role', 'MEDEWERKER')
+            ->where('is_active', true)
+            ->count();
+
+        // Total approved hours this year
+        $totaalMinuten = Overuren::where('status', 'GOEDGEKEURD')
+            ->where('jaar', $huidigJaar)
+            ->sum('minuten');
+
+        // Recent submissions
+        $recenteIndieningen = Overuren::where('status', 'INGEDIEND')
+            ->with('user:id,voornaam,achternaam')
+            ->orderBy('ingediend_op', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(fn ($o) => [
+                'id' => $o->id,
+                'medewerker' => $o->user->full_name,
+                'medewerker_id' => $o->user->id,
+                'datum' => $o->datum->format('Y-m-d'),
+                'minuten' => $o->minuten,
+                'formatted' => $o->formatted_time,
+                'reden' => $o->reden,
+                'ingediend_op' => $o->ingediend_op->format('Y-m-d H:i'),
+            ]);
+
+        return Inertia::render('HR/Dashboard', [
+            'statistieken' => [
+                'te_beoordelen' => $teBeoordelenCount,
+                'deze_week' => $dezeWeekCount,
+                'medewerkers' => $medewerkersCount,
+                'totaal_uren' => round($totaalMinuten / 60),
+            ],
+            'recente_indieningen' => $recenteIndieningen,
+        ]);
+    }
+
+    /**
+     * Get employees list
+     */
+    public function medewerkers(Request $request)
+    {
+        $huidigJaar = now()->year;
+        $query = User::where('role', 'MEDEWERKER')
+            ->with(['saldo' => fn ($q) => $q->where('jaar', $huidigJaar)]);
+
+        if ($request->filled('actief')) {
+            $query->where('is_active', $request->actief === 'true');
+        }
+
+        if ($request->filled('zoek')) {
+            $zoek = $request->zoek;
+            $query->where(function ($q) use ($zoek) {
+                $q->where('voornaam', 'like', "%{$zoek}%")
+                    ->orWhere('achternaam', 'like', "%{$zoek}%")
+                    ->orWhere('email', 'like', "%{$zoek}%");
+            });
+        }
+
+        $medewerkers = $query->orderBy('achternaam')
+            ->orderBy('voornaam')
+            ->get()
+            ->map(fn ($m) => [
+                'id' => $m->id,
+                'username' => $m->username,
+                'email' => $m->email,
+                'voornaam' => $m->voornaam,
+                'achternaam' => $m->achternaam,
+                'naam' => $m->full_name,
+                'afdeling' => $m->afdeling,
+                'startdatum' => $m->startdatum?->format('Y-m-d'),
+                'is_active' => $m->is_active,
+                'saldo' => $m->saldo->first() ? [
+                    'minuten' => $m->saldo->first()->huidig_saldo,
+                    'formatted' => $m->saldo->first()->formatted_saldo,
+                ] : null,
+            ]);
+
+        return Inertia::render('HR/Medewerkers', [
+            'medewerkers' => $medewerkers,
+        ]);
+    }
+
+    /**
+     * Get entries to review
+     */
+    public function teBeoordelen(Request $request)
+    {
+        $indieningen = Overuren::where('status', 'INGEDIEND')
+            ->with('user:id,voornaam,achternaam,afdeling')
+            ->orderBy('ingediend_op', 'asc')
+            ->paginate(50)
+            ->through(fn ($o) => [
+                'id' => $o->id,
+                'medewerker' => [
+                    'id' => $o->user->id,
+                    'naam' => $o->user->full_name,
+                    'afdeling' => $o->user->afdeling,
+                ],
+                'datum' => $o->datum->format('Y-m-d'),
+                'minuten' => $o->minuten,
+                'formatted' => $o->formatted_time,
+                'reden' => $o->reden,
+                'week_nummer' => $o->week_nummer,
+                'jaar' => $o->jaar,
+                'ingediend_op' => $o->ingediend_op->format('Y-m-d H:i'),
+            ]);
+
+        return Inertia::render('HR/TeBeoordelen', [
+            'indieningen' => $indieningen,
+        ]);
+    }
+
+    /**
+     * Approve overuren entry
+     */
+    public function goedkeuren(Request $request, Overuren $overuren)
+    {
+        if ($overuren->status !== 'INGEDIEND') {
+            return back()->withErrors([
+                'status' => 'Alleen ingediende uren kunnen worden goedgekeurd',
+            ]);
+        }
+
+        $overuren->status = 'GOEDGEKEURD';
+        $overuren->goedgekeurd_op = now();
+        $overuren->goedgekeurd_door = $request->user()->id;
+        $overuren->afkeur_reden = null;
+        $overuren->save();
+
+        // Recalculate saldo
+        $saldo = $this->saldoService->recalculateSaldo($overuren->user_id, $overuren->jaar);
+
+        // Notify employee
+        Notificatie::create([
+            'user_id' => $overuren->user_id,
+            'type' => 'GOEDKEURING',
+            'titel' => 'Overuren goedgekeurd',
+            'bericht' => "Je overuren van {$overuren->datum->format('Y-m-d')} ({$overuren->formatted_time}) zijn goedgekeurd. Je nieuwe saldo is {$saldo->formatted_saldo}.",
+            'gerelateerd_id' => $overuren->id,
+        ]);
+
+        return back()->with('success', 'Uren succesvol goedgekeurd');
+    }
+
+    /**
+     * Reject overuren entry
+     */
+    public function afkeuren(Request $request, Overuren $overuren)
+    {
+        $validated = $request->validate([
+            'reden' => 'required|string|min:3|max:500',
+        ]);
+
+        if ($overuren->status !== 'INGEDIEND') {
+            return back()->withErrors([
+                'status' => 'Alleen ingediende uren kunnen worden afgekeurd',
+            ]);
+        }
+
+        $overuren->status = 'AFGEKEURD';
+        $overuren->afkeur_reden = $validated['reden'];
+        $overuren->save();
+
+        // Notify employee
+        Notificatie::create([
+            'user_id' => $overuren->user_id,
+            'type' => 'AFKEURING',
+            'titel' => 'Overuren afgekeurd',
+            'bericht' => "Je overuren van {$overuren->datum->format('Y-m-d')} ({$overuren->formatted_time}) zijn afgekeurd. Reden: {$validated['reden']}",
+            'gerelateerd_id' => $overuren->id,
+        ]);
+
+        return back()->with('success', 'Uren afgekeurd');
+    }
+
+    /**
+     * Manually adjust employee saldo
+     */
+    public function saldoAanpassen(Request $request, User $user)
+    {
+        if ($user->role !== 'MEDEWERKER') {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'minuten' => 'required|integer',
+            'reden' => 'required|string|min:3|max:500',
+        ]);
+
+        $huidigJaar = now()->year;
+        $saldo = $this->saldoService->getOrCreateSaldo($user->id, $huidigJaar);
+
+        // Adjust saldo
+        $saldo->huidig_saldo += $validated['minuten'];
+        $saldo->laatst_bijgewerkt = now();
+        $saldo->save();
+
+        // Notify employee
+        $prefix = $validated['minuten'] > 0 ? '+' : '';
+        $absMinuten = abs($validated['minuten']);
+        $uren = floor($absMinuten / 60);
+        $minuten = $absMinuten % 60;
+
+        Notificatie::create([
+            'user_id' => $user->id,
+            'type' => 'SALDO_WIJZIGING',
+            'titel' => 'Saldo aangepast door HR',
+            'bericht' => "Je saldo is met {$prefix}{$uren}u {$minuten}m aangepast. Reden: {$validated['reden']}. Je nieuwe saldo is {$saldo->formatted_saldo}.",
+        ]);
+
+        return back()->with('success', 'Saldo succesvol aangepast');
+    }
+
+    /**
+     * Get employee details
+     */
+    public function medewerkerDetail(User $user)
+    {
+        if ($user->role !== 'MEDEWERKER') {
+            abort(404);
+        }
+
+        $huidigJaar = now()->year;
+        $saldo = $this->saldoService->getOrCreateSaldo($user->id, $huidigJaar);
+
+        $recenteUren = Overuren::where('user_id', $user->id)
+            ->where('jaar', $huidigJaar)
+            ->orderBy('datum', 'desc')
+            ->limit(20)
+            ->get()
+            ->map(fn ($o) => [
+                'id' => $o->id,
+                'datum' => $o->datum->format('Y-m-d'),
+                'minuten' => $o->minuten,
+                'formatted' => $o->formatted_time,
+                'reden' => $o->reden,
+                'status' => $o->status,
+            ]);
+
+        return Inertia::render('HR/MedewerkerDetail', [
+            'medewerker' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'voornaam' => $user->voornaam,
+                'achternaam' => $user->achternaam,
+                'naam' => $user->full_name,
+                'afdeling' => $user->afdeling,
+                'startdatum' => $user->startdatum?->format('Y-m-d'),
+                'is_active' => $user->is_active,
+                'saldo' => [
+                    'minuten' => $saldo->huidig_saldo,
+                    'formatted' => $saldo->formatted_saldo,
+                    'overgedragen' => $saldo->overgedragen_saldo,
+                    'gebruikt' => $saldo->gebruikt_saldo,
+                ],
+            ],
+            'recente_uren' => $recenteUren,
+        ]);
+    }
+}

@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\OverurenController;
+use App\Http\Controllers\SaldoController;
+use App\Http\Controllers\HRController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,12 +27,27 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Dashboard/Index');
     })->name('dashboard');
 
-    // HR dashboard
-    Route::get('/hr/dashboard', function () {
-        // Check if user is HR
-        if (!auth()->user()->isHR()) {
-            abort(403, 'Unauthorized');
-        }
-        return Inertia::render('HR/Dashboard');
-    })->name('hr.dashboard');
+    // Overuren routes (Employee)
+    Route::prefix('overuren')->name('overuren.')->group(function () {
+        Route::get('/', [OverurenController::class, 'index'])->name('index');
+        Route::post('/', [OverurenController::class, 'store'])->name('store');
+        Route::put('/{overuren}', [OverurenController::class, 'update'])->name('update');
+        Route::delete('/{overuren}', [OverurenController::class, 'destroy'])->name('destroy');
+        Route::get('/week/{jaar}/{weeknummer}', [OverurenController::class, 'weekOverview'])->name('week');
+    });
+
+    // Saldo routes
+    Route::get('/saldo', [SaldoController::class, 'index'])->name('saldo.index');
+    Route::get('/api/saldo/current', [SaldoController::class, 'current'])->name('saldo.current');
+
+    // HR routes (alleen voor HR gebruikers)
+    Route::prefix('hr')->name('hr.')->group(function () {
+        Route::get('/dashboard', [HRController::class, 'dashboard'])->name('dashboard');
+        Route::get('/medewerkers', [HRController::class, 'medewerkers'])->name('medewerkers');
+        Route::get('/medewerkers/{user}', [HRController::class, 'medewerkerDetail'])->name('medewerker.detail');
+        Route::get('/te-beoordelen', [HRController::class, 'teBeoordelen'])->name('te-beoordelen');
+        Route::post('/uren/{overuren}/goedkeuren', [HRController::class, 'goedkeuren'])->name('goedkeuren');
+        Route::post('/uren/{overuren}/afkeuren', [HRController::class, 'afkeuren'])->name('afkeuren');
+        Route::post('/medewerkers/{user}/saldo', [HRController::class, 'saldoAanpassen'])->name('saldo.aanpassen');
+    });
 });
