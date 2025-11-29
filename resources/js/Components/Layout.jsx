@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import Toast from './Toast';
 
 export default function Layout({ children }) {
     const { auth } = usePage().props;
@@ -9,6 +10,7 @@ export default function Layout({ children }) {
 
     return (
         <div className="min-h-screen" style={{ backgroundColor: '#F0F4F8' }}>
+            <Toast />
             <nav className="shadow-md p-4 mb-6" style={{ backgroundColor: '#FFFFFF' }}>
                 <div className="container mx-auto flex justify-between items-center">
                     <Link href={auth.user.is_hr ? '/hr/dashboard' : '/dashboard'}>
@@ -41,6 +43,13 @@ export default function Layout({ children }) {
                                 >
                                     Mijn Saldo
                                 </Link>
+                                <Link
+                                    href="/notificaties"
+                                    className="hover:opacity-75 transition-opacity"
+                                    style={{ color: '#718096' }}
+                                >
+                                    🔔 Notificaties
+                                </Link>
                             </>
                         )}
 
@@ -66,6 +75,13 @@ export default function Layout({ children }) {
                                     style={{ color: '#718096' }}
                                 >
                                     Medewerkers
+                                </Link>
+                                <Link
+                                    href="/notificaties"
+                                    className="hover:opacity-75 transition-opacity"
+                                    style={{ color: '#718096' }}
+                                >
+                                    🔔 Notificaties
                                 </Link>
                             </>
                         )}

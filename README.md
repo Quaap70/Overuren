@@ -1,59 +1,319 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🕐 Overuren Registratie Systeem
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Modern overuren registratie systeem gebouwd met Laravel 12, Inertia.js en React. Het systeem maakt het mogelijk voor medewerkers om overuren te registreren en voor HR om deze te beoordelen en goedkeuren.
 
-## About Laravel
+## ✨ Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Voor Medewerkers
+- ✅ Overuren registreren (concept of direct indienen)
+- ✅ Overzicht van alle overuren met status (CONCEPT, INGEDIEND, GOEDGEKEURD, AFGEKEURD)
+- ✅ Saldo bekijken (huidig, overgedragen, gebruikt)
+- ✅ Notificaties ontvangen bij goedkeuring/afkeuring
+- ✅ Week overzicht van geregistreerde uren
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Voor HR
+- ✅ Dashboard met statistieken
+- ✅ Overuren goedkeuren/afkeuren met reden
+- ✅ Medewerkers beheren en bekijken
+- ✅ Saldo handmatig aanpassen
+- ✅ Notificaties bij nieuwe indieningen
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Tech Stack
 
-## Learning Laravel
+- **Backend**: Laravel 12.40.2
+- **Frontend**: React 19 + Inertia.js v2.0.11
+- **Testing**: PEST v3.8.4
+- **Build Tool**: Vite v7.2.4
+- **Styling**: Tailwind CSS v4
+- **Database**: SQLite (configureerbaar naar MySQL/PostgreSQL)
+- **PHP**: 8.4.15
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 📋 Requirements
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP >= 8.4
+- Composer
+- Node.js >= 18.x
+- NPM of Yarn
 
-## Laravel Sponsors
+## 🚀 Installatie
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1. Clone de Repository
 
-### Premium Partners
+```bash
+git clone git@github.com:Quaap70/Overuren.git
+cd Overuren
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 2. Installeer Dependencies
 
-## Contributing
+```bash
+# PHP dependencies
+composer install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# JavaScript dependencies
+npm install
+```
 
-## Code of Conduct
+### 3. Environment Setup
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Kopieer .env.example naar .env
+cp .env.example .env
 
-## Security Vulnerabilities
+# Genereer application key
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4. Database Setup
 
-## License
+Het systeem is geconfigureerd met SQLite als default database.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+# Creëer SQLite database
+touch database/database.sqlite
+
+# Run migrations
+php artisan migrate
+
+# (Optioneel) Seed database met testdata
+php artisan db:seed
+```
+
+Dit creëert:
+- 1 HR gebruiker: `linda / Welkom123!`
+- 10 test medewerkers: `jan1, pieter2, kees3, etc. / Welkom123!`
+- Historische overuren data (laatste 3 maanden)
+- Berekende saldi voor alle medewerkers
+- Sample notificaties
+
+### 5. Build Assets
+
+```bash
+# Development (met hot reload)
+npm run dev
+
+# Production build
+npm run build
+```
+
+### 6. Start de Applicatie
+
+```bash
+# Start Laravel development server
+php artisan serve
+```
+
+Ga naar http://localhost:8000
+
+## 🔐 Test Accounts
+
+Na seeding zijn de volgende accounts beschikbaar:
+
+**HR Account:**
+- Username: `linda`
+- Password: `Welkom123!`
+
+**Medewerker Accounts:**
+- Usernames: `jan1`, `pieter2`, `kees3`, `hendrik4`, `willem5`, `dirk6`, `gerrit7`, `cor8`, `henk9`, `piet10`
+- Password (voor allemaal): `Welkom123!`
+
+## 🧪 Testing
+
+Het project gebruikt PEST voor testing:
+
+```bash
+# Run alle tests
+php artisan test
+
+# Of met Pest direct
+./vendor/bin/pest
+
+# Alleen feature tests
+./vendor/bin/pest --testsuite=Feature
+
+# Alleen unit tests
+./vendor/bin/pest --testsuite=Unit
+
+# Met coverage
+./vendor/bin/pest --coverage
+```
+
+## 📁 Project Structuur
+
+```
+/Overuren
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/       # Laravel controllers
+│   │   │   ├── Auth/          # Authentication controllers
+│   │   │   ├── DashboardController.php
+│   │   │   ├── OverurenController.php
+│   │   │   ├── SaldoController.php
+│   │   │   ├── HRController.php
+│   │   │   └── NotificatieController.php
+│   │   └── Middleware/        # Custom middleware
+│   ├── Models/                # Eloquent models
+│   │   ├── User.php
+│   │   ├── Overuren.php
+│   │   ├── Saldo.php
+│   │   └── Notificatie.php
+│   └── Services/              # Business logic services
+│       └── SaldoService.php
+├── database/
+│   ├── factories/             # Model factories voor testing
+│   ├── migrations/            # Database migrations
+│   └── seeders/               # Database seeders
+├── resources/
+│   ├── js/
+│   │   ├── Components/        # Herbruikbare React componenten
+│   │   │   ├── Button.jsx
+│   │   │   ├── Card.jsx
+│   │   │   ├── Input.jsx
+│   │   │   ├── Layout.jsx
+│   │   │   └── Toast.jsx
+│   │   └── Pages/             # Inertia.js pagina componenten
+│   │       ├── Auth/
+│   │       ├── Dashboard/
+│   │       ├── Overuren/
+│   │       ├── Saldo/
+│   │       ├── HR/
+│   │       └── Notificaties/
+│   └── css/
+│       └── app.css            # Tailwind CSS
+├── routes/
+│   └── web.php                # Web routes
+└── tests/
+    ├── Feature/               # Feature tests
+    └── Unit/                  # Unit tests
+```
+
+## 🎨 Design System
+
+Het systeem gebruikt een pastel kleurenschema:
+
+- **Mint** (#B8E6D1) - Primary actions
+- **Peach** (#FFD3BA) - Secondary/logout
+- **Lavender** (#D4A5FF) - Focus states
+- **Success** (#BAFFC9) - Success states
+- **Error** (#FFB3BA) - Error states
+- **Background** (#F0F4F8) - Page background
+- **Card** (#FFFFFF) - Card backgrounds
+- **Text Primary** (#2D3748) - Primary text
+- **Text Secondary** (#718096) - Secondary text
+
+## 📝 Database Schema
+
+### Users
+- **Role**: HR of MEDEWERKER
+- Bevat voornaam, achternaam, email, afdeling, startdatum
+
+### Overuren
+- Gekoppeld aan gebruiker
+- **Status**: CONCEPT, INGEDIEND, GOEDGEKEURD, AFGEKEURD
+- Bevat datum, minuten (veelvoud van 10, max ±720), reden
+- Week nummer en jaar worden automatisch berekend
+
+### Saldo
+- Per gebruiker per jaar
+- Overgedragen saldo, gebruikt saldo, huidig saldo
+- Wordt automatisch herberekend bij goedkeuring overuren
+
+### Notificaties
+- **Types**: GOEDKEURING, AFKEURING, SALDO_WIJZIGING, HERINNERING, INFO
+- Gelezen/ongelezen status
+
+## 🔒 Beveiliging
+
+- Session-based authenticatie (compatibel met Inertia.js)
+- CSRF protectie
+- Password hashing met bcrypt
+- HR middleware voor autorisatie van HR-only routes
+- Input validatie op alle formulieren
+- XSS protectie via React's automatic escaping
+
+## 🚧 Development
+
+### Code Style
+
+Het project volgt Laravel en React best practices:
+- PSR-12 voor PHP code
+- ES6+ JavaScript
+- Functional components voor React
+- PEST syntax voor tests
+
+### Git Workflow
+
+```bash
+# Nieuwe feature branch
+git checkout -b feature/naam
+
+# Commits
+git commit -m "Beschrijving"
+
+# Push naar GitHub
+git push origin feature/naam
+```
+
+## 📦 Production Deployment
+
+Voor production deployment:
+
+1. **Environment**:
+   ```bash
+   cp .env.example .env
+   # Pas .env aan voor production (APP_ENV=production, database credentials, etc.)
+   ```
+
+2. **Dependencies**:
+   ```bash
+   composer install --optimize-autoloader --no-dev
+   npm ci
+   ```
+
+3. **Build**:
+   ```bash
+   npm run build
+   ```
+
+4. **Cache**:
+   ```bash
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
+
+5. **Migrations**:
+   ```bash
+   php artisan migrate --force
+   ```
+
+## 🐛 Troubleshooting
+
+### Witte pagina / Geen styling
+
+Check of Vite draait:
+```bash
+npm run dev
+```
+
+### Database errors
+
+Check of de database bestaat:
+```bash
+php artisan migrate:fresh --seed
+```
+
+### Permission errors
+
+Check file permissions:
+```bash
+chmod -R 775 storage bootstrap/cache
+```
+
+## 📄 License
+
+Dit project is ontwikkeld als intern systeem voor overuren registratie.
+
+## 👥 Credits
+
+Ontwikkeld met Laravel 12, Inertia.js en React.

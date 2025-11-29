@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OverurenController;
 use App\Http\Controllers\SaldoController;
 use App\Http\Controllers\HRController;
+use App\Http\Controllers\NotificatieController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -39,8 +40,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/saldo', [SaldoController::class, 'index'])->name('saldo.index');
     Route::get('/api/saldo/current', [SaldoController::class, 'current'])->name('saldo.current');
 
+    // Notificaties routes
+    Route::prefix('notificaties')->name('notificaties.')->group(function () {
+        Route::get('/', [NotificatieController::class, 'index'])->name('index');
+        Route::post('/{notificatie}/gelezen', [NotificatieController::class, 'markAsRead'])->name('mark-read');
+        Route::post('/alles-gelezen', [NotificatieController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::delete('/{notificatie}', [NotificatieController::class, 'destroy'])->name('destroy');
+        Route::get('/ongelezen-count', [NotificatieController::class, 'unreadCount'])->name('unread-count');
+    });
+
     // HR routes (alleen voor HR gebruikers)
-    Route::prefix('hr')->name('hr.')->group(function () {
+    Route::prefix('hr')->name('hr.')->middleware('hr')->group(function () {
         Route::get('/dashboard', [HRController::class, 'dashboard'])->name('dashboard');
         Route::get('/medewerkers', [HRController::class, 'medewerkers'])->name('medewerkers');
         Route::get('/medewerkers/{user}', [HRController::class, 'medewerkerDetail'])->name('medewerker.detail');
