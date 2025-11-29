@@ -93,21 +93,19 @@ class HRController extends Controller
 
         $medewerkers = $query->orderBy('achternaam')
             ->orderBy('voornaam')
-            ->get()
-            ->map(fn ($m) => [
+            ->paginate(20)
+            ->through(fn ($m) => [
                 'id' => $m->id,
                 'username' => $m->username,
                 'email' => $m->email,
                 'voornaam' => $m->voornaam,
                 'achternaam' => $m->achternaam,
-                'naam' => $m->full_name,
+                'full_name' => $m->full_name,
                 'afdeling' => $m->afdeling,
                 'startdatum' => $m->startdatum?->format('Y-m-d'),
                 'is_active' => $m->is_active,
-                'saldo' => $m->saldo->first() ? [
-                    'minuten' => $m->saldo->first()->huidig_saldo,
-                    'formatted' => $m->saldo->first()->formatted_saldo,
-                ] : null,
+                'huidig_saldo' => $m->saldo->first()?->huidig_saldo ?? 0,
+                'formatted_saldo' => $m->saldo->first()?->formatted_saldo ?? '0u 0m',
             ]);
 
         return Inertia::render('HR/Medewerkers', [

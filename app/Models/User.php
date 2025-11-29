@@ -62,6 +62,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get if user is HR (accessor for frontend)
+     */
+    public function getIsHrAttribute(): bool
+    {
+        return $this->role === 'HR';
+    }
+
+    /**
      * Check if user is HR
      */
     public function isHR(): bool

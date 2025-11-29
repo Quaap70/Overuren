@@ -55,13 +55,7 @@ class Saldo extends Model
         $minuten = $absMinuten % 60;
         $prefix = $this->huidig_saldo < 0 ? '-' : '';
 
-        if ($uren === 0) {
-            return "{$prefix}{$minuten}m";
-        } elseif ($minuten === 0) {
-            return "{$prefix}{$uren}u";
-        } else {
-            return "{$prefix}{$uren}u {$minuten}m";
-        }
+        return "{$prefix}{$uren}u {$minuten}m";
     }
 
     /**

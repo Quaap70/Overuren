@@ -68,15 +68,9 @@ class Overuren extends Model
         $absMinuten = abs($this->minuten);
         $uren = floor($absMinuten / 60);
         $minuten = $absMinuten % 60;
-        $prefix = $this->minuten < 0 ? '-' : '+';
+        $prefix = $this->minuten < 0 ? '-' : '';
 
-        if ($uren === 0) {
-            return "{$prefix}{$minuten}m";
-        } elseif ($minuten === 0) {
-            return "{$prefix}{$uren}u";
-        } else {
-            return "{$prefix}{$uren}u {$minuten}m";
-        }
+        return "{$prefix}{$uren}u {$minuten}m";
     }
 
     /**
