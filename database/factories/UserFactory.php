@@ -24,21 +24,36 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'username' => fake()->userName(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'voornaam' => fake()->firstName(),
+            'achternaam' => fake()->lastName(),
+            'role' => 'MEDEWERKER',
+            'afdeling' => fake()->randomElement(['Productie', 'Montage', 'Onderhoud', 'Logistiek']),
+            'startdatum' => fake()->dateTimeBetween('-5 years', 'now'),
+            'is_active' => true,
             'remember_token' => Str::random(10),
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Indicate that the user is HR.
      */
-    public function unverified(): static
+    public function hr(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            'role' => 'HR',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is inactive.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
         ]);
     }
 }

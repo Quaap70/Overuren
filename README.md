@@ -25,7 +25,7 @@ Modern overuren registratie systeem gebouwd met Laravel 12, Inertia.js en React.
 - **Testing**: PEST v3.8.4
 - **Build Tool**: Vite v7.2.4
 - **Styling**: Tailwind CSS v4
-- **Database**: SQLite (configureerbaar naar MySQL/PostgreSQL)
+- **Database**: MySQL (ook SQLite/PostgreSQL ondersteund)
 - **PHP**: 8.4.15
 
 ## 📋 Requirements
@@ -66,9 +66,35 @@ php artisan key:generate
 
 ### 4. Database Setup
 
-Het systeem is geconfigureerd met SQLite als default database.
+Het systeem ondersteunt SQLite, MySQL en PostgreSQL. De `.env.example` is geconfigureerd voor MySQL.
+
+#### Optie A: MySQL (Aanbevolen voor development)
 
 ```bash
+# Creëer database
+mysql -u root -p -e "CREATE DATABASE overuren_test;"
+
+# Update .env met juiste credentials
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=overuren_test
+DB_USERNAME=root
+DB_PASSWORD=jouw_wachtwoord
+
+# Run migrations
+php artisan migrate
+
+# (Optioneel) Seed database met testdata
+php artisan db:seed
+```
+
+#### Optie B: SQLite (Eenvoudig, maar minder features)
+
+```bash
+# Update .env
+DB_CONNECTION=sqlite
+
 # Creëer SQLite database
 touch database/database.sqlite
 
@@ -76,6 +102,25 @@ touch database/database.sqlite
 php artisan migrate
 
 # (Optioneel) Seed database met testdata
+php artisan db:seed
+```
+
+#### Optie C: PostgreSQL
+
+```bash
+# Creëer database
+psql -U postgres -c "CREATE DATABASE overuren_test;"
+
+# Update .env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=overuren_test
+DB_USERNAME=postgres
+DB_PASSWORD=jouw_wachtwoord
+
+# Run migrations en seed
+php artisan migrate
 php artisan db:seed
 ```
 
