@@ -1,68 +1,151 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import Layout from '../../Components/Layout';
+import Card from '../../Components/Card';
+import Button from '../../Components/Button';
 
-export default function HRDashboard() {
-    const { auth } = usePage().props;
-
+export default function HRDashboard({ statistieken, recente_indieningen }) {
     return (
-        <>
+        <Layout>
             <Head title="HR Dashboard" />
-            <div className="min-h-screen" style={{ backgroundColor: '#F0F4F8' }}>
-                <nav className="shadow-md p-4 mb-6" style={{ backgroundColor: '#FFFFFF' }}>
-                    <div className="container mx-auto flex justify-between items-center">
-                        <h1 className="text-2xl font-bold" style={{ color: '#2D3748' }}>
-                            🕐 Overuren Systeem - HR Dashboard
-                        </h1>
-                        <div className="flex items-center gap-4">
-                            <span style={{ color: '#718096' }}>
-                                {auth.user.full_name} ({auth.user.role})
-                            </span>
-                            <Link
-                                href="/logout"
-                                method="post"
-                                as="button"
-                                className="px-4 py-2 rounded-lg"
-                                style={{ backgroundColor: '#FFD3BA', color: '#2D3748' }}
-                            >
-                                Uitloggen
-                            </Link>
-                        </div>
-                    </div>
-                </nav>
 
-                <div className="container mx-auto px-4">
-                    <div className="bg-white rounded-xl shadow-lg p-8">
-                        <h2 className="text-3xl font-bold mb-4" style={{ color: '#2D3748' }}>
-                            Welkom, {auth.user.voornaam}! 👋
-                        </h2>
-                        <p className="mb-6" style={{ color: '#718096' }}>
-                            Dit is het HR dashboard waar je straks overuren kunt goedkeuren en beheren.
-                        </p>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="p-6 rounded-lg" style={{ backgroundColor: '#B8E6D1' }}>
-                                <h3 className="text-xl font-semibold mb-2" style={{ color: '#2D3748' }}>
-                                    Openstaande Aanvragen
-                                </h3>
-                                <p style={{ color: '#718096' }}>Binnenkort beschikbaar</p>
-                            </div>
-
-                            <div className="p-6 rounded-lg" style={{ backgroundColor: '#FFD3BA' }}>
-                                <h3 className="text-xl font-semibold mb-2" style={{ color: '#2D3748' }}>
-                                    Medewerkers
-                                </h3>
-                                <p style={{ color: '#718096' }}>Binnenkort beschikbaar</p>
-                            </div>
-
-                            <div className="p-6 rounded-lg" style={{ backgroundColor: '#D4A5FF' }}>
-                                <h3 className="text-xl font-semibold mb-2" style={{ color: '#2D3748' }}>
-                                    Rapportages
-                                </h3>
-                                <p style={{ color: '#718096' }}>Binnenkort beschikbaar</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold" style={{ color: '#2D3748' }}>
+                    HR Dashboard
+                </h1>
+                <p style={{ color: '#718096' }}>Overzicht van alle overuren en medewerkers</p>
             </div>
-        </>
+
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <Card hover className="text-center">
+                    <div className="text-3xl mb-2">⏳</div>
+                    <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
+                        Te Beoordelen
+                    </h3>
+                    <p className="text-3xl font-bold mt-2" style={{ color: '#D4A5FF' }}>
+                        {statistieken?.te_beoordelen || 0}
+                    </p>
+                </Card>
+
+                <Card hover className="text-center">
+                    <div className="text-3xl mb-2">📅</div>
+                    <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
+                        Deze Week
+                    </h3>
+                    <p className="text-3xl font-bold mt-2" style={{ color: '#B8E6D1' }}>
+                        {statistieken?.deze_week || 0}
+                    </p>
+                </Card>
+
+                <Card hover className="text-center">
+                    <div className="text-3xl mb-2">👥</div>
+                    <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
+                        Medewerkers
+                    </h3>
+                    <p className="text-3xl font-bold mt-2" style={{ color: '#FFD3BA' }}>
+                        {statistieken?.medewerkers || 0}
+                    </p>
+                </Card>
+
+                <Card hover className="text-center">
+                    <div className="text-3xl mb-2">⏱️</div>
+                    <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
+                        Totaal Uren
+                    </h3>
+                    <p className="text-3xl font-bold mt-2" style={{ color: '#D4A5FF' }}>
+                        {statistieken?.totaal_uren || 0}u
+                    </p>
+                </Card>
+            </div>
+
+            {/* Recent Submissions */}
+            <Card>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold" style={{ color: '#2D3748' }}>
+                        Recente Indieningen
+                    </h2>
+                    <Link href="/hr/te-beoordelen">
+                        <Button variant="primary">Alles Bekijken</Button>
+                    </Link>
+                </div>
+
+                {recente_indieningen && recente_indieningen.length > 0 ? (
+                    <div className="space-y-3">
+                        {recente_indieningen.map((indiening) => (
+                            <div
+                                key={indiening.id}
+                                className="flex justify-between items-center p-4 rounded-lg transition-colors hover:bg-opacity-70"
+                                style={{ backgroundColor: '#F0F4F8' }}
+                            >
+                                <div>
+                                    <p className="font-semibold" style={{ color: '#2D3748' }}>
+                                        {indiening.medewerker}
+                                    </p>
+                                    <p className="text-sm" style={{ color: '#718096' }}>
+                                        {new Date(indiening.datum).toLocaleDateString('nl-NL')} -{' '}
+                                        {indiening.formatted}
+                                    </p>
+                                    {indiening.reden && (
+                                        <p className="text-sm italic mt-1" style={{ color: '#718096' }}>
+                                            "{indiening.reden}"
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="success"
+                                        className="px-4 py-2"
+                                        onClick={() => {
+                                            router.post(`/hr/uren/${indiening.id}/goedkeuren`, {}, {
+                                                preserveScroll: true,
+                                            });
+                                        }}
+                                    >
+                                        ✅
+                                    </Button>
+                                    <Button
+                                        variant="danger"
+                                        className="px-4 py-2"
+                                        onClick={() => {
+                                            const reden = prompt('Reden voor afkeuring:');
+                                            if (reden) {
+                                                router.post(`/hr/uren/${indiening.id}/afkeuren`, {
+                                                    reden
+                                                }, {
+                                                    preserveScroll: true,
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        ❌
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-center py-8" style={{ color: '#718096' }}>
+                        Geen nieuwe indieningen
+                    </p>
+                )}
+            </Card>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <Link href="/hr/medewerkers" className="block">
+                    <Button variant="primary" className="w-full py-4">
+                        👥 Medewerkers Beheer
+                    </Button>
+                </Link>
+                <Link href="/hr/te-beoordelen" className="block">
+                    <Button variant="secondary" className="w-full py-4">
+                        📊 Te Beoordelen
+                    </Button>
+                </Link>
+                <Button variant="secondary" className="w-full py-4">
+                    📥 Export naar Excel
+                </Button>
+            </div>
+        </Layout>
     );
 }
