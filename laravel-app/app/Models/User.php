@@ -18,9 +18,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
+        'role',
+        'voornaam',
+        'achternaam',
+        'afdeling',
+        'startdatum',
+        'is_active',
     ];
 
     /**
@@ -41,8 +47,65 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'startdatum' => 'date',
+            'is_active' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get user's full name
+     */
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->voornaam} {$this->achternaam}";
+    }
+
+    /**
+     * Check if user is HR
+     */
+    public function isHR(): bool
+    {
+        return $this->role === 'HR';
+    }
+
+    /**
+     * Check if user is employee
+     */
+    public function isMedewerker(): bool
+    {
+        return $this->role === 'MEDEWERKER';
+    }
+
+    /**
+     * Get user's overtime entries
+     */
+    public function overuren()
+    {
+        return $this->hasMany(Overuren::class);
+    }
+
+    /**
+     * Get user's balance records
+     */
+    public function saldo()
+    {
+        return $this->hasMany(Saldo::class);
+    }
+
+    /**
+     * Get user's notifications
+     */
+    public function notificaties()
+    {
+        return $this->hasMany(Notificatie::class);
+    }
+
+    /**
+     * Get overtime entries approved by this user
+     */
+    public function goedgekeurdeOveruren()
+    {
+        return $this->hasMany(Overuren::class, 'goedgekeurd_door');
     }
 }
