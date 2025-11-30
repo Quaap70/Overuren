@@ -4,7 +4,7 @@ import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import InputModal from '../../Components/InputModal';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, PlusIcon, PencilIcon } from '@heroicons/react/24/outline';
 
 export default function Medewerkers({ medewerkers, filters }) {
     const [searchTerm, setSearchTerm] = useState(filters?.zoek || '');
@@ -44,13 +44,21 @@ export default function Medewerkers({ medewerkers, filters }) {
         <Layout>
             <Head title="Medewerkers" />
 
-            <div className="mb-8">
-                <h1 className="text-2xl font-semibold mb-1" style={{ color: '#1E293B' }}>
-                    Medewerkers
-                </h1>
-                <p className="text-sm" style={{ color: '#64748B' }}>
-                    Beheer medewerkers en hun overuren saldo
-                </p>
+            <div className="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 className="text-2xl font-semibold mb-1" style={{ color: '#1E293B' }}>
+                        Medewerkers
+                    </h1>
+                    <p className="text-sm" style={{ color: '#64748B' }}>
+                        Beheer medewerkers en hun overuren saldo
+                    </p>
+                </div>
+                <Link href="/hr/gebruikers/nieuw">
+                    <Button variant="primary">
+                        <PlusIcon className="w-5 h-5 inline mr-2" />
+                        Nieuwe Gebruiker
+                    </Button>
+                </Link>
             </div>
 
             {/* Filters */}
@@ -157,6 +165,12 @@ export default function Medewerkers({ medewerkers, filters }) {
                                         <Link href={`/hr/medewerkers/${medewerker.id}`}>
                                             <Button variant="primary" className="px-4 py-2 text-sm">
                                                 Details
+                                            </Button>
+                                        </Link>
+                                        <Link href={`/hr/gebruikers/${medewerker.id}/bewerken`}>
+                                            <Button variant="secondary" className="px-4 py-2 text-sm">
+                                                <PencilIcon className="w-4 h-4 inline mr-1" />
+                                                Bewerken
                                             </Button>
                                         </Link>
                                         <Link href={`/hr/te-beoordelen?medewerker=${medewerker.id}`}>

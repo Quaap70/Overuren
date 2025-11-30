@@ -58,5 +58,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/uren/{overuren}/goedkeuren', [HRController::class, 'goedkeuren'])->name('goedkeuren');
         Route::post('/uren/{overuren}/afkeuren', [HRController::class, 'afkeuren'])->name('afkeuren');
         Route::post('/medewerkers/{user}/saldo', [HRController::class, 'saldoAanpassen'])->name('saldo.aanpassen');
+
+        // Gebruikersbeheer routes
+        Route::get('/gebruikers/nieuw', [HRController::class, 'gebruikerNieuw'])->name('gebruikers.nieuw');
+        Route::post('/gebruikers', [HRController::class, 'gebruikerStore'])->name('gebruikers.store');
+        Route::get('/gebruikers/{user}/bewerken', [HRController::class, 'gebruikerBewerken'])->name('gebruikers.bewerken');
+        Route::put('/gebruikers/{user}', [HRController::class, 'gebruikerUpdate'])->name('gebruikers.update');
+        Route::post('/gebruikers/{user}/deactiveren', [HRController::class, 'gebruikerDeactiveren'])->name('gebruikers.deactiveren');
+        Route::post('/gebruikers/{user}/activeren', [HRController::class, 'gebruikerActiveren'])->name('gebruikers.activeren');
+        Route::post('/gebruikers/{user}/wachtwoord-reset', [HRController::class, 'gebruikerWachtwoordReset'])->name('gebruikers.wachtwoord-reset');
     });
 });

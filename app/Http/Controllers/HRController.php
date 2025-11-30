@@ -310,4 +310,121 @@ class HRController extends Controller
             'recente_overuren' => $recenteUren,
         ]);
     }
+
+    /**
+     * Toon formulier voor nieuwe gebruiker
+     */
+    public function gebruikerNieuw()
+    {
+        return Inertia::render('HR/Gebruikers/Nieuw', [
+            'afdelingen' => ['Productie', 'Montage', 'Onderhoud', 'Logistiek', 'Magazijn', 'HR'],
+        ]);
+    }
+
+    /**
+     * Maak nieuwe gebruiker aan
+     */
+    public function gebruikerStore(Request $request)
+    {
+        $validated = $request->validate([
+            'username' => 'required|string|unique:users,username|max:255',
+            'email' => 'required|email|unique:users,email|max:255',
+            'password' => 'required|string|min:8|confirmed',
+            'voornaam' => 'required|string|max:255',
+            'achternaam' => 'required|string|max:255',
+            'role' => 'required|in:MEDEWERKER,HR',
+            'afdeling' => 'required|string|max:255',
+            'startdatum' => 'required|date',
+        ]);
+
+        User::create([
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'voornaam' => $validated['voornaam'],
+            'achternaam' => $validated['achternaam'],
+            'role' => $validated['role'],
+            'afdeling' => $validated['afdeling'],
+            'startdatum' => $validated['startdatum'],
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('hr.medewerkers')->with('success', 'Gebruiker succesvol aangemaakt');
+    }
+
+    /**
+     * Toon formulier voor gebruiker bewerken
+     */
+    public function gebruikerBewerken(User $user)
+    {
+        return Inertia::render('HR/Gebruikers/Bewerken', [
+            'gebruiker' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'voornaam' => $user->voornaam,
+                'achternaam' => $user->achternaam,
+                'role' => $user->role,
+                'afdeling' => $user->afdeling,
+                'startdatum' => $user->startdatum?->format('Y-m-d'),
+                'is_active' => $user->is_active,
+            ],
+            'afdelingen' => ['Productie', 'Montage', 'Onderhoud', 'Logistiek', 'Magazijn', 'HR'],
+        ]);
+    }
+
+    /**
+     * Wijzig gebruiker gegevens
+     */
+    public function gebruikerUpdate(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'voornaam' => 'required|string|max:255',
+            'achternaam' => 'required|string|max:255',
+            'role' => 'required|in:MEDEWERKER,HR',
+            'afdeling' => 'required|string|max:255',
+            'startdatum' => 'required|date',
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('hr.medewerkers')->with('success', 'Gebruiker succesvol bijgewerkt');
+    }
+
+    /**
+     * Deactiveer gebruiker
+     */
+    public function gebruikerDeactiveren(User $user)
+    {
+        $user->update(['is_active' => false]);
+
+        return back()->with('success', 'Gebruiker gedeactiveerd');
+    }
+
+    /**
+     * Activeer gebruiker
+     */
+    public function gebruikerActiveren(User $user)
+    {
+        $user->update(['is_active' => true]);
+
+        return back()->with('success', 'Gebruiker geactiveerd');
+    }
+
+    /**
+     * Reset gebruiker wachtwoord
+     */
+    public function gebruikerWachtwoordReset(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user->update([
+            'password' => bcrypt($validated['new_password']),
+        ]);
+
+        return back()->with('success', 'Wachtwoord succesvol gereset');
+    }
 }
