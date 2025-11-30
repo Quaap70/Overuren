@@ -239,6 +239,6 @@ test('hr dashboard shows correct statistics', function () {
     $response->assertInertia(fn ($page) =>
         $page->component('HR/Dashboard')
              ->where('statistieken.te_beoordelen', 5)
-             ->where('statistieken.medewerkers', 11) // 10 + 1 created in beforeEach
+             ->where('statistieken.medewerkers', 19) // 5 (eerste Overuren) + 3 (tweede Overuren) + 10 (User::factory) + 1 (beforeEach)
     );
 });
