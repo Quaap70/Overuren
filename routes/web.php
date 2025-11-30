@@ -7,6 +7,7 @@ use App\Http\Controllers\OverurenController;
 use App\Http\Controllers\SaldoController;
 use App\Http\Controllers\HRController;
 use App\Http\Controllers\NotificatieController;
+use App\Http\Controllers\ProfielController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,6 +24,14 @@ Route::middleware('guest')->group(function () {
 // Authenticated routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', LogoutController::class)->name('logout');
+
+    // Wachtwoord wijzigen (forced)
+    Route::get('/wachtwoord-wijzigen', [ProfielController::class, 'wachtwoordWijzigenPagina'])->name('wachtwoord-wijzigen');
+    Route::post('/wachtwoord-wijzigen', [ProfielController::class, 'wachtwoordWijzigen']);
+
+    // Profiel
+    Route::get('/profiel', [ProfielController::class, 'index'])->name('profiel');
+    Route::post('/profiel/wachtwoord', [ProfielController::class, 'updateWachtwoord'])->name('profiel.wachtwoord');
 
     // Employee dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

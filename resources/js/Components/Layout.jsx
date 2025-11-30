@@ -4,6 +4,7 @@ import {
     ClockIcon,
     BellIcon,
     ArrowRightOnRectangleIcon,
+    UserCircleIcon,
 } from '@heroicons/react/24/outline';
 
 export default function Layout({ children }) {
@@ -104,6 +105,13 @@ export default function Layout({ children }) {
                                         {auth.user.role}
                                     </p>
                                 </div>
+                                <Link
+                                    href="/profiel"
+                                    className="p-2 rounded-lg transition-colors hover:bg-slate-100"
+                                    title="Mijn Profiel"
+                                >
+                                    <UserCircleIcon className="h-5 w-5" style={{ color: '#64748B' }} />
+                                </Link>
                                 <Link
                                     href="/logout"
                                     method="post"

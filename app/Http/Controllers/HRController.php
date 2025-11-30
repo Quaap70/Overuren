@@ -347,9 +347,10 @@ class HRController extends Controller
             'afdeling' => $validated['afdeling'],
             'startdatum' => $validated['startdatum'],
             'is_active' => true,
+            'must_change_password' => true,
         ]);
 
-        return redirect()->route('hr.medewerkers')->with('success', 'Gebruiker succesvol aangemaakt');
+        return redirect()->route('hr.medewerkers')->with('success', 'Gebruiker succesvol aangemaakt. De gebruiker moet het wachtwoord wijzigen bij eerste login.');
     }
 
     /**
@@ -423,8 +424,9 @@ class HRController extends Controller
 
         $user->update([
             'password' => bcrypt($validated['new_password']),
+            'must_change_password' => true,
         ]);
 
-        return back()->with('success', 'Wachtwoord succesvol gereset');
+        return back()->with('success', 'Wachtwoord succesvol gereset. De gebruiker moet het wachtwoord wijzigen bij volgende login.');
     }
 }

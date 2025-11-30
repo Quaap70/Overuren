@@ -27,6 +27,7 @@ class User extends Authenticatable
         'afdeling',
         'startdatum',
         'is_active',
+        'must_change_password',
     ];
 
     /**
@@ -49,6 +50,7 @@ class User extends Authenticatable
         return [
             'startdatum' => 'date',
             'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
             'password' => 'hashed',
         ];
     }
