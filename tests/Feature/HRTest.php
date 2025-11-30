@@ -194,7 +194,7 @@ test('hr can view employee detail page', function () {
         $page->component('HR/MedewerkerDetail')
              ->has('medewerker')
              ->has('recente_overuren', 5)
-             ->has('saldo')
+             ->has('medewerker.saldo')
     );
 });
 

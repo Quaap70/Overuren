@@ -24,6 +24,17 @@ class Saldo extends Model
     ];
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'overgedragen_saldo' => 0,
+        'gebruikt_saldo' => 0,
+        'huidig_saldo' => 0,
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>

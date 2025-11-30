@@ -55,7 +55,7 @@ class HRController extends Controller
                 'minuten' => $o->minuten,
                 'formatted' => $o->formatted_time,
                 'reden' => $o->reden,
-                'ingediend_op' => $o->ingediend_op->format('Y-m-d H:i'),
+                'ingediend_op' => $o->ingediend_op?->format('Y-m-d H:i'),
             ]);
 
         return Inertia::render('HR/Dashboard', [
