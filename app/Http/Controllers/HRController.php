@@ -87,8 +87,13 @@ class HRController extends Controller
             $query->where(function ($q) use ($zoek) {
                 $q->where('voornaam', 'like', "%{$zoek}%")
                     ->orWhere('achternaam', 'like', "%{$zoek}%")
+                    ->orWhere('username', 'like', "%{$zoek}%")
                     ->orWhere('email', 'like', "%{$zoek}%");
             });
+        }
+
+        if ($request->filled('afdeling')) {
+            $query->where('afdeling', $request->afdeling);
         }
 
         $medewerkers = $query->orderBy('achternaam')
@@ -110,6 +115,11 @@ class HRController extends Controller
 
         return Inertia::render('HR/Medewerkers', [
             'medewerkers' => $medewerkers,
+            'filters' => [
+                'zoek' => $request->zoek,
+                'afdeling' => $request->afdeling,
+                'actief' => $request->actief,
+            ],
         ]);
     }
 

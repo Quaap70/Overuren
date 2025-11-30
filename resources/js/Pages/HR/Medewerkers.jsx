@@ -6,7 +6,7 @@ import Button from '../../Components/Button';
 import Input from '../../Components/Input';
 
 export default function Medewerkers({ medewerkers, filters }) {
-    const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+    const [searchTerm, setSearchTerm] = useState(filters?.zoek || '');
     const [selectedAfdeling, setSelectedAfdeling] = useState(filters?.afdeling || '');
 
     const formatMinutesToHoursMinutes = (minuten) => {
@@ -18,7 +18,7 @@ export default function Medewerkers({ medewerkers, filters }) {
 
     const handleSearch = () => {
         router.get('/hr/medewerkers', {
-            search: searchTerm,
+            zoek: searchTerm,
             afdeling: selectedAfdeling,
         }, {
             preserveState: true,

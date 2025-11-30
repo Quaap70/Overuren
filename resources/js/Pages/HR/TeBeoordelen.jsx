@@ -67,8 +67,11 @@ export default function TeBeoordelen({ indieningen, filters }) {
                                         {/* Employee Info */}
                                         <div className="flex items-center gap-3 mb-3">
                                             <h3 className="text-lg font-bold" style={{ color: '#2D3748' }}>
-                                                {indiening.medewerker}
+                                                {indiening.medewerker.naam}
                                             </h3>
+                                            <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: '#E2E8F0', color: '#718096' }}>
+                                                {indiening.medewerker.afdeling}
+                                            </span>
                                             <span
                                                 className="px-3 py-1 rounded-full text-xs font-semibold"
                                                 style={{ backgroundColor: '#D4A5FF', color: '#2D3748' }}
