@@ -1,3 +1,5 @@
+import { theme, componentStyles } from '../config/theme';
+
 export default function Input({
     label,
     type = 'text',
@@ -6,49 +8,105 @@ export default function Input({
     placeholder,
     error,
     required = false,
+    disabled = false,
     className = '',
     rows = 4,
     ...props
 }) {
-    const baseClasses = `w-full px-4 py-2 border-2 rounded-lg focus:outline-none transition-colors ${
+    const baseClasses = `w-full focus:outline-none transition-all ${
         error ? 'animate-shake' : ''
     } ${className}`;
 
-    const baseStyles = {
-        borderColor: error ? '#FFB3BA' : '#E2E8F0',
-        backgroundColor: '#F7FAFC'
+    const getInputStyle = (isFocused = false) => {
+        const inputStyles = componentStyles.input;
+
+        if (disabled) {
+            return {
+                ...inputStyles.states.disabled,
+                borderRadius: theme.borderRadius.md,
+                fontSize: theme.typography.fontSize.sm,
+                padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
+                border: `2px solid ${inputStyles.states.disabled.borderColor}`,
+            };
+        }
+
+        if (error) {
+            return {
+                borderColor: inputStyles.states.error.borderColor,
+                backgroundColor: componentStyles.input.states.default.background,
+                borderRadius: theme.borderRadius.md,
+                fontSize: theme.typography.fontSize.sm,
+                padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
+                border: `2px solid ${inputStyles.states.error.borderColor}`,
+                boxShadow: isFocused ? inputStyles.states.error.ring : 'none',
+            };
+        }
+
+        if (isFocused) {
+            return {
+                borderColor: inputStyles.states.focus.borderColor,
+                backgroundColor: componentStyles.input.states.default.background,
+                borderRadius: theme.borderRadius.md,
+                fontSize: theme.typography.fontSize.sm,
+                padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
+                border: `2px solid ${inputStyles.states.focus.borderColor}`,
+                boxShadow: inputStyles.states.focus.ring,
+            };
+        }
+
+        return {
+            borderColor: inputStyles.states.default.borderColor,
+            backgroundColor: inputStyles.states.default.background,
+            borderRadius: theme.borderRadius.md,
+            fontSize: theme.typography.fontSize.sm,
+            padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
+            border: `2px solid ${inputStyles.states.default.borderColor}`,
+        };
+    };
+
+    const inputProps = {
+        value,
+        onChange,
+        placeholder,
+        disabled,
+        className: baseClasses,
+        style: getInputStyle(),
+        onFocus: (e) => {
+            Object.assign(e.currentTarget.style, getInputStyle(true));
+        },
+        onBlur: (e) => {
+            Object.assign(e.currentTarget.style, getInputStyle(false));
+        },
+        ...props,
     };
 
     return (
         <div className="mb-4">
             {label && (
-                <label className="block text-sm font-medium mb-2" style={{ color: '#2D3748' }}>
+                <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: theme.colors.neutral[700] }}
+                >
                     {label}
-                    {required && <span className="ml-1" style={{ color: '#FFB3BA' }}>*</span>}
+                    {required && <span className="ml-1" style={{ color: theme.colors.error[500] }}>*</span>}
                 </label>
             )}
             {type === 'textarea' ? (
                 <textarea
-                    value={value}
-                    onChange={onChange}
-                    placeholder={placeholder}
                     rows={rows}
-                    className={baseClasses}
-                    style={baseStyles}
-                    {...props}
+                    {...inputProps}
                 />
             ) : (
                 <input
                     type={type}
-                    value={value}
-                    onChange={onChange}
-                    placeholder={placeholder}
-                    className={baseClasses}
-                    style={baseStyles}
-                    {...props}
+                    {...inputProps}
                 />
             )}
-            {error && <p className="text-sm mt-1" style={{ color: '#FFB3BA' }}>{error}</p>}
+            {error && (
+                <p className="text-sm mt-1" style={{ color: theme.colors.error[600] }}>
+                    {error}
+                </p>
+            )}
         </div>
     );
 }

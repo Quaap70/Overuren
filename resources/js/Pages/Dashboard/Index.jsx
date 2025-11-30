@@ -3,6 +3,7 @@ import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import { PlusIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
+import { theme } from '../../config/theme';
 
 export default function Dashboard({ saldo }) {
     const formatMinutesToHoursMinutes = (minuten) => {
@@ -16,25 +17,31 @@ export default function Dashboard({ saldo }) {
         <Layout>
             <Head title="Dashboard" />
 
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold" style={{ color: '#2D3748' }}>
-                    Overuren Dashboard
+            <div className="mb-8">
+                <h1 className="text-2xl font-bold mb-1" style={{ color: theme.colors.neutral[800] }}>
+                    Dashboard
                 </h1>
-                <p style={{ color: '#718096' }}>Welkom bij je persoonlijke overuren overzicht</p>
+                <p className="text-sm" style={{ color: theme.colors.neutral[500] }}>
+                    Welkom bij je persoonlijke overuren overzicht
+                </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Saldo Card */}
-                <Card className="col-span-full md:col-span-1 text-center" style={{
-                    background: 'linear-gradient(135deg, #D4A5FF 0%, #B8E6D1 100%)'
-                }}>
-                    <h2 className="text-lg font-semibold mb-2" style={{ color: '#2D3748' }}>
-                        Jouw Huidige Saldo
+                <Card className="col-span-full lg:col-span-1 text-center">
+                    <div
+                        className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                        style={{ backgroundColor: theme.colors.primary[100] }}
+                    >
+                        <ClockIcon className="w-8 h-8" style={{ color: theme.colors.primary[600] }} />
+                    </div>
+                    <h2 className="text-sm font-medium mb-2" style={{ color: theme.colors.neutral[600] }}>
+                        Huidig Saldo
                     </h2>
-                    <div className="text-5xl font-bold my-4" style={{ color: '#2D3748' }}>
+                    <div className="text-4xl font-bold my-3" style={{ color: theme.colors.neutral[800] }}>
                         {saldo?.formatted || '0u 0m'}
                     </div>
-                    <p className="text-sm" style={{ color: '#718096' }}>
+                    <p className="text-xs" style={{ color: theme.colors.neutral[500] }}>
                         Laatst bijgewerkt:{' '}
                         {saldo?.laatst_bijgewerkt
                             ? new Date(saldo.laatst_bijgewerkt).toLocaleDateString('nl-NL')
@@ -43,24 +50,27 @@ export default function Dashboard({ saldo }) {
                 </Card>
 
                 {/* Quick Actions */}
-                <Card className="col-span-full md:col-span-2">
-                    <h2 className="text-xl font-bold mb-4" style={{ color: '#2D3748' }}>
-                        Quick Actions
+                <Card className="col-span-full lg:col-span-2">
+                    <h2 className="text-lg font-bold mb-4" style={{ color: theme.colors.neutral[800] }}>
+                        Snelle Acties
                     </h2>
                     <div className="space-y-3">
                         <Link href="/overuren" className="block">
-                            <Button variant="primary" className="w-full">
-                                <PlusIcon className="w-5 h-5 inline mr-2" /> Nieuwe Uren Invoeren
+                            <Button variant="primary" size="md" className="w-full">
+                                <PlusIcon className="w-5 h-5 inline mr-2" />
+                                Nieuwe Uren Invoeren
                             </Button>
                         </Link>
                         <Link href="/overuren" className="block">
-                            <Button variant="secondary" className="w-full">
-                                <ChartBarIcon className="w-5 h-5 inline mr-2" /> Mijn Overzicht
+                            <Button variant="secondary" size="md" className="w-full">
+                                <ChartBarIcon className="w-5 h-5 inline mr-2" />
+                                Mijn Overzicht
                             </Button>
                         </Link>
                         <Link href="/saldo" className="block">
-                            <Button variant="secondary" className="w-full">
-                                <CurrencyDollarIcon className="w-5 h-5 inline mr-2" /> Bekijk Saldo Details
+                            <Button variant="secondary" size="md" className="w-full">
+                                <CurrencyDollarIcon className="w-5 h-5 inline mr-2" />
+                                Bekijk Saldo Details
                             </Button>
                         </Link>
                     </div>
@@ -68,53 +78,45 @@ export default function Dashboard({ saldo }) {
             </div>
 
             {/* Info Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                <Card hover>
-                    <div className="text-center">
-                        <CurrencyDollarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#D4A5FF' }} />
-                        <h3 className="font-semibold" style={{ color: '#2D3748' }}>
-                            Overgedragen Saldo
-                        </h3>
-                        <p className="text-2xl font-bold mt-2" style={{ color: '#D4A5FF' }}>
-                            {formatMinutesToHoursMinutes(saldo?.overgedragen || 0)}
-                        </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <Card>
+                    <div className="flex items-center gap-4">
+                        <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: theme.colors.primary[100] }}
+                        >
+                            <CurrencyDollarIcon className="w-6 h-6" style={{ color: theme.colors.primary[600] }} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
+                                Overgedragen Saldo
+                            </h3>
+                            <p className="text-xl font-bold" style={{ color: theme.colors.neutral[800] }}>
+                                {formatMinutesToHoursMinutes(saldo?.overgedragen || 0)}
+                            </p>
+                        </div>
                     </div>
                 </Card>
 
-                <Card hover>
-                    <div className="text-center">
-                        <ClockIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#B8E6D1' }} />
-                        <h3 className="font-semibold" style={{ color: '#2D3748' }}>
-                            Dit Jaar
-                        </h3>
-                        <p className="text-2xl font-bold mt-2" style={{ color: '#B8E6D1' }}>
-                            {saldo?.jaar || new Date().getFullYear()}
-                        </p>
-                    </div>
-                </Card>
-
-                <Card hover>
-                    <div className="text-center">
-                        <ArrowTrendingUpIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#BAFFC9' }} />
-                        <h3 className="font-semibold" style={{ color: '#2D3748' }}>
-                            Status
-                        </h3>
-                        <p className="text-2xl font-bold mt-2" style={{ color: '#BAFFC9' }}>
-                            Actief
-                        </p>
+                <Card>
+                    <div className="flex items-center gap-4">
+                        <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: theme.colors.info[100] }}
+                        >
+                            <ClockIcon className="w-6 h-6" style={{ color: theme.colors.info[600] }} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
+                                Dit Jaar
+                            </h3>
+                            <p className="text-xl font-bold" style={{ color: theme.colors.neutral[800] }}>
+                                {saldo?.jaar || new Date().getFullYear()}
+                            </p>
+                        </div>
                     </div>
                 </Card>
             </div>
-
-            {/* Recent Activity Placeholder */}
-            <Card className="mt-6">
-                <h2 className="text-xl font-bold mb-4" style={{ color: '#2D3748' }}>
-                    Recente Activiteit
-                </h2>
-                <p className="text-center py-8" style={{ color: '#718096' }}>
-                    Nog geen recente activiteit. Start met het invoeren van je overuren!
-                </p>
-            </Card>
         </Layout>
     );
 }

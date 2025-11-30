@@ -3,70 +3,109 @@ import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import { ClockIcon, CalendarIcon, UsersIcon, CheckCircleIcon, XCircleIcon, ChartBarIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { theme } from '../../config/theme';
 
 export default function HRDashboard({ statistieken, recente_indieningen }) {
     return (
         <Layout>
             <Head title="HR Dashboard" />
 
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold" style={{ color: '#2D3748' }}>
+            <div className="mb-8">
+                <h1 className="text-2xl font-bold mb-1" style={{ color: theme.colors.neutral[800] }}>
                     HR Dashboard
                 </h1>
-                <p style={{ color: '#718096' }}>Overzicht van alle overuren en medewerkers</p>
+                <p className="text-sm" style={{ color: theme.colors.neutral[500] }}>
+                    Overzicht van alle overuren en medewerkers
+                </p>
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <Card hover className="text-center">
-                    <ClockIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#D4A5FF' }} />
-                    <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
-                        Te Beoordelen
-                    </h3>
-                    <p className="text-3xl font-bold mt-2" style={{ color: '#D4A5FF' }}>
-                        {statistieken?.te_beoordelen || 0}
-                    </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <Card>
+                    <div className="flex items-center gap-4">
+                        <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: theme.colors.warning[100] }}
+                        >
+                            <ClockIcon className="w-6 h-6" style={{ color: theme.colors.warning[600] }} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
+                                Te Beoordelen
+                            </h3>
+                            <p className="text-2xl font-bold" style={{ color: theme.colors.neutral[800] }}>
+                                {statistieken?.te_beoordelen || 0}
+                            </p>
+                        </div>
+                    </div>
                 </Card>
 
-                <Card hover className="text-center">
-                    <CalendarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#B8E6D1' }} />
-                    <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
-                        Deze Week
-                    </h3>
-                    <p className="text-3xl font-bold mt-2" style={{ color: '#B8E6D1' }}>
-                        {statistieken?.deze_week || 0}
-                    </p>
+                <Card>
+                    <div className="flex items-center gap-4">
+                        <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: theme.colors.info[100] }}
+                        >
+                            <CalendarIcon className="w-6 h-6" style={{ color: theme.colors.info[600] }} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
+                                Deze Week
+                            </h3>
+                            <p className="text-2xl font-bold" style={{ color: theme.colors.neutral[800] }}>
+                                {statistieken?.deze_week || 0}
+                            </p>
+                        </div>
+                    </div>
                 </Card>
 
-                <Card hover className="text-center">
-                    <UsersIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#FFD3BA' }} />
-                    <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
-                        Medewerkers
-                    </h3>
-                    <p className="text-3xl font-bold mt-2" style={{ color: '#FFD3BA' }}>
-                        {statistieken?.medewerkers || 0}
-                    </p>
+                <Card>
+                    <div className="flex items-center gap-4">
+                        <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: theme.colors.primary[100] }}
+                        >
+                            <UsersIcon className="w-6 h-6" style={{ color: theme.colors.primary[600] }} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
+                                Medewerkers
+                            </h3>
+                            <p className="text-2xl font-bold" style={{ color: theme.colors.neutral[800] }}>
+                                {statistieken?.medewerkers || 0}
+                            </p>
+                        </div>
+                    </div>
                 </Card>
 
-                <Card hover className="text-center">
-                    <ClockIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#D4A5FF' }} />
-                    <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
-                        Totaal Uren
-                    </h3>
-                    <p className="text-3xl font-bold mt-2" style={{ color: '#D4A5FF' }}>
-                        {statistieken?.totaal_uren || 0}u
-                    </p>
+                <Card>
+                    <div className="flex items-center gap-4">
+                        <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: theme.colors.success[100] }}
+                        >
+                            <ClockIcon className="w-6 h-6" style={{ color: theme.colors.success[600] }} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
+                                Totaal Uren
+                            </h3>
+                            <p className="text-2xl font-bold" style={{ color: theme.colors.neutral[800] }}>
+                                {statistieken?.totaal_uren || 0}u
+                            </p>
+                        </div>
+                    </div>
                 </Card>
             </div>
 
             {/* Recent Submissions */}
             <Card>
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold" style={{ color: '#2D3748' }}>
+                    <h2 className="text-lg font-bold" style={{ color: theme.colors.neutral[800] }}>
                         Recente Indieningen
                     </h2>
                     <Link href="/hr/te-beoordelen">
-                        <Button variant="primary">Alles Bekijken</Button>
+                        <Button variant="primary" size="sm">Alles Bekijken</Button>
                     </Link>
                 </div>
 
@@ -75,38 +114,41 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                         {recente_indieningen.map((indiening) => (
                             <div
                                 key={indiening.id}
-                                className="flex justify-between items-center p-4 rounded-lg transition-colors hover:bg-opacity-70"
-                                style={{ backgroundColor: '#F0F4F8' }}
+                                className="flex justify-between items-center p-4 rounded-lg border transition-all"
+                                style={{
+                                    backgroundColor: theme.colors.neutral[50],
+                                    borderColor: theme.colors.neutral[200]
+                                }}
                             >
                                 <div>
-                                    <p className="font-semibold" style={{ color: '#2D3748' }}>
+                                    <p className="font-bold text-sm" style={{ color: theme.colors.neutral[800] }}>
                                         {indiening.medewerker}
                                     </p>
-                                    <p className="text-sm" style={{ color: '#718096' }}>
-                                        {new Date(indiening.datum).toLocaleDateString('nl-NL')} -{' '}
+                                    <p className="text-xs mt-1" style={{ color: theme.colors.neutral[600] }}>
+                                        {new Date(indiening.datum).toLocaleDateString('nl-NL')} •{' '}
                                         {indiening.formatted}
                                     </p>
                                     {indiening.reden && (
-                                        <p className="text-sm italic mt-1" style={{ color: '#718096' }}>
+                                        <p className="text-xs italic mt-1" style={{ color: theme.colors.neutral[500] }}>
                                             "{indiening.reden}"
                                         </p>
                                     )}
                                 </div>
                                 <div className="flex gap-2">
                                     <Button
-                                        variant="success"
-                                        className="px-4 py-2"
+                                        variant="primary"
+                                        size="sm"
                                         onClick={() => {
                                             router.post(`/hr/uren/${indiening.id}/goedkeuren`, {}, {
                                                 preserveScroll: true,
                                             });
                                         }}
                                     >
-                                        <CheckCircleIcon className="w-5 h-5" />
+                                        <CheckCircleIcon className="w-4 h-4" />
                                     </Button>
                                     <Button
                                         variant="danger"
-                                        className="px-4 py-2"
+                                        size="sm"
                                         onClick={() => {
                                             const reden = prompt('Reden voor afkeuring:');
                                             if (reden) {
@@ -118,34 +160,33 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                                             }
                                         }}
                                     >
-                                        <XCircleIcon className="w-5 h-5" />
+                                        <XCircleIcon className="w-4 h-4" />
                                     </Button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <p className="text-center py-8" style={{ color: '#718096' }}>
+                    <p className="text-center py-8 text-sm" style={{ color: theme.colors.neutral[500] }}>
                         Geen nieuwe indieningen
                     </p>
                 )}
             </Card>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <Link href="/hr/medewerkers" className="block">
-                    <Button variant="primary" className="w-full py-4">
-                        <UsersIcon className="w-5 h-5 inline mr-2" /> Medewerkers Beheer
+                    <Button variant="primary" size="md" className="w-full">
+                        <UsersIcon className="w-5 h-5 inline mr-2" />
+                        Medewerkers Beheer
                     </Button>
                 </Link>
                 <Link href="/hr/te-beoordelen" className="block">
-                    <Button variant="secondary" className="w-full py-4">
-                        <ChartBarIcon className="w-5 h-5 inline mr-2" /> Te Beoordelen
+                    <Button variant="secondary" size="md" className="w-full">
+                        <ChartBarIcon className="w-5 h-5 inline mr-2" />
+                        Te Beoordelen
                     </Button>
                 </Link>
-                <Button variant="secondary" className="w-full py-4">
-                    <ArrowDownTrayIcon className="w-5 h-5 inline mr-2" /> Export naar Excel
-                </Button>
             </div>
         </Layout>
     );
