@@ -93,4 +93,22 @@ class ProfielController extends Controller
 
         return back()->with('success', 'Wachtwoord succesvol gewijzigd');
     }
+
+    /**
+     * Wijzig email adres vanuit profiel
+     */
+    public function updateEmail(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update([
+            'email' => $validated['email'],
+        ]);
+
+        return back()->with('success', 'E-mailadres succesvol gewijzigd');
+    }
 }

@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     // Profiel
     Route::get('/profiel', [ProfielController::class, 'index'])->name('profiel');
     Route::post('/profiel/wachtwoord', [ProfielController::class, 'updateWachtwoord'])->name('profiel.wachtwoord');
+    Route::post('/profiel/email', [ProfielController::class, 'updateEmail'])->name('profiel.email');
 
     // Employee dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

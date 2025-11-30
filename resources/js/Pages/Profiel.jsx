@@ -8,11 +8,16 @@ import { UserIcon, KeyIcon } from '@heroicons/react/24/outline';
 
 export default function Profiel({ user }) {
     const [showPasswordForm, setShowPasswordForm] = useState(false);
+    const [isEditingEmail, setIsEditingEmail] = useState(false);
 
     const passwordForm = useForm({
         current_password: '',
         new_password: '',
         new_password_confirmation: '',
+    });
+
+    const emailForm = useForm({
+        email: user.email,
     });
 
     const handlePasswordSubmit = (e) => {
@@ -24,6 +29,22 @@ export default function Profiel({ user }) {
                 setShowPasswordForm(false);
             },
         });
+    };
+
+    const handleEmailSubmit = (e) => {
+        e.preventDefault();
+        emailForm.post('/profiel/email', {
+            preserveScroll: true,
+            onSuccess: () => {
+                setIsEditingEmail(false);
+            },
+        });
+    };
+
+    const cancelEmailEdit = () => {
+        emailForm.setData('email', user.email);
+        emailForm.clearErrors();
+        setIsEditingEmail(false);
     };
 
     return (
@@ -77,12 +98,47 @@ export default function Profiel({ user }) {
                                 <label className="block text-sm font-medium mb-2" style={{ color: '#718096' }}>
                                     E-mail
                                 </label>
-                                <Input
-                                    type="email"
-                                    value={user.email}
-                                    disabled
-                                    style={{ backgroundColor: '#E2E8F0', cursor: 'not-allowed' }}
-                                />
+                                {!isEditingEmail ? (
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="email"
+                                            value={user.email}
+                                            disabled
+                                            style={{ backgroundColor: '#E2E8F0', cursor: 'not-allowed' }}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            onClick={() => setIsEditingEmail(true)}
+                                            className="px-3"
+                                        >
+                                            Wijzigen
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleEmailSubmit} className="flex gap-2">
+                                        <div className="flex-1">
+                                            <Input
+                                                type="email"
+                                                value={emailForm.data.email}
+                                                onChange={(e) => emailForm.setData('email', e.target.value)}
+                                                error={emailForm.errors.email}
+                                                required
+                                            />
+                                            {emailForm.errors.email && (
+                                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
+                                                    {emailForm.errors.email}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <Button type="submit" disabled={emailForm.processing}>
+                                            Opslaan
+                                        </Button>
+                                        <Button type="button" variant="secondary" onClick={cancelEmailEdit}>
+                                            Annuleren
+                                        </Button>
+                                    </form>
+                                )}
                             </div>
 
                             <div>
@@ -136,8 +192,8 @@ export default function Profiel({ user }) {
 
                         <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: '#EDF2F7' }}>
                             <p className="text-sm" style={{ color: '#718096' }}>
-                                <strong>Let op:</strong> Je persoonlijke gegevens kunnen alleen worden gewijzigd door HR.
-                                Neem contact op met HR als je wijzigingen wilt doorvoeren.
+                                <strong>Let op:</strong> Je kunt je e-mailadres en wachtwoord zelf wijzigen.
+                                Voor wijzigingen aan naam, afdeling of startdatum, neem contact op met HR.
                             </p>
                         </div>
                     </Card>
