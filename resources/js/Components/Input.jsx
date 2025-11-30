@@ -7,8 +7,18 @@ export default function Input({
     error,
     required = false,
     className = '',
+    rows = 4,
     ...props
 }) {
+    const baseClasses = `w-full px-4 py-2 border-2 rounded-lg focus:outline-none transition-colors ${
+        error ? 'animate-shake' : ''
+    } ${className}`;
+
+    const baseStyles = {
+        borderColor: error ? '#FFB3BA' : '#E2E8F0',
+        backgroundColor: '#F7FAFC'
+    };
+
     return (
         <div className="mb-4">
             {label && (
@@ -17,20 +27,27 @@ export default function Input({
                     {required && <span className="ml-1" style={{ color: '#FFB3BA' }}>*</span>}
                 </label>
             )}
-            <input
-                type={type}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none transition-colors ${
-                    error ? 'animate-shake' : ''
-                } ${className}`}
-                style={{
-                    borderColor: error ? '#FFB3BA' : '#E2E8F0',
-                    backgroundColor: '#F7FAFC'
-                }}
-                {...props}
-            />
+            {type === 'textarea' ? (
+                <textarea
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    rows={rows}
+                    className={baseClasses}
+                    style={baseStyles}
+                    {...props}
+                />
+            ) : (
+                <input
+                    type={type}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    className={baseClasses}
+                    style={baseStyles}
+                    {...props}
+                />
+            )}
             {error && <p className="text-sm mt-1" style={{ color: '#FFB3BA' }}>{error}</p>}
         </div>
     );

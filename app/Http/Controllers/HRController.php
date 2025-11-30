@@ -128,9 +128,15 @@ class HRController extends Controller
      */
     public function teBeoordelen(Request $request)
     {
-        $indieningen = Overuren::where('status', 'INGEDIEND')
-            ->with('user:id,voornaam,achternaam,afdeling')
-            ->orderBy('ingediend_op', 'asc')
+        $query = Overuren::where('status', 'INGEDIEND')
+            ->with('user:id,voornaam,achternaam,afdeling');
+
+        // Filter by specific employee if requested
+        if ($request->filled('medewerker')) {
+            $query->where('user_id', $request->medewerker);
+        }
+
+        $indieningen = $query->orderBy('ingediend_op', 'asc')
             ->paginate(50)
             ->through(fn ($o) => [
                 'id' => $o->id,
@@ -150,6 +156,9 @@ class HRController extends Controller
 
         return Inertia::render('HR/TeBeoordelen', [
             'indieningen' => $indieningen,
+            'filters' => [
+                'medewerker' => $request->medewerker,
+            ],
         ]);
     }
 
