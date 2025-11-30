@@ -151,7 +151,7 @@ class HRController extends Controller
                 'reden' => $o->reden,
                 'week_nummer' => $o->week_nummer,
                 'jaar' => $o->jaar,
-                'ingediend_op' => $o->ingediend_op->format('Y-m-d H:i'),
+                'ingediend_op' => $o->ingediend_op?->format('Y-m-d H:i'),
             ]);
 
         return Inertia::render('HR/TeBeoordelen', [
@@ -307,7 +307,7 @@ class HRController extends Controller
                     'gebruikt' => $saldo->gebruikt_saldo,
                 ],
             ],
-            'recente_uren' => $recenteUren,
+            'recente_overuren' => $recenteUren,
         ]);
     }
 }

@@ -44,7 +44,7 @@ test('hr can view list of employees', function () {
     $response->assertOk();
     $response->assertInertia(fn ($page) =>
         $page->component('HR/Medewerkers')
-             ->has('medewerkers.data', 5)
+             ->has('medewerkers.data', 6)
     );
 });
 
@@ -138,6 +138,8 @@ test('approving overtime updates employee saldo', function () {
         'user_id' => $this->employee->id,
         'jaar' => now()->year,
         'huidig_saldo' => 0,
+        'overgedragen_saldo' => 0,
+        'gebruikt_saldo' => 0,
     ]);
 
     $overtime = Overuren::factory()->create([

@@ -86,7 +86,7 @@ class OverurenController extends Controller
             ]);
         }
 
-        $status = $validated['status'] ?? 'INGEDIEND';
+        $status = $validated['status'] ?? 'CONCEPT';
 
         // Create entry
         $overuren = Overuren::create([
