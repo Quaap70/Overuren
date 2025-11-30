@@ -111,4 +111,27 @@ class ProfielController extends Controller
 
         return back()->with('success', 'E-mailadres succesvol gewijzigd');
     }
+
+    /**
+     * Wijzig persoonlijke gegevens (alleen voor HR - eigen profiel)
+     */
+    public function updateProfiel(Request $request)
+    {
+        $user = auth()->user();
+
+        // Only HR can update personal details via profile
+        if (!$user->isHR()) {
+            abort(403, 'Alleen HR mag persoonlijke gegevens wijzigen.');
+        }
+
+        $validated = $request->validate([
+            'voornaam' => 'required|string|max:255',
+            'achternaam' => 'required|string|max:255',
+            'afdeling' => 'required|string|max:255',
+        ]);
+
+        $user->update($validated);
+
+        return back()->with('success', 'Persoonlijke gegevens succesvol bijgewerkt');
+    }
 }
