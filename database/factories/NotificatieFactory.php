@@ -2,60 +2,44 @@
 
 namespace Database\Factories;
 
+use App\Models\Notificatie;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Notificatie>
- */
 class NotificatieFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Notificatie::class;
+
     public function definition(): array
     {
-        $types = ['GOEDKEURING', 'AFKEURING', 'SALDO_WIJZIGING', 'HERINNERING', 'INFO'];
-        $type = $this->faker->randomElement($types);
+        $type = fake()->randomElement(['GOEDKEURING', 'AFKEURING', 'SALDO_WIJZIGING', 'HERINNERING', 'INFO']);
 
-        $messages = [
-            'GOEDKEURING' => [
-                'titel' => 'Overuren Goedgekeurd',
-                'bericht' => 'Je overuren van ' . $this->faker->date() . ' zijn goedgekeurd.',
-            ],
-            'AFKEURING' => [
-                'titel' => 'Overuren Afgekeurd',
-                'bericht' => 'Je overuren van ' . $this->faker->date() . ' zijn helaas afgekeurd.',
-            ],
-            'SALDO_WIJZIGING' => [
-                'titel' => 'Saldo Aangepast',
-                'bericht' => 'Je overuren saldo is handmatig aangepast door HR.',
-            ],
-            'HERINNERING' => [
-                'titel' => 'Herinnering',
-                'bericht' => 'Vergeet niet je overuren in te dienen!',
-            ],
-            'INFO' => [
-                'titel' => 'Informatie',
-                'bericht' => 'Dit is een informatieve melding.',
-            ],
+        $titels = [
+            'GOEDKEURING' => 'Overuren goedgekeurd',
+            'AFKEURING' => 'Overuren afgekeurd',
+            'SALDO_WIJZIGING' => 'Saldo aangepast',
+            'HERINNERING' => 'Herinnering: overuren indienen',
+            'INFO' => 'Nieuwe informatie',
+        ];
+
+        $berichten = [
+            'GOEDKEURING' => 'Je overuren zijn goedgekeurd en toegevoegd aan je saldo.',
+            'AFKEURING' => 'Je overuren zijn helaas afgekeurd. Zie de reden bij de registratie.',
+            'SALDO_WIJZIGING' => 'Je saldo is handmatig aangepast door HR.',
+            'HERINNERING' => 'Vergeet niet je overuren van deze week in te dienen.',
+            'INFO' => 'Er is nieuwe informatie beschikbaar over het overuren systeem.',
         ];
 
         return [
             'user_id' => User::factory(),
             'type' => $type,
-            'titel' => $messages[$type]['titel'],
-            'bericht' => $messages[$type]['bericht'],
-            'gelezen' => $this->faker->boolean(30), // 30% chance of being read
+            'titel' => $titels[$type],
+            'bericht' => $berichten[$type],
+            'gelezen' => fake()->boolean(30),
             'gerelateerd_id' => null,
         ];
     }
 
-    /**
-     * Indicate that the notification is unread.
-     */
     public function unread(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -63,51 +47,10 @@ class NotificatieFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the notification is read.
-     */
     public function read(): static
     {
         return $this->state(fn (array $attributes) => [
             'gelezen' => true,
-        ]);
-    }
-
-    /**
-     * Create a goedkeuring notification.
-     */
-    public function goedkeuring(int $overurenId = null): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'type' => 'GOEDKEURING',
-            'titel' => 'Overuren Goedgekeurd',
-            'bericht' => 'Je overuren zijn goedgekeurd!',
-            'gerelateerd_id' => $overurenId,
-        ]);
-    }
-
-    /**
-     * Create an afkeuring notification.
-     */
-    public function afkeuring(int $overurenId = null): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'type' => 'AFKEURING',
-            'titel' => 'Overuren Afgekeurd',
-            'bericht' => 'Je overuren zijn helaas afgekeurd.',
-            'gerelateerd_id' => $overurenId,
-        ]);
-    }
-
-    /**
-     * Create a saldo wijziging notification.
-     */
-    public function saldoWijziging(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'type' => 'SALDO_WIJZIGING',
-            'titel' => 'Saldo Aangepast',
-            'bericht' => 'Je overuren saldo is aangepast door HR.',
         ]);
     }
 }
