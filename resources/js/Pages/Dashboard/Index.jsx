@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
+import { PlusIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 
 export default function Dashboard({ saldo }) {
     const formatMinutesToHoursMinutes = (minuten) => {
@@ -49,17 +50,17 @@ export default function Dashboard({ saldo }) {
                     <div className="space-y-3">
                         <Link href="/overuren" className="block">
                             <Button variant="primary" className="w-full">
-                                ➕ Nieuwe Uren Invoeren
+                                <PlusIcon className="w-5 h-5 inline mr-2" /> Nieuwe Uren Invoeren
                             </Button>
                         </Link>
                         <Link href="/overuren" className="block">
                             <Button variant="secondary" className="w-full">
-                                📊 Mijn Overzicht
+                                <ChartBarIcon className="w-5 h-5 inline mr-2" /> Mijn Overzicht
                             </Button>
                         </Link>
                         <Link href="/saldo" className="block">
                             <Button variant="secondary" className="w-full">
-                                💰 Bekijk Saldo Details
+                                <CurrencyDollarIcon className="w-5 h-5 inline mr-2" /> Bekijk Saldo Details
                             </Button>
                         </Link>
                     </div>
@@ -70,7 +71,7 @@ export default function Dashboard({ saldo }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 <Card hover>
                     <div className="text-center">
-                        <div className="text-3xl mb-2">💰</div>
+                        <CurrencyDollarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#D4A5FF' }} />
                         <h3 className="font-semibold" style={{ color: '#2D3748' }}>
                             Overgedragen Saldo
                         </h3>
@@ -82,7 +83,7 @@ export default function Dashboard({ saldo }) {
 
                 <Card hover>
                     <div className="text-center">
-                        <div className="text-3xl mb-2">⏱️</div>
+                        <ClockIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#B8E6D1' }} />
                         <h3 className="font-semibold" style={{ color: '#2D3748' }}>
                             Dit Jaar
                         </h3>
@@ -94,7 +95,7 @@ export default function Dashboard({ saldo }) {
 
                 <Card hover>
                     <div className="text-center">
-                        <div className="text-3xl mb-2">📈</div>
+                        <ArrowTrendingUpIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#BAFFC9' }} />
                         <h3 className="font-semibold" style={{ color: '#2D3748' }}>
                             Status
                         </h3>

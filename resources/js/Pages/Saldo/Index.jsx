@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
+import { CurrencyDollarIcon, PlusIcon, MinusIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 
 export default function SaldoIndex({ saldo }) {
     const formatMinutesToHoursMinutes = (minuten) => {
@@ -40,7 +41,7 @@ export default function SaldoIndex({ saldo }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card hover>
                     <div className="text-center">
-                        <div className="text-4xl mb-3">💰</div>
+                        <CurrencyDollarIcon className="w-10 h-10 mx-auto mb-3" style={{ color: '#D4A5FF' }} />
                         <h3 className="text-lg font-semibold mb-2" style={{ color: '#2D3748' }}>
                             Overgedragen Saldo
                         </h3>
@@ -55,7 +56,7 @@ export default function SaldoIndex({ saldo }) {
 
                 <Card hover>
                     <div className="text-center">
-                        <div className="text-4xl mb-3">➕</div>
+                        <PlusIcon className="w-10 h-10 mx-auto mb-3" style={{ color: '#B8E6D1' }} />
                         <h3 className="text-lg font-semibold mb-2" style={{ color: '#2D3748' }}>
                             Opgebouwd Dit Jaar
                         </h3>
@@ -70,7 +71,7 @@ export default function SaldoIndex({ saldo }) {
 
                 <Card hover>
                     <div className="text-center">
-                        <div className="text-4xl mb-3">➖</div>
+                        <MinusIcon className="w-10 h-10 mx-auto mb-3" style={{ color: '#FFB3BA' }} />
                         <h3 className="text-lg font-semibold mb-2" style={{ color: '#2D3748' }}>
                             Gebruikt
                         </h3>
@@ -86,8 +87,8 @@ export default function SaldoIndex({ saldo }) {
 
             {/* Info Section */}
             <Card className="mt-6">
-                <h2 className="text-xl font-bold mb-4" style={{ color: '#2D3748' }}>
-                    ℹ️ Informatie
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#2D3748' }}>
+                    <InformationCircleIcon className="w-6 h-6" /> Informatie
                 </h2>
                 <div className="space-y-2" style={{ color: '#718096' }}>
                     <p>• Je saldo wordt automatisch bijgewerkt wanneer overuren worden goedgekeurd</p>

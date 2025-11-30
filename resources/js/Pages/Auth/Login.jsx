@@ -1,5 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { ClockIcon } from '@heroicons/react/24/outline';
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -17,8 +18,9 @@ export default function Login() {
         <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#F0F4F8' }}>
             <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 animate-fadeIn">
                 <div className="text-center mb-8">
+                    <ClockIcon className="w-16 h-16 mx-auto mb-4" style={{ color: '#D4A5FF' }} />
                     <h1 className="text-4xl font-bold mb-2" style={{ color: '#2D3748' }}>
-                        🕐 Overuren Systeem
+                        Overuren Systeem
                     </h1>
                     <p style={{ color: '#718096' }}>Log in om verder te gaan</p>
                 </div>

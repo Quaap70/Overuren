@@ -55,17 +55,18 @@ class Notificatie extends Model
     }
 
     /**
-     * Get icon based on notification type
+     * Get icon name based on notification type
+     * Returns the icon component name for use with HeroIcons
      */
     public function getIconAttribute(): string
     {
         return match($this->type) {
-            'GOEDKEURING' => '✅',
-            'AFKEURING' => '❌',
-            'SALDO_WIJZIGING' => '💰',
-            'HERINNERING' => '⏰',
-            'INFO' => 'ℹ️',
-            default => 'ℹ️',
+            'GOEDKEURING' => 'CheckCircleIcon',
+            'AFKEURING' => 'XCircleIcon',
+            'SALDO_WIJZIGING' => 'CurrencyDollarIcon',
+            'HERINNERING' => 'BellIcon',
+            'INFO' => 'InformationCircleIcon',
+            default => 'InformationCircleIcon',
         };
     }
 }

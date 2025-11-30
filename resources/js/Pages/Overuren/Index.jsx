@@ -4,6 +4,7 @@ import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import Input from '../../Components/Input';
+import { XMarkIcon, PlusIcon, PencilIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export default function OverurenIndex({ overuren, filters }) {
     const [showForm, setShowForm] = useState(false);
@@ -115,7 +116,11 @@ export default function OverurenIndex({ overuren, filters }) {
                         }
                     }}
                 >
-                    {showForm && !editingId ? '✕ Annuleren' : '➕ Nieuwe Registratie'}
+                    {showForm && !editingId ? (
+                        <><XMarkIcon className="w-5 h-5 inline mr-1" /> Annuleren</>
+                    ) : (
+                        <><PlusIcon className="w-5 h-5 inline mr-1" /> Nieuwe Registratie</>
+                    )}
                 </Button>
             </div>
 
@@ -246,7 +251,7 @@ export default function OverurenIndex({ overuren, filters }) {
                                                     className="px-3 py-1 text-sm"
                                                     onClick={() => handleEdit(uur)}
                                                 >
-                                                    ✏️
+                                                    <PencilIcon className="w-4 h-4" />
                                                 </Button>
                                                 {uur.status === 'CONCEPT' && (
                                                     <Button
@@ -254,7 +259,7 @@ export default function OverurenIndex({ overuren, filters }) {
                                                         className="px-3 py-1 text-sm"
                                                         onClick={() => handleSubmitForApproval(uur.id)}
                                                     >
-                                                        ✓ Indienen
+                                                        <CheckIcon className="w-4 h-4 inline mr-1" /> Indienen
                                                     </Button>
                                                 )}
                                             </>
@@ -265,7 +270,7 @@ export default function OverurenIndex({ overuren, filters }) {
                                                 className="px-3 py-1 text-sm"
                                                 onClick={() => handleDelete(uur.id)}
                                             >
-                                                🗑️
+                                                <TrashIcon className="w-4 h-4" />
                                             </Button>
                                         )}
                                     </div>

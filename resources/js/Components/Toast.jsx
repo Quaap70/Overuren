@@ -1,5 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { CheckCircleIcon, XCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 
 export default function Toast() {
     const { flash } = usePage().props;
@@ -29,17 +30,17 @@ export default function Toast() {
             success: {
                 backgroundColor: '#BAFFC9',
                 borderColor: '#B8E6D1',
-                icon: '✅',
+                Icon: CheckCircleIcon,
             },
             error: {
                 backgroundColor: '#FFB3BA',
                 borderColor: '#FFB3BA',
-                icon: '❌',
+                Icon: XCircleIcon,
             },
             info: {
                 backgroundColor: '#D4A5FF',
                 borderColor: '#D4A5FF',
-                icon: 'ℹ️',
+                Icon: InformationCircleIcon,
             },
         };
         return styles[message.type];
@@ -62,7 +63,7 @@ export default function Toast() {
                     color: '#2D3748',
                 }}
             >
-                <span className="text-2xl">{styles.icon}</span>
+                <styles.Icon className="w-6 h-6 flex-shrink-0" style={{ color: '#2D3748' }} />
                 <p className="flex-1 font-medium">{message.text}</p>
                 <button
                     onClick={() => setVisible(false)}

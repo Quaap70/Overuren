@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
+import { ClockIcon, CalendarIcon, UsersIcon, CheckCircleIcon, XCircleIcon, ChartBarIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 export default function HRDashboard({ statistieken, recente_indieningen }) {
     return (
@@ -18,7 +19,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
             {/* Statistics Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                 <Card hover className="text-center">
-                    <div className="text-3xl mb-2">⏳</div>
+                    <ClockIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#D4A5FF' }} />
                     <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
                         Te Beoordelen
                     </h3>
@@ -28,7 +29,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                 </Card>
 
                 <Card hover className="text-center">
-                    <div className="text-3xl mb-2">📅</div>
+                    <CalendarIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#B8E6D1' }} />
                     <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
                         Deze Week
                     </h3>
@@ -38,7 +39,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                 </Card>
 
                 <Card hover className="text-center">
-                    <div className="text-3xl mb-2">👥</div>
+                    <UsersIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#FFD3BA' }} />
                     <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
                         Medewerkers
                     </h3>
@@ -48,7 +49,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                 </Card>
 
                 <Card hover className="text-center">
-                    <div className="text-3xl mb-2">⏱️</div>
+                    <ClockIcon className="w-8 h-8 mx-auto mb-2" style={{ color: '#D4A5FF' }} />
                     <h3 className="text-sm font-semibold" style={{ color: '#718096' }}>
                         Totaal Uren
                     </h3>
@@ -101,7 +102,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                                             });
                                         }}
                                     >
-                                        ✅
+                                        <CheckCircleIcon className="w-5 h-5" />
                                     </Button>
                                     <Button
                                         variant="danger"
@@ -117,7 +118,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                                             }
                                         }}
                                     >
-                                        ❌
+                                        <XCircleIcon className="w-5 h-5" />
                                     </Button>
                                 </div>
                             </div>
@@ -134,16 +135,16 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 <Link href="/hr/medewerkers" className="block">
                     <Button variant="primary" className="w-full py-4">
-                        👥 Medewerkers Beheer
+                        <UsersIcon className="w-5 h-5 inline mr-2" /> Medewerkers Beheer
                     </Button>
                 </Link>
                 <Link href="/hr/te-beoordelen" className="block">
                     <Button variant="secondary" className="w-full py-4">
-                        📊 Te Beoordelen
+                        <ChartBarIcon className="w-5 h-5 inline mr-2" /> Te Beoordelen
                     </Button>
                 </Link>
                 <Button variant="secondary" className="w-full py-4">
-                    📥 Export naar Excel
+                    <ArrowDownTrayIcon className="w-5 h-5 inline mr-2" /> Export naar Excel
                 </Button>
             </div>
         </Layout>

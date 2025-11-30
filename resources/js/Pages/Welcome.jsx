@@ -1,9 +1,12 @@
+import { SparklesIcon } from '@heroicons/react/24/outline';
+
 export default function Welcome() {
     return (
         <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
             <div className="text-center">
+                <SparklesIcon className="w-20 h-20 mx-auto mb-4" style={{ color: 'var(--color-lavender)' }} />
                 <h1 className="text-5xl font-bold mb-4" style={{ color: 'var(--color-lavender)' }}>
-                    🎉 Overuren Systeem
+                    Overuren Systeem
                 </h1>
                 <p className="text-2xl" style={{ color: 'var(--color-text-secondary)' }}>
                     Laravel 12 + Inertia.js + React werkt!

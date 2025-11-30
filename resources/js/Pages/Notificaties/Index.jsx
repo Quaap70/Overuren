@@ -2,17 +2,18 @@ import { Head, router } from '@inertiajs/react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
+import { CheckCircleIcon, XCircleIcon, CogIcon, BellIcon, InformationCircleIcon, InboxIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
     const getTypeIcon = (type) => {
         const icons = {
-            GOEDKEURING: '✅',
-            AFKEURING: '❌',
-            SALDO_WIJZIGING: '⚙️',
-            HERINNERING: '🔔',
-            INFO: 'ℹ️',
+            GOEDKEURING: CheckCircleIcon,
+            AFKEURING: XCircleIcon,
+            SALDO_WIJZIGING: CogIcon,
+            HERINNERING: BellIcon,
+            INFO: InformationCircleIcon,
         };
-        return icons[type] || 'ℹ️';
+        return icons[type] || InformationCircleIcon;
     };
 
     const getTypeColor = (type) => {
@@ -86,7 +87,7 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
                 </div>
                 {ongelezen_count > 0 && (
                     <Button variant="secondary" onClick={markAllAsRead}>
-                        ✓ Alles Gelezen
+                        <CheckIcon className="w-4 h-4 inline mr-1" /> Alles Gelezen
                     </Button>
                 )}
             </div>
@@ -107,9 +108,10 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
                                 <div className="flex justify-between items-start">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <span className="text-2xl">
-                                                {getTypeIcon(notificatie.type)}
-                                            </span>
+                                            {(() => {
+                                                const IconComponent = getTypeIcon(notificatie.type);
+                                                return <IconComponent className="w-6 h-6 flex-shrink-0" style={{ color: '#2D3748' }} />;
+                                            })()}
                                             <div className="flex-1">
                                                 <h3 className="font-bold" style={{ color: '#2D3748' }}>
                                                     {notificatie.titel}
@@ -141,7 +143,7 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
                                                 className="px-3 py-1 text-sm"
                                                 onClick={() => markAsRead(notificatie.id)}
                                             >
-                                                ✓
+                                                <CheckIcon className="w-4 h-4" />
                                             </Button>
                                         )}
                                         <Button
@@ -149,7 +151,7 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
                                             className="px-3 py-1 text-sm"
                                             onClick={() => deleteNotificatie(notificatie.id)}
                                         >
-                                            🗑️
+                                            <TrashIcon className="w-4 h-4" />
                                         </Button>
                                     </div>
                                 </div>
@@ -158,7 +160,7 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
                     </div>
                 ) : (
                     <div className="text-center py-12">
-                        <div className="text-6xl mb-4">📭</div>
+                        <InboxIcon className="w-16 h-16 mx-auto mb-4" style={{ color: '#718096' }} />
                         <p className="text-xl font-semibold mb-2" style={{ color: '#2D3748' }}>
                             Geen Notificaties
                         </p>
