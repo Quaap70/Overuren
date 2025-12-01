@@ -1,3 +1,4 @@
+import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';

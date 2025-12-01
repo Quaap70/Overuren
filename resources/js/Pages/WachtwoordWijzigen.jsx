@@ -1,3 +1,4 @@
+import React from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import Card from '../Components/Card';
 import Button from '../Components/Button';
