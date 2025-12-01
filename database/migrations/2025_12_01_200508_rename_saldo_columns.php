@@ -16,10 +16,6 @@ return new class extends Migration
             $table->renameColumn('huidig_saldo', 'overuren_saldo');
             $table->renameColumn('gebruikt_saldo', 'opgenomen_saldo');
         });
-
-        // Update comment descriptions
-        \DB::statement('ALTER TABLE saldo MODIFY COLUMN overuren_saldo INT DEFAULT 0 COMMENT "Totaal opgebouwde overuren in minuten (alleen positieve waarden)"');
-        \DB::statement('ALTER TABLE saldo MODIFY COLUMN opgenomen_saldo INT DEFAULT 0 COMMENT "Totaal opgenomen uren in minuten (absoluut getal van negatieve entries)"');
     }
 
     /**
@@ -31,8 +27,5 @@ return new class extends Migration
             $table->renameColumn('overuren_saldo', 'huidig_saldo');
             $table->renameColumn('opgenomen_saldo', 'gebruikt_saldo');
         });
-
-        \DB::statement('ALTER TABLE saldo MODIFY COLUMN huidig_saldo INT DEFAULT 0 COMMENT "Huidig totaal saldo in minuten"');
-        \DB::statement('ALTER TABLE saldo MODIFY COLUMN gebruikt_saldo INT DEFAULT 0 COMMENT "Gebruikt saldo in minuten (bijv. voor vakantie)"');
     }
 };
