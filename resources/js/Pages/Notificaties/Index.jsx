@@ -4,7 +4,7 @@ import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import ConfirmModal from '../../Components/ConfirmModal';
-import { CheckCircleIcon, XCircleIcon, CogIcon, BellIcon, InformationCircleIcon, InboxIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, CogIcon, BellIcon, InformationCircleIcon, InboxIcon, CheckIcon, TrashIcon, ArrowUpCircleIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline';
 
 export default function NotificatiesIndex({ notificaties, ongelezen_count, gelezen_count }) {
     const [markAllConfirm, setMarkAllConfirm] = useState(false);
@@ -137,7 +137,12 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
             <Card>
                 {notificaties.data && notificaties.data.length > 0 ? (
                     <div className="space-y-3">
-                        {notificaties.data.map((notificatie) => (
+                        {notificaties.data.map((notificatie) => {
+                            // Bepaal of het overuren of opname betreft
+                            const isOpname = notificatie.overuren && notificatie.overuren.minuten < 0;
+                            const isOveruren = notificatie.overuren && notificatie.overuren.minuten > 0;
+
+                            return (
                             <div
                                 key={notificatie.id}
                                 className="p-4 rounded-lg border-2 transition-all"
@@ -162,17 +167,42 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
                                                     {formatDate(notificatie.created_at)}
                                                 </p>
                                             </div>
-                                            {!notificatie.gelezen && (
-                                                <span
-                                                    className="px-2 py-1 rounded-full text-xs font-semibold"
-                                                    style={{
-                                                        backgroundColor: '#D4A5FF',
-                                                        color: '#2D3748'
-                                                    }}
-                                                >
-                                                    NIEUW
-                                                </span>
-                                            )}
+                                            <div className="flex gap-2 items-center">
+                                                {/* Badge voor type uren */}
+                                                {isOpname && (
+                                                    <span
+                                                        className="px-2 py-1 rounded text-xs font-semibold flex items-center gap-1"
+                                                        style={{
+                                                            backgroundColor: '#FFB3BA',
+                                                            color: '#2D3748'
+                                                        }}
+                                                    >
+                                                        <ArrowDownCircleIcon className="w-4 h-4" /> Opname
+                                                    </span>
+                                                )}
+                                                {isOveruren && (
+                                                    <span
+                                                        className="px-2 py-1 rounded text-xs font-semibold flex items-center gap-1"
+                                                        style={{
+                                                            backgroundColor: '#B8E6D1',
+                                                            color: '#2D3748'
+                                                        }}
+                                                    >
+                                                        <ArrowUpCircleIcon className="w-4 h-4" /> Overuren
+                                                    </span>
+                                                )}
+                                                {!notificatie.gelezen && (
+                                                    <span
+                                                        className="px-2 py-1 rounded-full text-xs font-semibold"
+                                                        style={{
+                                                            backgroundColor: '#D4A5FF',
+                                                            color: '#2D3748'
+                                                        }}
+                                                    >
+                                                        NIEUW
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                         <p className="mb-3" style={{ color: '#2D3748' }}>
                                             {notificatie.bericht}
@@ -198,7 +228,8 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <div className="text-center py-12">

@@ -48,6 +48,14 @@ class Notificatie extends Model
     }
 
     /**
+     * Get the related overuren entry (if any)
+     */
+    public function overuren(): BelongsTo
+    {
+        return $this->belongsTo(Overuren::class, 'gerelateerd_id');
+    }
+
+    /**
      * Mark notification as read
      */
     public function markAsRead(): void

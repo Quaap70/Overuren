@@ -15,6 +15,7 @@ class NotificatieController extends Controller
     {
         $notificaties = $request->user()
             ->notificaties()
+            ->with('overuren')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 

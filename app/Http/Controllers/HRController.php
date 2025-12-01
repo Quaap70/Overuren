@@ -183,11 +183,14 @@ class HRController extends Controller
         $saldo = $this->saldoService->recalculateSaldo($overuren->user_id, $overuren->jaar);
 
         // Notify employee
+        $isOpname = $overuren->minuten < 0;
+        $typeText = $isOpname ? 'Opname' : 'Overuren';
+
         Notificatie::create([
             'user_id' => $overuren->user_id,
             'type' => 'GOEDKEURING',
-            'titel' => 'Overuren goedgekeurd',
-            'bericht' => "Je overuren van {$overuren->datum->format('Y-m-d')} ({$overuren->formatted_time}) zijn goedgekeurd. Je nieuwe saldo is {$saldo->formatted_saldo}.",
+            'titel' => "{$typeText} goedgekeurd",
+            'bericht' => "Je {$typeText} van {$overuren->datum->format('Y-m-d')} ({$overuren->formatted_time}) zijn goedgekeurd. Je nieuwe saldo is {$saldo->formatted_saldo}.",
             'gerelateerd_id' => $overuren->id,
         ]);
 
@@ -214,11 +217,14 @@ class HRController extends Controller
         $overuren->save();
 
         // Notify employee
+        $isOpname = $overuren->minuten < 0;
+        $typeText = $isOpname ? 'Opname' : 'Overuren';
+
         Notificatie::create([
             'user_id' => $overuren->user_id,
             'type' => 'AFKEURING',
-            'titel' => 'Overuren afgekeurd',
-            'bericht' => "Je overuren van {$overuren->datum->format('Y-m-d')} ({$overuren->formatted_time}) zijn afgekeurd. Reden: {$validated['reden']}",
+            'titel' => "{$typeText} afgekeurd",
+            'bericht' => "Je {$typeText} van {$overuren->datum->format('Y-m-d')} ({$overuren->formatted_time}) zijn afgekeurd. Reden: {$validated['reden']}",
             'gerelateerd_id' => $overuren->id,
         ]);
 
