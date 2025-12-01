@@ -60,9 +60,9 @@ class OverurenController extends Controller
     public function store(Request $request)
     {
         \Log::info('=== BACKEND STORE DEBUG ===');
-        \Log::info('Raw request all:', $request->all());
-        \Log::info('Raw request status:', $request->input('status'));
-        \Log::info('Has status:', $request->has('status') ? 'YES' : 'NO');
+        \Log::info('Raw request all', $request->all());
+        \Log::info('Raw request status', ['status' => $request->input('status')]);
+        \Log::info('Has status: ' . ($request->has('status') ? 'YES' : 'NO'));
 
         $validated = $request->validate([
             'datum' => 'required|date',
@@ -71,8 +71,8 @@ class OverurenController extends Controller
             'status' => 'required|in:CONCEPT,INGEDIEND',
         ]);
 
-        \Log::info('Validated data:', $validated);
-        \Log::info('Validated status:', $validated['status']);
+        \Log::info('Validated data', $validated);
+        \Log::info('Validated status: ' . $validated['status']);
         \Log::info('===========================');
 
         // Validate minutes
@@ -100,7 +100,7 @@ class OverurenController extends Controller
         // Status is now always present because it's required in validation
         $status = $validated['status'];
 
-        \Log::info('Final status before create:', $status);
+        \Log::info('Final status before create: ' . $status);
 
         // Create entry
         $overuren = Overuren::create([
@@ -140,8 +140,8 @@ class OverurenController extends Controller
     public function update(Request $request, Overuren $overuren)
     {
         \Log::info('=== BACKEND UPDATE DEBUG ===');
-        \Log::info('Raw request all:', $request->all());
-        \Log::info('Raw request status:', $request->input('status'));
+        \Log::info('Raw request all', $request->all());
+        \Log::info('Raw request status', ['status' => $request->input('status')]);
 
         // Check ownership
         if ($overuren->user_id !== $request->user()->id) {
@@ -160,7 +160,7 @@ class OverurenController extends Controller
             'status' => 'sometimes|in:CONCEPT,INGEDIEND',
         ]);
 
-        \Log::info('Validated data:', $validated);
+        \Log::info('Validated data', $validated);
         \Log::info('============================');
 
         // Validate minutes if provided
@@ -178,7 +178,7 @@ class OverurenController extends Controller
             $overuren->reden = $validated['reden'];
         }
         if (isset($validated['status'])) {
-            \Log::info('Updating status to:', $validated['status']);
+            \Log::info('Updating status to: ' . $validated['status']);
             $overuren->status = $validated['status'];
             if ($validated['status'] === 'INGEDIEND') {
                 $overuren->ingediend_op = now();
