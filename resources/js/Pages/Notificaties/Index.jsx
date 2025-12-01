@@ -6,8 +6,9 @@ import Button from '../../Components/Button';
 import ConfirmModal from '../../Components/ConfirmModal';
 import { CheckCircleIcon, XCircleIcon, CogIcon, BellIcon, InformationCircleIcon, InboxIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
+export default function NotificatiesIndex({ notificaties, ongelezen_count, gelezen_count }) {
     const [markAllConfirm, setMarkAllConfirm] = useState(false);
+    const [deleteAllReadConfirm, setDeleteAllReadConfirm] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null });
     const getTypeIcon = (type) => {
         const icons = {
@@ -45,6 +46,17 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
         router.post('/notificaties/alles-gelezen', {}, {
             preserveScroll: true,
             onFinish: () => setMarkAllConfirm(false),
+        });
+    };
+
+    const deleteAllRead = () => {
+        setDeleteAllReadConfirm(true);
+    };
+
+    const confirmDeleteAllRead = () => {
+        router.delete('/notificaties/gelezen', {
+            preserveScroll: true,
+            onFinish: () => setDeleteAllReadConfirm(false),
         });
     };
 
@@ -95,11 +107,18 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
                             : 'Alle notificaties zijn gelezen'}
                     </p>
                 </div>
-                {ongelezen_count > 0 && (
-                    <Button variant="secondary" onClick={markAllAsRead}>
-                        <CheckIcon className="w-4 h-4 inline mr-1" /> Alles Gelezen
-                    </Button>
-                )}
+                <div className="flex gap-2">
+                    {ongelezen_count > 0 && (
+                        <Button variant="secondary" onClick={markAllAsRead}>
+                            <CheckIcon className="w-4 h-4 inline mr-1" /> Alles Gelezen
+                        </Button>
+                    )}
+                    {gelezen_count > 0 && (
+                        <Button variant="danger" onClick={deleteAllRead}>
+                            <TrashIcon className="w-4 h-4 inline mr-1" /> Verwijder Gelezen
+                        </Button>
+                    )}
+                </div>
             </div>
 
             <Card>
@@ -210,6 +229,16 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
                 onConfirm={confirmMarkAllAsRead}
                 confirmText="Markeren als gelezen"
                 variant="primary"
+            />
+
+            <ConfirmModal
+                isOpen={deleteAllReadConfirm}
+                onClose={() => setDeleteAllReadConfirm(false)}
+                title="Alle gelezen notificaties verwijderen"
+                message={`Weet je zeker dat je alle ${gelezen_count} gelezen notificatie${gelezen_count !== 1 ? 's' : ''} permanent wilt verwijderen?`}
+                onConfirm={confirmDeleteAllRead}
+                confirmText="Alles Verwijderen"
+                variant="danger"
             />
 
             <ConfirmModal

@@ -21,6 +21,7 @@ class NotificatieController extends Controller
         return Inertia::render('Notificaties/Index', [
             'notificaties' => $notificaties,
             'ongelezen_count' => $request->user()->notificaties()->where('gelezen', false)->count(),
+            'gelezen_count' => $request->user()->notificaties()->where('gelezen', true)->count(),
         ]);
     }
 
@@ -63,6 +64,19 @@ class NotificatieController extends Controller
         }
 
         $notificatie->delete();
+
+        return redirect()->back();
+    }
+
+    /**
+     * Delete all read notifications
+     */
+    public function destroyAllRead(Request $request)
+    {
+        $request->user()
+            ->notificaties()
+            ->where('gelezen', true)
+            ->delete();
 
         return redirect()->back();
     }

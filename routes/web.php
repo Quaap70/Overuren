@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [NotificatieController::class, 'index'])->name('index');
         Route::post('/{notificatie}/gelezen', [NotificatieController::class, 'markAsRead'])->name('mark-read');
         Route::post('/alles-gelezen', [NotificatieController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::delete('/gelezen', [NotificatieController::class, 'destroyAllRead'])->name('destroy-all-read');
         Route::delete('/{notificatie}', [NotificatieController::class, 'destroy'])->name('destroy');
         Route::get('/ongelezen-count', [NotificatieController::class, 'unreadCount'])->name('unread-count');
     });
