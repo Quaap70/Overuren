@@ -40,14 +40,22 @@ export default function OverurenIndex({ overuren, filters }) {
     const handleSubmit = (e, overrideStatus = null) => {
         e.preventDefault();
 
+        // Explicitly determine the status
+        const finalStatus = overrideStatus !== null ? overrideStatus : data.status;
+
         const submitData = {
             datum: data.datum,
             minuten: data.minuten,
             reden: data.reden,
-            status: overrideStatus || data.status,
+            status: finalStatus,
         };
 
-        console.log('Submitting data:', submitData);
+        console.log('=== FRONTEND DEBUG ===');
+        console.log('overrideStatus parameter:', overrideStatus);
+        console.log('data.status:', data.status);
+        console.log('finalStatus:', finalStatus);
+        console.log('submitData:', JSON.stringify(submitData, null, 2));
+        console.log('======================');
 
         if (editingId) {
             router.put(`/overuren/${editingId}`, submitData, {
