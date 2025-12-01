@@ -318,7 +318,7 @@ class HRController extends Controller
     public function gebruikerNieuw()
     {
         return Inertia::render('HR/Gebruikers/Nieuw', [
-            'afdelingen' => ['Productie', 'Montage', 'Onderhoud', 'Logistiek', 'Magazijn', 'HR'],
+            'afdelingen' => ['Zakelijk', 'Particulier', 'Schade', 'ICT', 'HR'],
         ]);
     }
 
@@ -371,7 +371,7 @@ class HRController extends Controller
                 'startdatum' => $user->startdatum?->format('Y-m-d'),
                 'is_active' => $user->is_active,
             ],
-            'afdelingen' => ['Productie', 'Montage', 'Onderhoud', 'Logistiek', 'Magazijn', 'HR'],
+            'afdelingen' => ['Zakelijk', 'Particulier', 'Schade', 'ICT', 'HR'],
         ]);
     }
 
