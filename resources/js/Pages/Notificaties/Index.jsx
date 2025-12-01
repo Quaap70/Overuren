@@ -1,10 +1,14 @@
 import { Head, router } from '@inertiajs/react';
+import { useState } from 'react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
+import ConfirmModal from '../../Components/ConfirmModal';
 import { CheckCircleIcon, XCircleIcon, CogIcon, BellIcon, InformationCircleIcon, InboxIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
+    const [markAllConfirm, setMarkAllConfirm] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null });
     const getTypeIcon = (type) => {
         const icons = {
             GOEDKEURING: CheckCircleIcon,
@@ -34,19 +38,25 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
     };
 
     const markAllAsRead = () => {
-        if (confirm('Wil je alle notificaties als gelezen markeren?')) {
-            router.post('/notificaties/alles-gelezen', {}, {
-                preserveScroll: true,
-            });
-        }
+        setMarkAllConfirm(true);
+    };
+
+    const confirmMarkAllAsRead = () => {
+        router.post('/notificaties/alles-gelezen', {}, {
+            preserveScroll: true,
+            onFinish: () => setMarkAllConfirm(false),
+        });
     };
 
     const deleteNotificatie = (notificatieId) => {
-        if (confirm('Weet je zeker dat je deze notificatie wilt verwijderen?')) {
-            router.delete(`/notificaties/${notificatieId}`, {
-                preserveScroll: true,
-            });
-        }
+        setDeleteConfirm({ show: true, id: notificatieId });
+    };
+
+    const confirmDelete = () => {
+        router.delete(`/notificaties/${deleteConfirm.id}`, {
+            preserveScroll: true,
+            onFinish: () => setDeleteConfirm({ show: false, id: null }),
+        });
     };
 
     const formatDate = (dateString) => {
@@ -190,6 +200,27 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
                     </div>
                 )}
             </Card>
+
+            {/* Confirm Modals */}
+            <ConfirmModal
+                show={markAllConfirm}
+                title="Alle notificaties markeren als gelezen"
+                message="Wil je alle notificaties als gelezen markeren?"
+                onConfirm={confirmMarkAllAsRead}
+                onCancel={() => setMarkAllConfirm(false)}
+                confirmText="Markeren als gelezen"
+                confirmVariant="primary"
+            />
+
+            <ConfirmModal
+                show={deleteConfirm.show}
+                title="Notificatie verwijderen"
+                message="Weet je zeker dat je deze notificatie wilt verwijderen?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteConfirm({ show: false, id: null })}
+                confirmText="Verwijderen"
+                confirmVariant="danger"
+            />
         </Layout>
     );
 }
