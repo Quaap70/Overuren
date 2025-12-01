@@ -57,12 +57,16 @@ class OverurenController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('Overuren store request:', $request->all());
+
         $validated = $request->validate([
             'datum' => 'required|date',
             'minuten' => 'required|integer',
             'reden' => 'nullable|string|max:1000',
             'status' => 'sometimes|in:CONCEPT,INGEDIEND',
         ]);
+
+        \Log::info('Overuren validated data:', $validated);
 
         // Validate minutes
         if (!Overuren::validateMinuten($validated['minuten'])) {

@@ -40,9 +40,14 @@ export default function OverurenIndex({ overuren, filters }) {
     const handleSubmit = (e, overrideStatus = null) => {
         e.preventDefault();
 
-        const submitData = overrideStatus
-            ? { ...data, status: overrideStatus }
-            : data;
+        const submitData = {
+            datum: data.datum,
+            minuten: data.minuten,
+            reden: data.reden,
+            status: overrideStatus || data.status,
+        };
+
+        console.log('Submitting data:', submitData);
 
         if (editingId) {
             router.put(`/overuren/${editingId}`, submitData, {
