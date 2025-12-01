@@ -9,7 +9,9 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.jsx', 'resources/js/ziggy.js'],
             refresh: true,
         }),
-        react(),
+        react({
+            jsxRuntime: 'classic',
+        }),
         tailwindcss(),
     ],
     server: {
