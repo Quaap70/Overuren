@@ -1,3 +1,4 @@
+import React from 'react';
 import Modal from './Modal';
 import Button from './Button';
 import { ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';

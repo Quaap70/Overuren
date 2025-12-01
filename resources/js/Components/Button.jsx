@@ -29,10 +29,7 @@ export default function Button({
     const getVariantStyle = () => {
         const styles = componentStyles.button.variants[variant];
 
-        if (!styles) {
-            console.error(`Button variant "${variant}" not found. Available:`, Object.keys(componentStyles.button.variants));
-            return {};
-        }
+        if (!styles) return {};
 
         const baseStyle = {
             backgroundColor: styles.background,
@@ -43,8 +40,6 @@ export default function Button({
         if (styles.border) {
             baseStyle.border = styles.border;
         }
-
-        console.log(`Button variant="${variant}", backgroundColor=${baseStyle.backgroundColor}`);
 
         return baseStyle;
     };

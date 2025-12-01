@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import Toast from './Toast';
 import {

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function Modal({ isOpen, onClose, title, children, size = 'md' }) {
