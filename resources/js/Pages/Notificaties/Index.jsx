@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
@@ -91,6 +91,19 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
             year: 'numeric'
         });
     };
+
+    // Polling: reload notificaties elke 15 seconden
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['notificaties', 'ongelezen_count', 'gelezen_count'],
+                preserveScroll: true,
+                preserveState: true,
+            });
+        }, 15000); // 15 seconden
+
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <Layout>
