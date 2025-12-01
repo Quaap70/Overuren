@@ -1,15 +1,17 @@
-import React from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import Input from '../../Components/Input';
+import ConfirmModal from '../../Components/ConfirmModal';
 import { XMarkIcon, PlusIcon, PencilIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export default function OverurenIndex({ overuren, filters }) {
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null });
+    const [submitConfirm, setSubmitConfirm] = useState({ show: false, id: null });
 
     const { data, setData, post, put, reset, errors, processing } = useForm({
         datum: '',
@@ -35,11 +37,28 @@ export default function OverurenIndex({ overuren, filters }) {
         return styles[status] || styles.CONCEPT;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e, overrideStatus = null) => {
         e.preventDefault();
 
+        // Explicitly determine the status
+        const finalStatus = overrideStatus !== null ? overrideStatus : data.status;
+
+        const submitData = {
+            datum: data.datum,
+            minuten: data.minuten,
+            reden: data.reden,
+            status: finalStatus,
+        };
+
+        console.log('=== FRONTEND DEBUG ===');
+        console.log('overrideStatus parameter:', overrideStatus);
+        console.log('data.status:', data.status);
+        console.log('finalStatus:', finalStatus);
+        console.log('submitData:', JSON.stringify(submitData, null, 2));
+        console.log('======================');
+
         if (editingId) {
-            put(`/overuren/${editingId}`, {
+            router.put(`/overuren/${editingId}`, submitData, {
                 preserveScroll: true,
                 onSuccess: () => {
                     reset();
@@ -48,7 +67,7 @@ export default function OverurenIndex({ overuren, filters }) {
                 },
             });
         } else {
-            post('/overuren', {
+            router.post('/overuren', submitData, {
                 preserveScroll: true,
                 onSuccess: () => {
                     reset();
@@ -70,21 +89,27 @@ export default function OverurenIndex({ overuren, filters }) {
     };
 
     const handleDelete = (id) => {
-        if (confirm('Weet je zeker dat je deze registratie wilt verwijderen?')) {
-            router.delete(`/overuren/${id}`, {
-                preserveScroll: true,
-            });
-        }
+        setDeleteConfirm({ show: true, id });
+    };
+
+    const confirmDelete = () => {
+        router.delete(`/overuren/${deleteConfirm.id}`, {
+            preserveScroll: true,
+            onFinish: () => setDeleteConfirm({ show: false, id: null }),
+        });
     };
 
     const handleSubmitForApproval = (id) => {
-        if (confirm('Weet je zeker dat je deze registratie wilt indienen voor goedkeuring?')) {
-            put(`/overuren/${id}`, {
-                status: 'INGEDIEND',
-            }, {
-                preserveScroll: true,
-            });
-        }
+        setSubmitConfirm({ show: true, id });
+    };
+
+    const confirmSubmit = () => {
+        router.put(`/overuren/${submitConfirm.id}`, {
+            status: 'INGEDIEND',
+        }, {
+            preserveScroll: true,
+            onFinish: () => setSubmitConfirm({ show: false, id: null }),
+        });
     };
 
     const cancelEdit = () => {
@@ -172,10 +197,7 @@ export default function OverurenIndex({ overuren, filters }) {
                                     type="button"
                                     variant="success"
                                     disabled={processing}
-                                    onClick={() => {
-                                        setData('status', 'INGEDIEND');
-                                        setTimeout(() => handleSubmit({ preventDefault: () => {} }), 0);
-                                    }}
+                                    onClick={(e) => handleSubmit(e, 'INGEDIEND')}
                                 >
                                     Opslaan en Indienen
                                 </Button>
@@ -305,6 +327,27 @@ export default function OverurenIndex({ overuren, filters }) {
                     </div>
                 )}
             </Card>
+
+            {/* Confirm Modals */}
+            <ConfirmModal
+                show={deleteConfirm.show}
+                title="Registratie verwijderen"
+                message="Weet je zeker dat je deze registratie wilt verwijderen?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteConfirm({ show: false, id: null })}
+                confirmText="Verwijderen"
+                confirmVariant="danger"
+            />
+
+            <ConfirmModal
+                show={submitConfirm.show}
+                title="Registratie indienen"
+                message="Weet je zeker dat je deze registratie wilt indienen voor goedkeuring?"
+                onConfirm={confirmSubmit}
+                onCancel={() => setSubmitConfirm({ show: false, id: null })}
+                confirmText="Indienen"
+                confirmVariant="success"
+            />
         </Layout>
     );
 }

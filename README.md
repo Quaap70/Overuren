@@ -254,7 +254,7 @@ Het systeem gebruikt een pastel kleurenschema:
 ### Overuren
 - Gekoppeld aan gebruiker
 - **Status**: CONCEPT, INGEDIEND, GOEDGEKEURD, AFGEKEURD
-- Bevat datum, minuten (veelvoud van 10, max ±720), reden
+- Bevat datum, minuten (veelvoud van 5, max ±720), reden
 - Week nummer en jaar worden automatisch berekend
 
 ### Saldo

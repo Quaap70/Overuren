@@ -1,14 +1,15 @@
-import React from 'react';
 import { Head, useForm, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import Layout from '../../../Components/Layout';
 import Card from '../../../Components/Card';
 import Button from '../../../Components/Button';
 import Input from '../../../Components/Input';
+import ConfirmModal from '../../../Components/ConfirmModal';
 import { ArrowLeftIcon, KeyIcon } from '@heroicons/react/24/outline';
 
 export default function GebruikerBewerken({ gebruiker, afdelingen }) {
     const [showPasswordReset, setShowPasswordReset] = useState(false);
+    const [toggleActiveConfirm, setToggleActiveConfirm] = useState(false);
 
     const { data, setData, put, errors, processing } = useForm({
         email: gebruiker.email || '',
@@ -41,16 +42,15 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
     };
 
     const handleToggleActive = () => {
-        const action = gebruiker.is_active ? 'deactiveren' : 'activeren';
-        const message = gebruiker.is_active
-            ? 'Weet je zeker dat je deze gebruiker wilt deactiveren?'
-            : 'Weet je zeker dat je deze gebruiker wilt activeren?';
+        setToggleActiveConfirm(true);
+    };
 
-        if (confirm(message)) {
-            router.post(`/hr/gebruikers/${gebruiker.id}/${action}`, {}, {
-                preserveScroll: true,
-            });
-        }
+    const confirmToggleActive = () => {
+        const action = gebruiker.is_active ? 'deactiveren' : 'activeren';
+        router.post(`/hr/gebruikers/${gebruiker.id}/${action}`, {}, {
+            preserveScroll: true,
+            onFinish: () => setToggleActiveConfirm(false),
+        });
     };
 
     return (
@@ -340,6 +340,19 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                     </Card>
                 </div>
             </div>
+
+            {/* Confirm Modal */}
+            <ConfirmModal
+                show={toggleActiveConfirm}
+                title={gebruiker.is_active ? 'Gebruiker deactiveren' : 'Gebruiker activeren'}
+                message={gebruiker.is_active
+                    ? 'Weet je zeker dat je deze gebruiker wilt deactiveren?'
+                    : 'Weet je zeker dat je deze gebruiker wilt activeren?'}
+                onConfirm={confirmToggleActive}
+                onCancel={() => setToggleActiveConfirm(false)}
+                confirmText={gebruiker.is_active ? 'Deactiveren' : 'Activeren'}
+                confirmVariant={gebruiker.is_active ? 'danger' : 'success'}
+            />
         </Layout>
     );
 }

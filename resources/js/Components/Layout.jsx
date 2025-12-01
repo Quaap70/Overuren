@@ -1,6 +1,7 @@
-import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 import Toast from './Toast';
+import { theme } from '../config/theme';
 import {
     ClockIcon,
     BellIcon,
@@ -10,6 +11,29 @@ import {
 
 export default function Layout({ children }) {
     const { auth } = usePage().props;
+    const [ongelezen, setOngelezen] = useState(0);
+
+    useEffect(() => {
+        if (!auth.user) return;
+
+        // Fetch initial count
+        fetchOngelezen();
+
+        // Poll every 10 seconds
+        const interval = setInterval(fetchOngelezen, 10000);
+
+        return () => clearInterval(interval);
+    }, [auth.user]);
+
+    const fetchOngelezen = async () => {
+        try {
+            const response = await fetch('/notificaties/ongelezen-count');
+            const data = await response.json();
+            setOngelezen(data.count);
+        } catch (error) {
+            console.error('Failed to fetch unread notifications:', error);
+        }
+    };
 
     if (!auth.user) {
         return children;
@@ -54,11 +78,22 @@ export default function Layout({ children }) {
                                     </Link>
                                     <Link
                                         href="/notificaties"
-                                        className="text-sm font-medium transition-colors hover:text-slate-900 flex items-center gap-1.5"
-                                        style={{ color: '#64748B' }}
+                                        className="text-sm font-medium transition-colors hover:text-slate-900 flex items-center gap-1.5 relative"
+                                        style={{ color: ongelezen > 0 ? theme.colors.error[500] : theme.colors.neutral[500] }}
                                     >
                                         <BellIcon className="h-4 w-4" />
                                         Notificaties
+                                        {ongelezen > 0 && (
+                                            <span
+                                                className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1"
+                                                style={{
+                                                    backgroundColor: theme.colors.error[500],
+                                                    color: '#FFFFFF',
+                                                }}
+                                            >
+                                                {ongelezen > 99 ? '99+' : ongelezen}
+                                            </span>
+                                        )}
                                     </Link>
                                 </>
                             )}
@@ -88,11 +123,22 @@ export default function Layout({ children }) {
                                     </Link>
                                     <Link
                                         href="/notificaties"
-                                        className="text-sm font-medium transition-colors hover:text-slate-900 flex items-center gap-1.5"
-                                        style={{ color: '#64748B' }}
+                                        className="text-sm font-medium transition-colors hover:text-slate-900 flex items-center gap-1.5 relative"
+                                        style={{ color: ongelezen > 0 ? theme.colors.error[500] : theme.colors.neutral[500] }}
                                     >
                                         <BellIcon className="h-4 w-4" />
                                         Notificaties
+                                        {ongelezen > 0 && (
+                                            <span
+                                                className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1"
+                                                style={{
+                                                    backgroundColor: theme.colors.error[500],
+                                                    color: '#FFFFFF',
+                                                }}
+                                            >
+                                                {ongelezen > 99 ? '99+' : ongelezen}
+                                            </span>
+                                        )}
                                     </Link>
                                 </>
                             )}

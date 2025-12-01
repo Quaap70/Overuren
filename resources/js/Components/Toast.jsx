@@ -1,4 +1,3 @@
-import React from 'react';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { CheckCircleIcon, XCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
