@@ -9,6 +9,7 @@ import { XMarkIcon, PlusIcon, PencilIcon, CheckIcon, TrashIcon } from '@heroicon
 
 export default function OverurenIndex({ overuren, filters }) {
     const [showForm, setShowForm] = useState(false);
+    const [activeTab, setActiveTab] = useState('overuren'); // 'overuren' of 'opnemen'
     const [editingId, setEditingId] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null });
     const [submitConfirm, setSubmitConfirm] = useState({ show: false, id: null });
@@ -43,17 +44,23 @@ export default function OverurenIndex({ overuren, filters }) {
         // Explicitly determine the status
         const finalStatus = overrideStatus !== null ? overrideStatus : data.status;
 
+        // Als activeTab 'opnemen' is en gebruiker heeft positief getal ingevoerd, maak het negatief
+        let finalMinuten = parseInt(data.minuten);
+        if (activeTab === 'opnemen' && finalMinuten > 0) {
+            finalMinuten = -finalMinuten;
+        }
+
         const submitData = {
             datum: data.datum,
-            minuten: data.minuten,
+            minuten: finalMinuten,
             reden: data.reden,
             status: finalStatus,
         };
 
         console.log('=== FRONTEND DEBUG ===');
-        console.log('overrideStatus parameter:', overrideStatus);
-        console.log('data.status:', data.status);
-        console.log('finalStatus:', finalStatus);
+        console.log('activeTab:', activeTab);
+        console.log('input minuten:', data.minuten);
+        console.log('final minuten:', finalMinuten);
         console.log('submitData:', JSON.stringify(submitData, null, 2));
         console.log('======================');
 
@@ -78,9 +85,13 @@ export default function OverurenIndex({ overuren, filters }) {
     };
 
     const handleEdit = (uur) => {
+        // Bij negatieve waarden: toon als positief + zet tab op 'opnemen'
+        const isOpname = uur.minuten < 0;
+        setActiveTab(isOpname ? 'opnemen' : 'overuren');
+
         setData({
             datum: uur.datum,
-            minuten: uur.minuten,
+            minuten: Math.abs(uur.minuten), // Altijd positief tonen in het formulier
             reden: uur.reden || '',
             status: uur.status,
         });
@@ -125,9 +136,9 @@ export default function OverurenIndex({ overuren, filters }) {
             <div className="mb-6 flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold" style={{ color: '#2D3748' }}>
-                        Mijn Overuren
+                        Mijn Uren
                     </h1>
-                    <p style={{ color: '#718096' }}>Beheer je overuren registraties</p>
+                    <p style={{ color: '#718096' }}>Registreer overuren en opgenomen uren</p>
                 </div>
                 <Button
                     variant="primary"
@@ -154,8 +165,46 @@ export default function OverurenIndex({ overuren, filters }) {
             {showForm && (
                 <Card className="mb-6">
                     <h2 className="text-xl font-bold mb-4" style={{ color: '#2D3748' }}>
-                        {editingId ? 'Bewerk Registratie' : 'Nieuwe Overuren Registratie'}
+                        {editingId ? 'Bewerk Registratie' : 'Nieuwe Uren Registratie'}
                     </h2>
+
+                    {/* Tabs */}
+                    {!editingId && (
+                        <div className="flex border-b-2 mb-4" style={{ borderColor: '#E2E8F0' }}>
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('overuren')}
+                                className="px-6 py-3 font-semibold transition-all"
+                                style={{
+                                    color: activeTab === 'overuren' ? '#2D3748' : '#718096',
+                                    borderBottom: activeTab === 'overuren' ? '3px solid #B8E6D1' : '3px solid transparent',
+                                }}
+                            >
+                                Overuren
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('opnemen')}
+                                className="px-6 py-3 font-semibold transition-all"
+                                style={{
+                                    color: activeTab === 'opnemen' ? '#2D3748' : '#718096',
+                                    borderBottom: activeTab === 'opnemen' ? '3px solid #FFB3BA' : '3px solid transparent',
+                                }}
+                            >
+                                Opnemen
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Info text */}
+                    <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: activeTab === 'overuren' ? '#B8E6D1' : '#FFB3BA', color: '#2D3748' }}>
+                        <p className="text-sm font-medium">
+                            {activeTab === 'overuren'
+                                ? '✓ Registreer extra gewerkte uren (positief)'
+                                : '✗ Registreer opgenomen verlofuren (wordt afgetrokken van je saldo)'}
+                        </p>
+                    </div>
+
                     <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Input
@@ -167,13 +216,15 @@ export default function OverurenIndex({ overuren, filters }) {
                                 required
                             />
                             <Input
-                                label="Minuten"
+                                label={activeTab === 'overuren' ? 'Aantal Minuten' : 'Opgenomen Minuten'}
                                 type="number"
                                 value={data.minuten}
                                 onChange={(e) => setData('minuten', e.target.value)}
-                                placeholder="Bijv. 60 (voor 1 uur)"
+                                placeholder={activeTab === 'overuren' ? 'Bijv. 60 (voor 1 uur overwerk)' : 'Bijv. 480 (voor 1 dag verlof)'}
                                 error={errors.minuten}
                                 required
+                                min="5"
+                                step="5"
                             />
                         </div>
                         <Input
@@ -181,7 +232,7 @@ export default function OverurenIndex({ overuren, filters }) {
                             type="text"
                             value={data.reden}
                             onChange={(e) => setData('reden', e.target.value)}
-                            placeholder="Waarom heb je overuren gemaakt?"
+                            placeholder={activeTab === 'overuren' ? 'Waarom heb je overuren gemaakt?' : 'Reden voor opname (bijv. verlof, doktersbezoek)'}
                             error={errors.reden}
                         />
                         <div className="flex gap-3 mt-4">
@@ -199,7 +250,7 @@ export default function OverurenIndex({ overuren, filters }) {
                                     disabled={processing}
                                     onClick={(e) => handleSubmit(e, 'INGEDIEND')}
                                 >
-                                    Opslaan en Indienen
+                                    {activeTab === 'overuren' ? 'Opslaan en Indienen' : 'Opname Indienen'}
                                 </Button>
                             )}
                             <Button
