@@ -100,7 +100,7 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
                 preserveScroll: true,
                 preserveState: true,
             });
-        }, 15000); // 15 seconden
+        }, 10000); // 15 seconden
 
         return () => clearInterval(interval);
     }, []);

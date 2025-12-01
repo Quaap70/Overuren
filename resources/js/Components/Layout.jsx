@@ -85,7 +85,7 @@ export default function Layout({ children }) {
                                         Notificaties
                                         {ongelezen > 0 && (
                                             <span
-                                                className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1"
+                                                className="absolute -top-2 -right-3 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1"
                                                 style={{
                                                     backgroundColor: theme.colors.error[500],
                                                     color: '#FFFFFF',
@@ -130,7 +130,7 @@ export default function Layout({ children }) {
                                         Notificaties
                                         {ongelezen > 0 && (
                                             <span
-                                                className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1"
+                                                className="absolute -top-2 -right-3 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1"
                                                 style={{
                                                     backgroundColor: theme.colors.error[500],
                                                     color: '#FFFFFF',
