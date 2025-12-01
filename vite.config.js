@@ -9,10 +9,7 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.jsx'],
             refresh: true,
         }),
-        react({
-            jsxRuntime: 'automatic',
-            fastRefresh: true,
-        }),
+        react(),
         tailwindcss(),
     ],
     server: {
