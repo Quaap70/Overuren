@@ -297,6 +297,7 @@ class HRController extends Controller
                 'voornaam' => $user->voornaam,
                 'achternaam' => $user->achternaam,
                 'naam' => $user->full_name,
+                'role' => $user->role,
                 'afdeling' => $user->afdeling,
                 'startdatum' => $user->startdatum?->format('Y-m-d'),
                 'is_active' => $user->is_active,
