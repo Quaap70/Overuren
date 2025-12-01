@@ -19,8 +19,8 @@ class SaldoService
             ],
             [
                 'overgedragen_saldo' => 0,
-                'gebruikt_saldo' => 0,
-                'huidig_saldo' => 0,
+                'opgenomen_saldo' => 0,
+                'overuren_saldo' => 0,
                 'laatst_bijgewerkt' => now(),
             ]
         );
@@ -28,6 +28,11 @@ class SaldoService
 
     /**
      * Recalculate saldo for user
+     *
+     * Nieuwe berekening:
+     * - overuren_saldo = som van positieve minuten (overuren gemaakt)
+     * - opgenomen_saldo = absoluut getal van negatieve minuten (uren opgenomen)
+     * - totaal = overgedragen + overuren_saldo - opgenomen_saldo
      */
     public function recalculateSaldo(int $userId, int $jaar): Saldo
     {
@@ -36,10 +41,19 @@ class SaldoService
             ->where('status', 'GOEDGEKEURD')
             ->get();
 
-        $totaalMinuten = $goedgekeurdeUren->sum('minuten');
+        // Bereken overuren saldo (alleen positieve waarden)
+        $overurenSaldo = $goedgekeurdeUren
+            ->where('minuten', '>', 0)
+            ->sum('minuten');
+
+        // Bereken opgenomen saldo (absoluut getal van negatieve waarden)
+        $opgenomenSaldo = abs($goedgekeurdeUren
+            ->where('minuten', '<', 0)
+            ->sum('minuten'));
 
         $saldo = $this->getOrCreateSaldo($userId, $jaar);
-        $saldo->huidig_saldo = $saldo->overgedragen_saldo + $totaalMinuten - $saldo->gebruikt_saldo;
+        $saldo->overuren_saldo = $overurenSaldo;
+        $saldo->opgenomen_saldo = $opgenomenSaldo;
         $saldo->laatst_bijgewerkt = now();
         $saldo->save();
 

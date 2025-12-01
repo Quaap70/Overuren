@@ -109,7 +109,7 @@ class HRController extends Controller
                 'afdeling' => $m->afdeling,
                 'startdatum' => $m->startdatum?->format('Y-m-d'),
                 'is_active' => $m->is_active,
-                'huidig_saldo' => $m->saldo->first()?->huidig_saldo ?? 0,
+                'huidig_saldo' => $m->saldo->first()?->totaal_saldo ?? 0,
                 'formatted_saldo' => $m->saldo->first()?->formatted_saldo ?? '0u 0m',
             ]);
 
@@ -242,8 +242,8 @@ class HRController extends Controller
         $huidigJaar = now()->year;
         $saldo = $this->saldoService->getOrCreateSaldo($user->id, $huidigJaar);
 
-        // Adjust saldo
-        $saldo->huidig_saldo += $validated['minuten'];
+        // Adjust overgedragen_saldo (manual correction by HR)
+        $saldo->overgedragen_saldo += $validated['minuten'];
         $saldo->laatst_bijgewerkt = now();
         $saldo->save();
 
@@ -302,10 +302,11 @@ class HRController extends Controller
                 'startdatum' => $user->startdatum?->format('Y-m-d'),
                 'is_active' => $user->is_active,
                 'saldo' => [
-                    'minuten' => $saldo->huidig_saldo,
+                    'minuten' => $saldo->totaal_saldo,
                     'formatted' => $saldo->formatted_saldo,
                     'overgedragen' => $saldo->overgedragen_saldo,
-                    'gebruikt' => $saldo->gebruikt_saldo,
+                    'overuren' => $saldo->overuren_saldo,
+                    'opgenomen' => $saldo->opgenomen_saldo,
                 ],
             ],
             'recente_overuren' => $recenteUren,

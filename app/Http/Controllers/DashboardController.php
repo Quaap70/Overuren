@@ -23,10 +23,11 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard/Index', [
             'saldo' => [
                 'jaar' => $huidigJaar,
-                'saldo_minuten' => $saldo->huidig_saldo,
+                'saldo_minuten' => $saldo->totaal_saldo,
                 'formatted' => $saldo->formatted_saldo,
                 'overgedragen' => $saldo->overgedragen_saldo,
-                'gebruikt' => $saldo->gebruikt_saldo,
+                'overuren' => $saldo->overuren_saldo,
+                'opgenomen' => $saldo->opgenomen_saldo,
                 'laatst_bijgewerkt' => $saldo->laatst_bijgewerkt->format('Y-m-d H:i:s'),
             ],
         ]);

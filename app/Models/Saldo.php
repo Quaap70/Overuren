@@ -18,8 +18,8 @@ class Saldo extends Model
         'user_id',
         'jaar',
         'overgedragen_saldo',
-        'gebruikt_saldo',
-        'huidig_saldo',
+        'opgenomen_saldo',
+        'overuren_saldo',
         'laatst_bijgewerkt',
     ];
 
@@ -30,8 +30,8 @@ class Saldo extends Model
      */
     protected $attributes = [
         'overgedragen_saldo' => 0,
-        'gebruikt_saldo' => 0,
-        'huidig_saldo' => 0,
+        'opgenomen_saldo' => 0,
+        'overuren_saldo' => 0,
     ];
 
     /**
@@ -59,25 +59,25 @@ class Saldo extends Model
     }
 
     /**
-     * Get formatted saldo string (e.g., "24u 30m")
+     * Calculate total saldo
+     * Formula: overgedragen + overuren - opgenomen
      */
-    public function getFormattedSaldoAttribute(): string
+    public function getTotaalSaldoAttribute(): int
     {
-        $absMinuten = abs($this->huidig_saldo);
-        $uren = floor($absMinuten / 60);
-        $minuten = $absMinuten % 60;
-        $prefix = $this->huidig_saldo < 0 ? '-' : '';
-
-        return "{$prefix}{$uren}u {$minuten}m";
+        return $this->overgedragen_saldo + $this->overuren_saldo - $this->opgenomen_saldo;
     }
 
     /**
-     * Update saldo based on approved hours
+     * Get formatted total saldo string (e.g., "24u 30m")
      */
-    public function updateSaldo(int $minuten): void
+    public function getFormattedSaldoAttribute(): string
     {
-        $this->huidig_saldo += $minuten;
-        $this->laatst_bijgewerkt = now();
-        $this->save();
+        $totaal = $this->totaal_saldo;
+        $absMinuten = abs($totaal);
+        $uren = floor($absMinuten / 60);
+        $minuten = $absMinuten % 60;
+        $prefix = $totaal < 0 ? '-' : '';
+
+        return "{$prefix}{$uren}u {$minuten}m";
     }
 }
