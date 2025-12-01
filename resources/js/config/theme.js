@@ -175,6 +175,12 @@ export const componentStyles = {
                 border: `1px solid ${theme.colors.neutral[300]}`,
                 focusRing: `0 0 0 3px ${theme.colors.neutral[200]}`,
             },
+            success: {
+                background: theme.colors.success[600],
+                color: '#FFFFFF',
+                hoverBackground: theme.colors.success[700],
+                focusRing: `0 0 0 3px ${theme.colors.success[100]}`,
+            },
             danger: {
                 background: theme.colors.error[600],
                 color: '#FFFFFF',

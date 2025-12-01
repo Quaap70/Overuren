@@ -15,6 +15,7 @@ export default function Button({
     const variantClasses = {
         primary: 'text-white shadow-sm hover:shadow-md',
         secondary: 'border border-solid',
+        success: 'text-white shadow-sm hover:shadow-md',
         danger: 'text-white shadow-sm hover:shadow-md',
         ghost: '',
     };
