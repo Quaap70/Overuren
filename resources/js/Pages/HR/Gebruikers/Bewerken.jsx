@@ -343,15 +343,15 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
 
             {/* Confirm Modal */}
             <ConfirmModal
-                show={toggleActiveConfirm}
+                isOpen={toggleActiveConfirm}
+                onClose={() => setToggleActiveConfirm(false)}
                 title={gebruiker.is_active ? 'Gebruiker deactiveren' : 'Gebruiker activeren'}
                 message={gebruiker.is_active
                     ? 'Weet je zeker dat je deze gebruiker wilt deactiveren?'
                     : 'Weet je zeker dat je deze gebruiker wilt activeren?'}
                 onConfirm={confirmToggleActive}
-                onCancel={() => setToggleActiveConfirm(false)}
                 confirmText={gebruiker.is_active ? 'Deactiveren' : 'Activeren'}
-                confirmVariant={gebruiker.is_active ? 'danger' : 'success'}
+                variant={gebruiker.is_active ? 'danger' : 'success'}
             />
         </Layout>
     );

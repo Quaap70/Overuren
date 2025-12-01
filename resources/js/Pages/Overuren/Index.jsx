@@ -330,23 +330,23 @@ export default function OverurenIndex({ overuren, filters }) {
 
             {/* Confirm Modals */}
             <ConfirmModal
-                show={deleteConfirm.show}
+                isOpen={deleteConfirm.show}
+                onClose={() => setDeleteConfirm({ show: false, id: null })}
                 title="Registratie verwijderen"
                 message="Weet je zeker dat je deze registratie wilt verwijderen?"
                 onConfirm={confirmDelete}
-                onCancel={() => setDeleteConfirm({ show: false, id: null })}
                 confirmText="Verwijderen"
-                confirmVariant="danger"
+                variant="danger"
             />
 
             <ConfirmModal
-                show={submitConfirm.show}
+                isOpen={submitConfirm.show}
+                onClose={() => setSubmitConfirm({ show: false, id: null })}
                 title="Registratie indienen"
                 message="Weet je zeker dat je deze registratie wilt indienen voor goedkeuring?"
                 onConfirm={confirmSubmit}
-                onCancel={() => setSubmitConfirm({ show: false, id: null })}
                 confirmText="Indienen"
-                confirmVariant="success"
+                variant="success"
             />
         </Layout>
     );

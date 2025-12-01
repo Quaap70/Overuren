@@ -203,23 +203,23 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count }) {
 
             {/* Confirm Modals */}
             <ConfirmModal
-                show={markAllConfirm}
+                isOpen={markAllConfirm}
+                onClose={() => setMarkAllConfirm(false)}
                 title="Alle notificaties markeren als gelezen"
                 message="Wil je alle notificaties als gelezen markeren?"
                 onConfirm={confirmMarkAllAsRead}
-                onCancel={() => setMarkAllConfirm(false)}
                 confirmText="Markeren als gelezen"
-                confirmVariant="primary"
+                variant="primary"
             />
 
             <ConfirmModal
-                show={deleteConfirm.show}
+                isOpen={deleteConfirm.show}
+                onClose={() => setDeleteConfirm({ show: false, id: null })}
                 title="Notificatie verwijderen"
                 message="Weet je zeker dat je deze notificatie wilt verwijderen?"
                 onConfirm={confirmDelete}
-                onCancel={() => setDeleteConfirm({ show: false, id: null })}
                 confirmText="Verwijderen"
-                confirmVariant="danger"
+                variant="danger"
             />
         </Layout>
     );
