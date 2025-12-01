@@ -61,10 +61,10 @@ export default function SaldoIndex({ saldo }) {
                             Opgebouwd Dit Jaar
                         </h3>
                         <p className="text-sm mb-2" style={{ color: '#718096' }}>
-                            Goedgekeurde uren
+                            Goedgekeurde overuren
                         </p>
                         <p className="text-3xl font-bold" style={{ color: '#B8E6D1' }}>
-                            {formatMinutesToHoursMinutes(saldo.saldo_minuten - saldo.overgedragen + saldo.gebruikt)}
+                            {formatMinutesToHoursMinutes(saldo.overuren)}
                         </p>
                     </div>
                 </Card>
@@ -73,13 +73,13 @@ export default function SaldoIndex({ saldo }) {
                     <div className="text-center">
                         <MinusIcon className="w-10 h-10 mx-auto mb-3" style={{ color: '#FFB3BA' }} />
                         <h3 className="text-lg font-semibold mb-2" style={{ color: '#2D3748' }}>
-                            Gebruikt
+                            Opgenomen
                         </h3>
                         <p className="text-sm mb-2" style={{ color: '#718096' }}>
                             Opgenomen uren
                         </p>
                         <p className="text-3xl font-bold" style={{ color: '#FFB3BA' }}>
-                            {formatMinutesToHoursMinutes(saldo.gebruikt)}
+                            {formatMinutesToHoursMinutes(saldo.opgenomen)}
                         </p>
                     </div>
                 </Card>
@@ -92,9 +92,10 @@ export default function SaldoIndex({ saldo }) {
                 </h2>
                 <div className="space-y-2" style={{ color: '#718096' }}>
                     <p>• Je saldo wordt automatisch bijgewerkt wanneer overuren worden goedgekeurd</p>
-                    <p>• Overgedragen saldo komt van het vorige jaar</p>
-                    <p>• Gebruikt saldo zijn uren die je hebt opgenomen</p>
-                    <p>• Alleen goedgekeurde uren tellen mee in je saldo</p>
+                    <p>• <strong>Overgedragen saldo:</strong> komt van het vorige jaar</p>
+                    <p>• <strong>Opgebouwd dit jaar:</strong> goedgekeurde overuren (positief)</p>
+                    <p>• <strong>Opgenomen:</strong> uren die je hebt opgenomen (negatief)</p>
+                    <p>• <strong>Huidig saldo:</strong> overgedragen + opgebouwd - opgenomen</p>
                 </div>
             </Card>
         </Layout>
