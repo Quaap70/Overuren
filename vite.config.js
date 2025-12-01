@@ -14,10 +14,10 @@ export default defineConfig({
     ],
     server: {
         host: '0.0.0.0',
-        port: 5173,
-        strictPort: true,
         hmr: {
-            host: 'localhost',
-        },
+            host: '10.1.10.129', // ← jouw lokale IP
+            port: 5173,
+            clientPort: 5173
+        }
     },
 });
