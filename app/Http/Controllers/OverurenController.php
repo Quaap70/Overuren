@@ -40,6 +40,8 @@ class OverurenController extends Controller
                 'minuten' => $o->minuten,
                 'formatted_time' => $o->formatted_time,
                 'reden' => $o->reden,
+                'week_nummer' => $o->week_nummer,
+                'jaar' => $o->jaar,
                 'status' => $o->status,
                 'kan_wijzigen' => $o->canBeModified(),
                 'afkeur_reden' => $o->afkeur_reden,
@@ -57,6 +59,8 @@ class OverurenController extends Controller
      */
     public function store(Request $request)
     {
+        //dd($request->all());
+
         $validated = $request->validate([
             'datum' => 'required|date',
             'minuten' => 'required|integer',
@@ -67,7 +71,7 @@ class OverurenController extends Controller
         // Validate minutes
         if (!Overuren::validateMinuten($validated['minuten'])) {
             return back()->withErrors([
-                'minuten' => 'Minuten moeten een veelvoud van 10 zijn en max ±12 uur (720 minuten)',
+                'minuten' => 'Minuten moeten een veelvoud van 5 zijn en max 8 uur (640 minuten)',
             ]);
         }
 
@@ -145,7 +149,7 @@ class OverurenController extends Controller
         // Validate minutes if provided
         if (isset($validated['minuten']) && !Overuren::validateMinuten($validated['minuten'])) {
             return back()->withErrors([
-                'minuten' => 'Minuten moeten een veelvoud van 10 zijn en max ±12 uur (720 minuten)',
+                'minuten' => 'Minuten moeten een veelvoud van 5 zijn en max 8 uur (640 minuten)',
             ]);
         }
 

@@ -88,6 +88,6 @@ class Overuren extends Model
      */
     public static function validateMinuten(int $minuten): bool
     {
-        return $minuten % 10 === 0 && abs($minuten) <= 720;
+        return $minuten % 5 === 0 && abs($minuten) <= 640;
     }
 }
