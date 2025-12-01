@@ -40,12 +40,21 @@ export default function OverurenIndex({ overuren, filters }) {
     const handleSubmit = (e, overrideStatus = null) => {
         e.preventDefault();
 
-        const submitData = overrideStatus
-            ? { ...data, status: overrideStatus }
-            : data;
+        // Temporarily override status if needed
+        if (overrideStatus) {
+            setData('status', overrideStatus);
+            // Use setTimeout to ensure state update completes
+            setTimeout(() => {
+                submitForm();
+            }, 0);
+        } else {
+            submitForm();
+        }
+    };
 
+    const submitForm = () => {
         if (editingId) {
-            router.put(`/overuren/${editingId}`, submitData, {
+            put(`/overuren/${editingId}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     reset();
@@ -54,7 +63,7 @@ export default function OverurenIndex({ overuren, filters }) {
                 },
             });
         } else {
-            router.post('/overuren', submitData, {
+            post('/overuren', {
                 preserveScroll: true,
                 onSuccess: () => {
                     reset();
