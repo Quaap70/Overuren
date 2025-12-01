@@ -5,7 +5,7 @@ import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import Input from '../../Components/Input';
 import ConfirmModal from '../../Components/ConfirmModal';
-import { XMarkIcon, PlusIcon, PencilIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PlusIcon, PencilIcon, CheckIcon, TrashIcon, ArrowUpCircleIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline';
 
 export default function OverurenIndex({ overuren, filters }) {
     const [showForm, setShowForm] = useState(false);
@@ -273,84 +273,102 @@ export default function OverurenIndex({ overuren, filters }) {
 
                 {overuren.data && overuren.data.length > 0 ? (
                     <div className="space-y-3">
-                        {overuren.data.map((uur) => (
-                            <div
-                                key={uur.id}
-                                className="p-4 rounded-lg border-2"
-                                style={{
-                                    backgroundColor: '#F7FAFC',
-                                    borderColor: '#E2E8F0',
-                                }}
-                            >
-                                <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <span className="font-semibold" style={{ color: '#2D3748' }}>
-                                                {new Date(uur.datum).toLocaleDateString('nl-NL', {
-                                                    weekday: 'short',
-                                                    year: 'numeric',
-                                                    month: 'short',
-                                                    day: 'numeric'
-                                                })}
-                                            </span>
-                                            <span
-                                                className="px-3 py-1 rounded-full text-sm font-semibold"
-                                                style={getStatusBadgeStyle(uur.status)}
-                                            >
-                                                {uur.status}
-                                            </span>
-                                        </div>
-                                        <p className="text-2xl font-bold mb-1" style={{ color: '#2D3748' }}>
-                                            {uur.formatted_time}
-                                        </p>
-                                        {uur.reden && (
-                                            <p className="text-sm italic" style={{ color: '#718096' }}>
-                                                "{uur.reden}"
-                                            </p>
-                                        )}
-                                        {uur.afkeur_reden && (
-                                            <p className="text-sm mt-2 p-2 rounded" style={{ backgroundColor: '#FFB3BA', color: '#2D3748' }}>
-                                                Afkeur reden: {uur.afkeur_reden}
-                                            </p>
-                                        )}
-                                        <p className="text-xs mt-2" style={{ color: '#718096' }}>
-                                            Week {uur.week_nummer} • Jaar {uur.jaar}
-                                        </p>
-                                    </div>
-                                    <div className="flex gap-2 ml-4">
-                                        {(uur.status === 'CONCEPT' || uur.status === 'AFGEKEURD') && (
-                                            <>
-                                                <Button
-                                                    variant="secondary"
-                                                    className="px-3 py-1 text-sm"
-                                                    onClick={() => handleEdit(uur)}
+                        {overuren.data.map((uur) => {
+                            const isOpname = uur.minuten < 0;
+                            return (
+                                <div
+                                    key={uur.id}
+                                    className="p-4 rounded-lg border-2"
+                                    style={{
+                                        backgroundColor: isOpname ? '#FFF5F5' : '#F0FFF4',
+                                        borderColor: isOpname ? '#FFB3BA' : '#B8E6D1',
+                                        borderLeftWidth: '6px',
+                                    }}
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                {/* Type Badge */}
+                                                <span
+                                                    className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                                                    style={{
+                                                        backgroundColor: isOpname ? '#FFB3BA' : '#B8E6D1',
+                                                        color: '#2D3748',
+                                                    }}
                                                 >
-                                                    <PencilIcon className="w-4 h-4" />
-                                                </Button>
-                                                {uur.status === 'CONCEPT' && (
+                                                    {isOpname ? (
+                                                        <><ArrowDownCircleIcon className="w-4 h-4" /> Opname</>
+                                                    ) : (
+                                                        <><ArrowUpCircleIcon className="w-4 h-4" /> Overuren</>
+                                                    )}
+                                                </span>
+                                                <span className="font-semibold" style={{ color: '#2D3748' }}>
+                                                    {new Date(uur.datum).toLocaleDateString('nl-NL', {
+                                                        weekday: 'short',
+                                                        year: 'numeric',
+                                                        month: 'short',
+                                                        day: 'numeric'
+                                                    })}
+                                                </span>
+                                                <span
+                                                    className="px-3 py-1 rounded-full text-sm font-semibold"
+                                                    style={getStatusBadgeStyle(uur.status)}
+                                                >
+                                                    {uur.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-2xl font-bold mb-1" style={{ color: isOpname ? '#DC2626' : '#059669' }}>
+                                                {uur.formatted_time}
+                                            </p>
+                                            {uur.reden && (
+                                                <p className="text-sm italic" style={{ color: '#718096' }}>
+                                                    "{uur.reden}"
+                                                </p>
+                                            )}
+                                            {uur.afkeur_reden && (
+                                                <p className="text-sm mt-2 p-2 rounded" style={{ backgroundColor: '#FFB3BA', color: '#2D3748' }}>
+                                                    Afkeur reden: {uur.afkeur_reden}
+                                                </p>
+                                            )}
+                                            <p className="text-xs mt-2" style={{ color: '#718096' }}>
+                                                Week {uur.week_nummer} • Jaar {uur.jaar}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-2 ml-4">
+                                            {(uur.status === 'CONCEPT' || uur.status === 'AFGEKEURD') && (
+                                                <>
                                                     <Button
-                                                        variant="success"
+                                                        variant="secondary"
                                                         className="px-3 py-1 text-sm"
-                                                        onClick={() => handleSubmitForApproval(uur.id)}
+                                                        onClick={() => handleEdit(uur)}
                                                     >
-                                                        <CheckIcon className="w-4 h-4 inline mr-1" /> Indienen
+                                                        <PencilIcon className="w-4 h-4" />
                                                     </Button>
-                                                )}
-                                            </>
-                                        )}
-                                        {uur.status === 'CONCEPT' && (
-                                            <Button
-                                                variant="danger"
-                                                className="px-3 py-1 text-sm"
-                                                onClick={() => handleDelete(uur.id)}
-                                            >
-                                                <TrashIcon className="w-4 h-4" />
-                                            </Button>
-                                        )}
+                                                    {uur.status === 'CONCEPT' && (
+                                                        <Button
+                                                            variant="success"
+                                                            className="px-3 py-1 text-sm"
+                                                            onClick={() => handleSubmitForApproval(uur.id)}
+                                                        >
+                                                            <CheckIcon className="w-4 h-4 inline mr-1" /> Indienen
+                                                        </Button>
+                                                    )}
+                                                </>
+                                            )}
+                                            {uur.status === 'CONCEPT' && (
+                                                <Button
+                                                    variant="danger"
+                                                    className="px-3 py-1 text-sm"
+                                                    onClick={() => handleDelete(uur.id)}
+                                                >
+                                                    <TrashIcon className="w-4 h-4" />
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <p className="text-center py-8" style={{ color: '#718096' }}>

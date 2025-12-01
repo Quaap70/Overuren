@@ -5,7 +5,7 @@ import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import ConfirmModal from '../../Components/ConfirmModal';
 import InputModal from '../../Components/InputModal';
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, ArrowUpCircleIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline';
 
 export default function TeBeoordelen({ indieningen }) {
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null });
@@ -53,55 +53,72 @@ export default function TeBeoordelen({ indieningen }) {
 
                 {indieningen.data && indieningen.data.length > 0 ? (
                     <div className="space-y-3">
-                        {indieningen.data.map((indiening) => (
-                            <div
-                                key={indiening.id}
-                                className="p-4 rounded-lg border transition-all hover:border-slate-300"
-                                style={{
-                                    backgroundColor: '#FAFAFA',
-                                    borderColor: '#E2E8F0',
-                                }}
-                            >
-                                <div className="flex justify-between items-start gap-6">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <h3 className="text-base font-semibold" style={{ color: '#1E293B' }}>
-                                                {indiening.medewerker.naam}
-                                            </h3>
-                                            <span className="text-sm px-2 py-0.5 rounded" style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}>
-                                                {indiening.medewerker.afdeling}
-                                            </span>
-                                            <span
-                                                className="px-2 py-0.5 rounded text-xs font-medium"
-                                                style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}
-                                            >
-                                                INGEDIEND
-                                            </span>
-                                        </div>
+                        {indieningen.data.map((indiening) => {
+                            const isOpname = indiening.minuten < 0;
+                            return (
+                                <div
+                                    key={indiening.id}
+                                    className="p-4 rounded-lg border-2 transition-all hover:border-slate-300"
+                                    style={{
+                                        backgroundColor: isOpname ? '#FFF5F5' : '#F0FFF4',
+                                        borderColor: isOpname ? '#FFB3BA' : '#B8E6D1',
+                                        borderLeftWidth: '6px',
+                                    }}
+                                >
+                                    <div className="flex justify-between items-start gap-6">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                {/* Type Badge */}
+                                                <span
+                                                    className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                                                    style={{
+                                                        backgroundColor: isOpname ? '#FFB3BA' : '#B8E6D1',
+                                                        color: '#2D3748',
+                                                    }}
+                                                >
+                                                    {isOpname ? (
+                                                        <><ArrowDownCircleIcon className="w-4 h-4" /> Opname</>
+                                                    ) : (
+                                                        <><ArrowUpCircleIcon className="w-4 h-4" /> Overuren</>
+                                                    )}
+                                                </span>
+                                                <h3 className="text-base font-semibold" style={{ color: '#1E293B' }}>
+                                                    {indiening.medewerker.naam}
+                                                </h3>
+                                                <span className="text-sm px-2 py-0.5 rounded" style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}>
+                                                    {indiening.medewerker.afdeling}
+                                                </span>
+                                                <span
+                                                    className="px-2 py-0.5 rounded text-xs font-medium"
+                                                    style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}
+                                                >
+                                                    INGEDIEND
+                                                </span>
+                                            </div>
 
-                                        <div className="grid grid-cols-2 gap-4 mb-3">
-                                            <div>
-                                                <span className="text-xs block mb-1" style={{ color: '#94A3B8' }}>
-                                                    Datum
-                                                </span>
-                                                <p className="text-sm font-medium" style={{ color: '#475569' }}>
-                                                    {new Date(indiening.datum).toLocaleDateString('nl-NL', {
-                                                        weekday: 'short',
-                                                        day: 'numeric',
-                                                        month: 'short',
-                                                        year: 'numeric'
-                                                    })}
-                                                </p>
+                                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                                <div>
+                                                    <span className="text-xs block mb-1" style={{ color: '#94A3B8' }}>
+                                                        Datum
+                                                    </span>
+                                                    <p className="text-sm font-medium" style={{ color: '#475569' }}>
+                                                        {new Date(indiening.datum).toLocaleDateString('nl-NL', {
+                                                            weekday: 'short',
+                                                            day: 'numeric',
+                                                            month: 'short',
+                                                            year: 'numeric'
+                                                        })}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs block mb-1" style={{ color: '#94A3B8' }}>
+                                                        {isOpname ? 'Opgenomen Uren' : 'Overuren'}
+                                                    </span>
+                                                    <p className="text-base font-semibold" style={{ color: isOpname ? '#DC2626' : '#059669' }}>
+                                                        {indiening.formatted}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <span className="text-xs block mb-1" style={{ color: '#94A3B8' }}>
-                                                    Uren
-                                                </span>
-                                                <p className="text-base font-semibold" style={{ color: '#1E293B' }}>
-                                                    {indiening.formatted}
-                                                </p>
-                                            </div>
-                                        </div>
 
                                         {indiening.reden && (
                                             <div className="p-3 rounded border mb-3" style={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0' }}>
@@ -141,7 +158,8 @@ export default function TeBeoordelen({ indieningen }) {
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <div className="text-center py-16">
