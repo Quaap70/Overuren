@@ -41,6 +41,8 @@ class OverurenController extends Controller
                 'formatted_time' => $o->formatted_time,
                 'reden' => $o->reden,
                 'status' => $o->status,
+                'week_nummer' => $o->week_nummer,
+                'jaar' => $o->jaar,
                 'kan_wijzigen' => $o->canBeModified(),
                 'afkeur_reden' => $o->afkeur_reden,
                 'goedgekeurd_op' => $o->goedgekeurd_op?->format('Y-m-d H:i'),
