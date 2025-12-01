@@ -34,11 +34,15 @@ export default function OverurenIndex({ overuren, filters }) {
         return styles[status] || styles.CONCEPT;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e, overrideStatus = null) => {
         e.preventDefault();
 
+        const submitData = overrideStatus
+            ? { ...data, status: overrideStatus }
+            : data;
+
         if (editingId) {
-            put(`/overuren/${editingId}`, {
+            router.put(`/overuren/${editingId}`, submitData, {
                 preserveScroll: true,
                 onSuccess: () => {
                     reset();
@@ -47,7 +51,7 @@ export default function OverurenIndex({ overuren, filters }) {
                 },
             });
         } else {
-            post('/overuren', {
+            router.post('/overuren', submitData, {
                 preserveScroll: true,
                 onSuccess: () => {
                     reset();
@@ -171,10 +175,7 @@ export default function OverurenIndex({ overuren, filters }) {
                                     type="button"
                                     variant="success"
                                     disabled={processing}
-                                    onClick={() => {
-                                        setData('status', 'INGEDIEND');
-                                        setTimeout(() => handleSubmit({ preventDefault: () => {} }), 0);
-                                    }}
+                                    onClick={(e) => handleSubmit(e, 'INGEDIEND')}
                                 >
                                     Opslaan en Indienen
                                 </Button>
