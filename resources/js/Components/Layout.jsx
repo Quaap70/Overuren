@@ -79,7 +79,7 @@ export default function Layout({ children }) {
                                     <Link
                                         href="/notificaties"
                                         className="text-sm font-medium transition-colors hover:text-slate-900 flex items-center gap-1.5 relative"
-                                        style={{ color: ongelezen > 0 ? theme.colors.primary[500] : theme.colors.neutral[500] }}
+                                        style={{ color: ongelezen > 0 ? theme.colors.error[500] : theme.colors.neutral[500] }}
                                     >
                                         <BellIcon className="h-4 w-4" />
                                         Notificaties
@@ -87,7 +87,7 @@ export default function Layout({ children }) {
                                             <span
                                                 className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1"
                                                 style={{
-                                                    backgroundColor: theme.colors.primary[500],
+                                                    backgroundColor: theme.colors.error[500],
                                                     color: '#FFFFFF',
                                                 }}
                                             >
@@ -124,7 +124,7 @@ export default function Layout({ children }) {
                                     <Link
                                         href="/notificaties"
                                         className="text-sm font-medium transition-colors hover:text-slate-900 flex items-center gap-1.5 relative"
-                                        style={{ color: ongelezen > 0 ? theme.colors.primary[500] : theme.colors.neutral[500] }}
+                                        style={{ color: ongelezen > 0 ? theme.colors.error[500] : theme.colors.neutral[500] }}
                                     >
                                         <BellIcon className="h-4 w-4" />
                                         Notificaties
@@ -132,7 +132,7 @@ export default function Layout({ children }) {
                                             <span
                                                 className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1"
                                                 style={{
-                                                    backgroundColor: theme.colors.primary[500],
+                                                    backgroundColor: theme.colors.error[500],
                                                     color: '#FFFFFF',
                                                 }}
                                             >
