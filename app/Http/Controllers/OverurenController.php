@@ -67,7 +67,7 @@ class OverurenController extends Controller
         // Validate minutes
         if (!Overuren::validateMinuten($validated['minuten'])) {
             return back()->withErrors([
-                'minuten' => 'Minuten moeten een veelvoud van 10 zijn en max ±12 uur (720 minuten)',
+                'minuten' => 'Minuten moeten een veelvoud van 5 zijn en max ±12 uur (720 minuten)',
             ]);
         }
 
@@ -145,7 +145,7 @@ class OverurenController extends Controller
         // Validate minutes if provided
         if (isset($validated['minuten']) && !Overuren::validateMinuten($validated['minuten'])) {
             return back()->withErrors([
-                'minuten' => 'Minuten moeten een veelvoud van 10 zijn en max ±12 uur (720 minuten)',
+                'minuten' => 'Minuten moeten een veelvoud van 5 zijn en max ±12 uur (720 minuten)',
             ]);
         }
 
