@@ -1,4 +1,3 @@
-import React from 'react';
 import { theme, componentStyles } from '../config/theme';
 
 export default function Card({ children, className = '', variant = 'default', hover = false }) {

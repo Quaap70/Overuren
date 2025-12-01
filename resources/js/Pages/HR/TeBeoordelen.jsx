@@ -1,4 +1,3 @@
-import React from 'react';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import Layout from '../../Components/Layout';
