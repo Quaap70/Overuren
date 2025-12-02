@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Services\SaldoService;
+use App\Services\MonthCalendarService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
     public function __construct(
-        private SaldoService $saldoService
+        private SaldoService $saldoService,
+        private MonthCalendarService $monthCalendarService,
     ) {}
 
     /**
@@ -18,7 +20,14 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $huidigJaar = now()->year;
+        $huidigeMaand = now()->month;
+
+        // Query parameters (optioneel): ?year=YYYY&month=MM
+        $jaar = (int) ($request->query('year', $huidigJaar));
+        $maand = (int) ($request->query('month', $huidigeMaand));
+
         $saldo = $this->saldoService->getOrCreateSaldo($request->user()->id, $huidigJaar);
+        $calendarData = $this->monthCalendarService->getUserMonth($request->user()->id, $jaar, $maand);
 
         return Inertia::render('Dashboard/Index', [
             'saldo' => [
@@ -30,6 +39,7 @@ class DashboardController extends Controller
                 'opgenomen' => $saldo->opgenomen_saldo,
                 'laatst_bijgewerkt' => $saldo->laatst_bijgewerkt->format('Y-m-d H:i:s'),
             ],
+            'calendar' => $calendarData,
         ]);
     }
 }

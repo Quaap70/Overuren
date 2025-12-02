@@ -6,8 +6,9 @@ import { PlusIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, ArrowTrendingUpI
 import { theme } from '../../config/theme';
 import route from 'ziggy-js';
 import { Ziggy } from '../../ziggy';
+import MonthCalendar from '../../Components/MonthCalendar';
 
-export default function Dashboard({ saldo }) {
+export default function Dashboard({ saldo, calendar }) {
     const formatMinutesToHoursMinutes = (minuten) => {
         const uren = Math.floor(Math.abs(minuten) / 60);
         const mins = Math.abs(minuten) % 60;
@@ -29,8 +30,10 @@ export default function Dashboard({ saldo }) {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Saldo Card */}
-                <Card className="col-span-full lg:col-span-1 text-center">
+                {/* Linkerkolom: Huidig Saldo + Overgedragen + Dit Jaar (onder elkaar) */}
+                <div className="col-span-full lg:col-span-1 space-y-6">
+                    {/* Huidig Saldo */}
+                    <Card className="text-center">
                     <div
                         className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
                         style={{ backgroundColor: theme.colors.primary[100] }}
@@ -49,74 +52,47 @@ export default function Dashboard({ saldo }) {
                             ? new Date(saldo.laatst_bijgewerkt).toLocaleDateString('nl-NL')
                             : '-'}
                     </p>
-                </Card>
+                    </Card>
 
-                {/* Quick Actions */}
-                <Card className="col-span-full lg:col-span-2">
-                    <h2 className="text-lg font-bold mb-4" style={{ color: theme.colors.neutral[800] }}>
-                        Snelle Acties
-                    </h2>
-                    <div className="space-y-3">
-                        <Link href={route('overuren.index', {}, false, Ziggy)} className="block">
-                            <Button variant="primary" size="md" className="w-full">
-                                <PlusIcon className="w-5 h-5 inline mr-2" />
-                                Nieuwe Uren Invoeren
-                            </Button>
-                        </Link>
-                        <Link href={route('overuren.index', {}, false, Ziggy)} className="block">
-                            <Button variant="secondary" size="md" className="w-full">
-                                <ChartBarIcon className="w-5 h-5 inline mr-2" />
-                                Mijn Overzicht
-                            </Button>
-                        </Link>
-                        <Link href={route('saldo.index', {}, false, Ziggy)} className="block">
-                            <Button variant="secondary" size="md" className="w-full">
-                                <CurrencyDollarIcon className="w-5 h-5 inline mr-2" />
-                                Bekijk Saldo Details
-                            </Button>
-                        </Link>
-                    </div>
-                </Card>
-            </div>
-
-            {/* Info Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <Card>
-                    <div className="flex items-center gap-4">
+                    {/* Overgedragen Saldo */}
+                    <Card className="text-center">
                         <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                            className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3"
                             style={{ backgroundColor: theme.colors.primary[100] }}
                         >
-                            <CurrencyDollarIcon className="w-6 h-6" style={{ color: theme.colors.primary[600] }} />
+                            <CurrencyDollarIcon className="w-5 h-5" style={{ color: theme.colors.primary[600] }} />
                         </div>
-                        <div>
-                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
-                                Overgedragen Saldo
-                            </h3>
-                            <p className="text-xl font-bold" style={{ color: theme.colors.neutral[800] }}>
-                                {formatMinutesToHoursMinutes(saldo?.overgedragen || 0)}
-                            </p>
-                        </div>
-                    </div>
-                </Card>
+                        <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
+                            Overgedragen Saldo
+                        </h3>
+                        <p className="text-lg font-bold" style={{ color: theme.colors.neutral[800] }}>
+                            {formatMinutesToHoursMinutes(saldo?.overgedragen || 0)}
+                        </p>
+                    </Card>
 
-                <Card>
-                    <div className="flex items-center gap-4">
+                    {/* Dit Jaar */}
+                    <Card className="text-center">
                         <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                            className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3"
                             style={{ backgroundColor: theme.colors.info[100] }}
                         >
-                            <ClockIcon className="w-6 h-6" style={{ color: theme.colors.info[600] }} />
+                            <ClockIcon className="w-5 h-5" style={{ color: theme.colors.info[600] }} />
                         </div>
-                        <div>
-                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
-                                Dit Jaar
-                            </h3>
-                            <p className="text-xl font-bold" style={{ color: theme.colors.neutral[800] }}>
-                                {saldo?.jaar || new Date().getFullYear()}
-                            </p>
-                        </div>
-                    </div>
+                        <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
+                            Dit Jaar
+                        </h3>
+                        <p className="text-lg font-bold" style={{ color: theme.colors.neutral[800] }}>
+                            {saldo?.jaar || new Date().getFullYear()}
+                        </p>
+                    </Card>
+                </div>
+
+                {/* Rechterkolom: Maandkalender */}
+                <Card className="col-span-full lg:col-span-2">
+                    <h2 className="text-lg font-bold mb-4" style={{ color: theme.colors.neutral[800] }}>
+                        Maandkalender
+                    </h2>
+                    <MonthCalendar data={calendar} basePath="/dashboard" />
                 </Card>
             </div>
         </Layout>
