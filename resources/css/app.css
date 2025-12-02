@@ -37,6 +37,26 @@ body {
     color: var(--color-text-primary);
 }
 
+/*
+ * Form controls — enforce a consistent visual height across inputs/selects
+ * to match our shared Input component (~44px).
+ * This keeps native <select> controls aligned with text inputs without
+ * requiring per-file inline styles.
+ */
+:where(input[type='text'],
+       input[type='email'],
+       input[type='password'],
+       input[type='date'],
+       input[type='number'],
+       input[type='search'],
+       select) {
+    height: 44px;           /* align with Input.jsx */
+    line-height: 1.25;      /* avoid clipped text on some platforms */
+}
+
+/* Optional utility if you want to opt-in explicitly in markup */
+.field-44 { height: 44px; }
+
 /* Custom animations */
 @keyframes fadeIn {
     from {

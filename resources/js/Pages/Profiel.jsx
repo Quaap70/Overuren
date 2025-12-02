@@ -180,6 +180,7 @@ export default function Profiel({ user, afdelingen }) {
                                                 backgroundColor: '#FFFFFF',
                                                 color: theme.colors.neutral[800],
                                                 outline: 'none',
+                                                height: '44px',
                                             }}
                                             onFocus={(e) => {
                                                 e.currentTarget.style.borderColor = theme.colors.primary[500];

@@ -79,11 +79,6 @@ export default function GebruikerNieuw({ afdelingen }) {
                                 error={errors.username}
                                 required
                             />
-                            {errors.username && (
-                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                    {errors.username}
-                                </p>
-                            )}
                         </div>
 
                         {/* Email */}
@@ -98,11 +93,6 @@ export default function GebruikerNieuw({ afdelingen }) {
                                 error={errors.email}
                                 required
                             />
-                            {errors.email && (
-                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                    {errors.email}
-                                </p>
-                            )}
                         </div>
 
                         {/* Password */}
@@ -192,6 +182,7 @@ export default function GebruikerNieuw({ afdelingen }) {
                                     backgroundColor: '#FFFFFF',
                                     color: '#2D3748',
                                     outline: 'none',
+                                    height: '44px',
                                 }}
                                 onFocus={(e) => {
                                     e.currentTarget.style.borderColor = '#8B5CF6';
@@ -227,6 +218,7 @@ export default function GebruikerNieuw({ afdelingen }) {
                                     backgroundColor: '#FFFFFF',
                                     color: '#2D3748',
                                     outline: 'none',
+                                    height: '44px',
                                 }}
                                 onFocus={(e) => {
                                     e.currentTarget.style.borderColor = '#8B5CF6';
@@ -264,11 +256,6 @@ export default function GebruikerNieuw({ afdelingen }) {
                                 error={errors.startdatum}
                                 required
                             />
-                            {errors.startdatum && (
-                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                    {errors.startdatum}
-                                </p>
-                            )}
                         </div>
 
                         {/* Overgedragen Saldo */}
@@ -299,6 +286,8 @@ export default function GebruikerNieuw({ afdelingen }) {
                                         padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
                                         fontSize: theme.typography.fontSize.sm,
                                         borderRadius: theme.borderRadius.md,
+                                        // Zorg dat de hoogte gelijk is aan het Input component
+                                        height: '44px',
                                     }}
                                     onFocus={(e) => {
                                         e.currentTarget.style.borderColor = theme.colors.primary[500];
@@ -313,11 +302,7 @@ export default function GebruikerNieuw({ afdelingen }) {
                                     <option value="uren">Uren</option>
                                 </select>
                             </div>
-                            {errors.overgedragen_saldo && (
-                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                    {errors.overgedragen_saldo}
-                                </p>
-                            )}
+                            {/* Input component already renders its own error when provided via error prop */}
                             <p className="text-xs mt-1" style={{ color: '#718096' }}>
                                 Stel het beginsaldo in voor bestaande overuren (optioneel)
                             </p>

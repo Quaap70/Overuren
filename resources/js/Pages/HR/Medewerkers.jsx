@@ -70,7 +70,8 @@ export default function Medewerkers({ medewerkers, filters }) {
                             style={{
                                 borderColor: theme.colors.neutral[200],
                                 backgroundColor: '#FFFFFF',
-                                color: theme.colors.neutral[800]
+                                color: theme.colors.neutral[800],
+                                height: '44px',
                             }}
                         />
                     </div>
@@ -81,7 +82,8 @@ export default function Medewerkers({ medewerkers, filters }) {
                         style={{
                             borderColor: theme.colors.neutral[200],
                             backgroundColor: '#FFFFFF',
-                            color: theme.colors.neutral[800]
+                            color: theme.colors.neutral[800],
+                            height: '44px',
                         }}
                     >
                         <option value="">Alle afdelingen</option>

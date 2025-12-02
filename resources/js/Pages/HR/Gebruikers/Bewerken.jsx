@@ -123,11 +123,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                         error={errors.email}
                                         required
                                     />
-                                    {errors.email && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.email}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Voornaam */}
@@ -142,11 +137,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                         error={errors.voornaam}
                                         required
                                     />
-                                    {errors.voornaam && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.voornaam}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Achternaam */}
@@ -161,11 +151,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                         error={errors.achternaam}
                                         required
                                     />
-                                    {errors.achternaam && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.achternaam}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Role */}
@@ -182,6 +167,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                             backgroundColor: '#FFFFFF',
                                             color: '#2D3748',
                                             outline: 'none',
+                                            height: '44px',
                                         }}
                                         onFocus={(e) => {
                                             e.currentTarget.style.borderColor = '#8B5CF6';
@@ -217,6 +203,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                             backgroundColor: '#FFFFFF',
                                             color: '#2D3748',
                                             outline: 'none',
+                                            height: '44px',
                                         }}
                                         onFocus={(e) => {
                                             e.currentTarget.style.borderColor = '#8B5CF6';
@@ -254,11 +241,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                         error={errors.startdatum}
                                         required
                                     />
-                                    {errors.startdatum && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.startdatum}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Overgedragen Saldo */}
@@ -289,6 +271,8 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                                 padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
                                                 fontSize: theme.typography.fontSize.sm,
                                                 borderRadius: theme.borderRadius.md,
+                                                // Zorg dat de hoogte gelijk is aan het Input component
+                                                height: '44px',
                                             }}
                                             onFocus={(e) => {
                                                 e.currentTarget.style.borderColor = theme.colors.primary[500];
@@ -303,11 +287,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                             <option value="uren">Uren</option>
                                         </select>
                                     </div>
-                                    {errors.overgedragen_saldo && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.overgedragen_saldo}
-                                        </p>
-                                    )}
+                                    {/* Input component already renders its own error when provided via error prop */}
                                     <p className="text-xs mt-1" style={{ color: '#718096' }}>
                                         Pas het overgedragen saldo aan voor dit jaar
                                     </p>
@@ -389,11 +369,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                             error={passwordForm.errors.new_password}
                                             required
                                         />
-                                        {passwordForm.errors.new_password && (
-                                            <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                                {passwordForm.errors.new_password}
-                                            </p>
-                                        )}
                                     </div>
 
                                     <div>
