@@ -383,7 +383,7 @@ test('hr can create new employee with overgedragen saldo in minuten', function (
 
     // Controleer saldo in database
     $huidigJaar = now()->year;
-    $this->assertDatabaseHas('saldos', [
+    $this->assertDatabaseHas('saldo', [
         'user_id' => $newUser->id,
         'jaar' => $huidigJaar,
         'overgedragen_saldo' => 480,
@@ -414,7 +414,7 @@ test('hr can create new employee with overgedragen saldo in uren (wordt omgereke
 
     // Controleer dat 2400 minuten (40 uur) correct is opgeslagen
     $huidigJaar = now()->year;
-    $this->assertDatabaseHas('saldos', [
+    $this->assertDatabaseHas('saldo', [
         'user_id' => $newUser->id,
         'jaar' => $huidigJaar,
         'overgedragen_saldo' => 2400,
@@ -476,7 +476,7 @@ test('hr can create new employee with negative overgedragen saldo', function () 
     expect($newUser)->not->toBeNull();
 
     $huidigJaar = now()->year;
-    $this->assertDatabaseHas('saldos', [
+    $this->assertDatabaseHas('saldo', [
         'user_id' => $newUser->id,
         'jaar' => $huidigJaar,
         'overgedragen_saldo' => -240,
@@ -505,7 +505,7 @@ test('hr can update employee overgedragen saldo in minuten', function () {
     $response->assertRedirect('/hr/medewerkers');
 
     $huidigJaar = now()->year;
-    $this->assertDatabaseHas('saldos', [
+    $this->assertDatabaseHas('saldo', [
         'user_id' => $user->id,
         'jaar' => $huidigJaar,
         'overgedragen_saldo' => 960,
@@ -540,7 +540,7 @@ test('hr can update employee overgedragen saldo to zero', function () {
 
     $response->assertRedirect('/hr/medewerkers');
 
-    $this->assertDatabaseHas('saldos', [
+    $this->assertDatabaseHas('saldo', [
         'user_id' => $user->id,
         'jaar' => $huidigJaar,
         'overgedragen_saldo' => 0,
