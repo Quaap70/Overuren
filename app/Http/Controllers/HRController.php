@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Overuren;
 use App\Models\Saldo;
+use App\Models\UrenMutatie;
+use App\Models\UrenBaseline;
 use App\Models\Notificatie;
 use App\Services\SaldoService;
 use Illuminate\Http\Request;
@@ -23,6 +25,7 @@ class HRController extends Controller
     public function dashboard()
     {
         $huidigJaar = now()->year;
+        $vorigJaar = $huidigJaar - 1;
 
         // Pending approvals count
         $teBeoordelenCount = Overuren::where('status', 'INGEDIEND')->count();
@@ -58,6 +61,16 @@ class HRController extends Controller
                 'ingediend_op' => $o->ingediend_op?->format('Y-m-d H:i'),
             ]);
 
+        // Jaaracties (HR) status
+        $baselineHuidigBestaat = UrenBaseline::where('jaar', $huidigJaar)->exists();
+        $openVorigJaarCount = UrenBaseline::where('jaar', $vorigJaar)
+            ->where('status', UrenBaseline::STATUS_OPEN)
+            ->count();
+        // Aantal openstaande (niet‑goedgekeurde) overuren in vorig jaar
+        $pendingPrevYearCount = Overuren::where('status', 'INGEDIEND')
+            ->where('jaar', $vorigJaar)
+            ->count();
+
         return Inertia::render('HR/Dashboard', [
             'statistieken' => [
                 'te_beoordelen' => $teBeoordelenCount,
@@ -66,6 +79,13 @@ class HRController extends Controller
                 'totaal_uren' => round($totaalMinuten / 60),
             ],
             'recente_indieningen' => $recenteIndieningen,
+            'jaarActies' => [
+                'huidigJaar' => $huidigJaar,
+                'vorigJaar' => $vorigJaar,
+                'baselineHuidigBestaat' => $baselineHuidigBestaat,
+                'openVorigJaarCount' => $openVorigJaarCount,
+                'pendingPrevYearCount' => $pendingPrevYearCount,
+            ],
         ]);
     }
 
@@ -99,23 +119,52 @@ class HRController extends Controller
         $medewerkers = $query->orderBy('achternaam')
             ->orderBy('voornaam')
             ->paginate(20)
-            ->through(fn ($m) => [
-                'id' => $m->id,
-                'username' => $m->username,
-                'email' => $m->email,
-                'voornaam' => $m->voornaam,
-                'achternaam' => $m->achternaam,
-                'full_name' => $m->full_name,
-                'afdeling' => $m->afdeling,
-                'startdatum' => $m->startdatum?->format('Y-m-d'),
-                'is_active' => $m->is_active,
-                'huidig_saldo' => $m->saldo->first()?->totaal_saldo ?? 0,
-                'formatted_saldo' => $m->saldo->first()?->formatted_saldo ?? '0u 0m',
-                'overgedragen_saldo' => $m->saldo->first()?->overgedragen_saldo ?? 0,
-                'formatted_overgedragen_saldo' => $m->saldo->first()
-                    ? $this->formatMinutesToHoursMinutes($m->saldo->first()->overgedragen_saldo)
-                    : '0u 0m',
-            ]);
+            ->through(function ($m) use ($huidigJaar) {
+                // Nieuw: probeer eerst de nieuwe berekening op basis van baseline + mutaties
+                $overzicht = $this->saldoService->getJaarOverzicht($m->id, $huidigJaar);
+
+                if (($overzicht['zichtbaar'] ?? false) === true) {
+                    $huidigSaldo = (int) ($overzicht['huidig_saldo'] ?? 0);
+                    $overgenomen = (int) ($overzicht['overgenomen_uren'] ?? 0);
+
+                    return [
+                        'id' => $m->id,
+                        'username' => $m->username,
+                        'email' => $m->email,
+                        'voornaam' => $m->voornaam,
+                        'achternaam' => $m->achternaam,
+                        'full_name' => $m->full_name,
+                        'afdeling' => $m->afdeling,
+                        'startdatum' => $m->startdatum?->format('Y-m-d'),
+                        'is_active' => $m->is_active,
+                        'huidig_saldo' => $huidigSaldo,
+                        'formatted_saldo' => $this->formatMinutesToHoursMinutes($huidigSaldo),
+                        'overgedragen_saldo' => $overgenomen,
+                        'formatted_overgedragen_saldo' => $this->formatMinutesToHoursMinutes($overgenomen),
+                    ];
+                }
+
+                // Fallback (backward compatible): gebruik legacy saldo-cache als zichtbaar=false of ontbreekt
+                $legacySaldo = $m->saldo->first();
+                $totaal = $legacySaldo?->totaal_saldo ?? 0;
+                $overgedragen = $legacySaldo?->overgedragen_saldo ?? 0;
+
+                return [
+                    'id' => $m->id,
+                    'username' => $m->username,
+                    'email' => $m->email,
+                    'voornaam' => $m->voornaam,
+                    'achternaam' => $m->achternaam,
+                    'full_name' => $m->full_name,
+                    'afdeling' => $m->afdeling,
+                    'startdatum' => $m->startdatum?->format('Y-m-d'),
+                    'is_active' => $m->is_active,
+                    'huidig_saldo' => $totaal,
+                    'formatted_saldo' => $legacySaldo?->formatted_saldo ?? $this->formatMinutesToHoursMinutes(0),
+                    'overgedragen_saldo' => $overgedragen,
+                    'formatted_overgedragen_saldo' => $this->formatMinutesToHoursMinutes($overgedragen),
+                ];
+            });
 
         return Inertia::render('HR/Medewerkers', [
             'medewerkers' => $medewerkers,
@@ -184,6 +233,18 @@ class HRController extends Controller
         $overuren->afkeur_reden = null;
         $overuren->save();
 
+        // Boek in journaal als definitieve mutatie (opbouw/opname) met originele datum
+        UrenMutatie::create([
+            'user_id' => $overuren->user_id,
+            'datum' => $overuren->datum,
+            'minuten' => $overuren->minuten,
+            'type' => $overuren->minuten >= 0 ? UrenMutatie::TYPE_OPBOUW : UrenMutatie::TYPE_OPNAME,
+            'status' => UrenMutatie::STATUS_DEFINITIEF,
+            'bron' => 'OVERUREN',
+            'bron_id' => $overuren->id,
+            'geboekt_op' => now(),
+        ]);
+
         // Recalculate saldo
         $saldo = $this->saldoService->recalculateSaldo($overuren->user_id, $overuren->jaar);
 
@@ -200,6 +261,62 @@ class HRController extends Controller
         ]);
 
         return back()->with('success', 'Uren succesvol goedgekeurd');
+    }
+
+    /**
+     * HR action: sluit vorig jaar (indien open) en start nieuw jaar in één actie (rollover)
+     */
+    public function rollover(Request $request)
+    {
+        $validated = $request->validate([
+            'jaar' => 'required|integer|min:2000|max:2100',
+        ]);
+
+        $jaar = (int) $validated['jaar'];
+        // Laat rollover alleen toe als er geen openstaande (INGEDIEND) verzoeken meer zijn in vorig jaar
+        $prev = $jaar - 1;
+        $pendingPrev = Overuren::where('status', 'INGEDIEND')
+            ->where('jaar', $prev)
+            ->count();
+        if ($pendingPrev > 0) {
+            return back()->withErrors([
+                'rollover' => "Kan boekjaar {$jaar} niet starten: er zijn {$pendingPrev} ingediende overuren in jaar {$prev} die eerst beoordeeld moeten worden.",
+            ]);
+        }
+
+        $result = $this->saldoService->rolOverNaarJaar($jaar);
+
+        return back()->with('success', sprintf(
+            'Boekjaar %d gestart voor %d medewerkers. Vorig jaar gesloten: %d.',
+            $jaar,
+            $result['started'] ?? 0,
+            $result['closed_prev'] ?? 0
+        ));
+    }
+
+    /**
+     * HR action: start jaar voor alle medewerkers (legt start_saldo vast)
+     */
+    public function startJaar(Request $request)
+    {
+        $validated = $request->validate([
+            'jaar' => 'required|integer|min:2000|max:2100',
+        ]);
+
+        $aantal = $this->saldoService->startJaar((int) $validated['jaar']);
+        return back()->with('success', "Jaar {$validated['jaar']} gestart voor {$aantal} medewerkers (waar toegestaan).");
+    }
+
+    /**
+     * HR action: sluit jaar (zet baseline status CLOSED)
+     */
+    public function sluitJaar(Request $request)
+    {
+        $validated = $request->validate([
+            'jaar' => 'required|integer|min:2000|max:2100',
+        ]);
+        $aantal = $this->saldoService->sluitJaar((int) $validated['jaar']);
+        return back()->with('success', "Jaar {$validated['jaar']} afgesloten ({$aantal} records bijgewerkt).");
     }
 
     /**

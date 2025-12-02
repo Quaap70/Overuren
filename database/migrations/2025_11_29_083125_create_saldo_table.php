@@ -11,19 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('saldo', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('jaar');
-            $table->integer('overgedragen_saldo')->default(0)->comment('Saldo in minuten overgedragen van vorig jaar');
-            $table->integer('gebruikt_saldo')->default(0)->comment('Gebruikt saldo in minuten (bijv. voor vakantie)');
-            $table->integer('huidig_saldo')->default(0)->comment('Huidig totaal saldo in minuten');
-            $table->timestamp('laatst_bijgewerkt')->useCurrent();
-            $table->timestamps();
+        // Maak direct de cache-tabel met de definitieve naam aan.
+        // Let op: oudere projecten maakten hier 'saldo' aan. We creëren nu 'saldo_cache'.
+        if (!Schema::hasTable('saldo_cache')) {
+            Schema::create('saldo_cache', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->integer('jaar');
+                // Definitieve kolomnamen (DRY t.o.v. journaal/baseline)
+                $table->integer('overgedragen_saldo')->default(0)->comment('Carry-over in minuten (baseline start_saldo)');
+                $table->integer('opgenomen_saldo')->default(0)->comment('Opgenomen minuten in het jaar (abs van negatieve mutaties)');
+                $table->integer('overuren_saldo')->default(0)->comment('Opgebouwde minuten in het jaar (som positieve mutaties)');
+                $table->timestamp('laatst_bijgewerkt')->useCurrent();
+                $table->timestamps();
 
-            // Unique constraint
-            $table->unique(['user_id', 'jaar']);
-        });
+                $table->unique(['user_id', 'jaar']);
+            });
+        }
     }
 
     /**
@@ -31,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('saldo');
+        Schema::dropIfExists('saldo_cache');
     }
 };

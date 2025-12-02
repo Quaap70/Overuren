@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Overuren;
 use App\Models\Saldo;
 use App\Models\Notificatie;
+use App\Models\UrenBaseline;
+use App\Models\UrenMutatie;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -65,131 +67,94 @@ class UserSeeder extends Seeder
         ]);
         echo "✅ HR user created: linda / Welkom123!\n";
 
-        // 2. Create test employees
-//        echo "\n📝 Creating test employees...\n";
-//        $medewerkers = [];
-//
-//        foreach (self::NEDERLANDSE_NAMEN as $index => $naam) {
-//            $username = strtolower($naam['voornaam']) . ($index + 1);
-//
-//            $medewerker = User::create([
-//                'username' => $username,
-//                'password' => Hash::make('Welkom123!'),
-//                'email' => "{$username}@overuren.nl",
-//                'voornaam' => $naam['voornaam'],
-//                'achternaam' => $naam['achternaam'],
-//                'role' => 'MEDEWERKER',
-//                'afdeling' => config('afdelingen.lijst')[array_rand(config('afdelingen.lijst'))],
-//                'startdatum' => sprintf('2020-%02d-01', rand(1, 12)),
-//                'is_active' => true,
-//            ]);
-//
-//            $medewerkers[] = $medewerker;
-//            echo "   ✅ {$medewerker->full_name} ({$username})\n";
-//        }
-//
-//        // 3. Create historical overuren data (last 3 months)
-//        echo "\n📝 Creating historical overuren data...\n";
-//        $huidigJaar = now()->year;
-//        $totalEntries = 0;
-//
-//        foreach ($medewerkers as $medewerker) {
-//            $aantalEntries = rand(15, 30);
-//
-//            for ($i = 0; $i < $aantalEntries; $i++) {
-//                $datum = now()->subDays(rand(0, 90))->format('Y-m-d');
-//                $date = new \DateTime($datum);
-//                $weekNummer = (int) $date->format('W');
-//                $jaar = (int) $date->format('Y');
-//
-//                $minutenOptions = [-120, -60, -30, 0, 30, 60, 90, 120, 150, 180, 240, 300, 360];
-//                $minuten = $minutenOptions[array_rand($minutenOptions)];
-//
-//                $statusRand = rand(1, 100) / 100;
-//                if ($statusRand < 0.7) {
-//                    $status = 'GOEDGEKEURD';
-//                } elseif ($statusRand < 0.85) {
-//                    $status = 'INGEDIEND';
-//                } elseif ($statusRand < 0.95) {
-//                    $status = 'AFGEKEURD';
-//                } else {
-//                    $status = 'CONCEPT';
-//                }
-//
-//                Overuren::create([
-//                    'user_id' => $medewerker->id,
-//                    'datum' => $datum,
-//                    'minuten' => $minuten,
-//                    'reden' => $minuten !== 0 ? self::REDENEN[array_rand(self::REDENEN)] : null,
-//                    'week_nummer' => $weekNummer,
-//                    'jaar' => $jaar,
-//                    'status' => $status,
-//                    'ingediend_op' => $status !== 'CONCEPT' ? $date : null,
-//                    'goedgekeurd_op' => $status === 'GOEDGEKEURD' ? $date : null,
-//                    'goedgekeurd_door' => $status === 'GOEDGEKEURD' ? $hrUser->id : null,
-//                    'afkeur_reden' => $status === 'AFGEKEURD' ? 'Graag meer details over de reden' : null,
-//                ]);
-//
-//                $totalEntries++;
-//            }
-//        }
-//
-//        echo "✅ Created {$totalEntries} overuren entries\n";
-//
-//        // 4. Calculate and create saldi
-//        echo "\n📝 Calculating saldi...\n";
-//
-//        foreach ($medewerkers as $medewerker) {
-//            $goedgekeurdeUren = Overuren::where('user_id', $medewerker->id)
-//                ->where('jaar', $huidigJaar)
-//                ->where('status', 'GOEDGEKEURD')
-//                ->get();
-//
-//            $totaalMinuten = $goedgekeurdeUren->sum('minuten');
-//            $overgedragen = rand(-20, 40) * 60; // -20u to +40u
-//
-//            $saldo = Saldo::create([
-//                'user_id' => $medewerker->id,
-//                'jaar' => $huidigJaar,
-//                'overgedragen_saldo' => $overgedragen,
-//                'gebruikt_saldo' => 0,
-//                'huidig_saldo' => $overgedragen + $totaalMinuten,
-//                'laatst_bijgewerkt' => now(),
-//            ]);
-//
-//            echo "   ✅ {$medewerker->full_name}: {$saldo->formatted_saldo}\n";
-//        }
-//
-//        // 5. Create some notifications
-//        echo "\n📝 Creating sample notifications...\n";
-//
-//        for ($i = 0; $i < 5; $i++) {
-//            $medewerker = $medewerkers[array_rand($medewerkers)];
-//            Notificatie::create([
-//                'user_id' => $medewerker->id,
-//                'type' => 'GOEDKEURING',
-//                'titel' => 'Overuren goedgekeurd',
-//                'bericht' => 'Je overuren zijn goedgekeurd en toegevoegd aan je saldo.',
-//                'gelezen' => (bool) rand(0, 1),
-//            ]);
-//        }
-//
-//        Notificatie::create([
-//            'user_id' => $hrUser->id,
-//            'type' => 'INFO',
-//            'titel' => 'Nieuwe overuren ingediend',
-//            'bericht' => "{$medewerkers[array_rand($medewerkers)]->full_name} heeft nieuwe overuren ingediend.",
-//            'gelezen' => false,
-//        ]);
-//
-//        echo "✅ Notifications created\n";
-//
-//        echo "\n✅ Database seeding completed!\n\n";
-//        echo "📊 Summary:\n";
-//        echo "   - 1 HR user (linda / Welkom123!)\n";
-//        echo "   - 10 test employees (username: jan1, pieter2, etc. / Welkom123!)\n";
-//        echo "   - {$totalEntries} overuren entries\n";
-//        echo "   - Saldi berekend voor alle medewerkers\n";
-//        echo "   - Sample notificaties aangemaakt\n\n";
+        // 2. Create exactly 1 medewerker
+        echo "\n📝 Creating 1 medewerker...\n";
+        $medewerker = User::create([
+            'username' => 'jan',
+            'password' => Hash::make('Welkom123!'),
+            'email' => 'jan@overuren.nl',
+            'voornaam' => 'Jan',
+            'achternaam' => 'Jansen',
+            'role' => 'MEDEWERKER',
+            'afdeling' => config('afdelingen.lijst')[0] ?? 'Algemeen',
+            'startdatum' => '2021-05-01',
+            'is_active' => true,
+        ]);
+        echo "✅ Medewerker created: jan / Welkom123!\n";
+
+        // 3. Seed previous year baseline (OPEN) and some mutaties for medewerker
+        $huidigJaar = now()->year;
+        $vorigJaar = $huidigJaar - 1;
+
+        echo "\n🧮 Creating baseline for vorig jaar ({$vorigJaar})...\n";
+        UrenBaseline::create([
+            'user_id' => $medewerker->id,
+            'jaar' => $vorigJaar,
+            'start_saldo' => 60 * 10, // 10 uur carry-over naar vorig jaar
+            'status' => UrenBaseline::STATUS_OPEN, // bewust OPEN laten zodat HR knop zichtbaar is
+            'asof' => now()->startOfYear(),
+            'locked' => false,
+        ]);
+        echo "✅ Baseline (OPEN) for {$vorigJaar} created\n";
+
+        echo "🧾 Creating definitieve mutaties in {$vorigJaar}...\n";
+        // Positieve opbouw (3 uur) op 15 maart vorig jaar
+        UrenMutatie::create([
+            'user_id' => $medewerker->id,
+            'datum' => now()->setYear($vorigJaar)->setMonth(3)->setDay(15)->toDateString(),
+            'minuten' => 180,
+            'type' => UrenMutatie::TYPE_OPBOUW,
+            'status' => UrenMutatie::STATUS_DEFINITIEF,
+            'bron' => 'SEED',
+            'geboekt_op' => now(),
+        ]);
+        // Nog een opbouw (2 uur) in september vorig jaar
+        UrenMutatie::create([
+            'user_id' => $medewerker->id,
+            'datum' => now()->setYear($vorigJaar)->setMonth(9)->setDay(5)->toDateString(),
+            'minuten' => 120,
+            'type' => UrenMutatie::TYPE_OPBOUW,
+            'status' => UrenMutatie::STATUS_DEFINITIEF,
+            'bron' => 'SEED',
+            'geboekt_op' => now(),
+        ]);
+        // Opname (1,5 uur) in november vorig jaar (negatief)
+        UrenMutatie::create([
+            'user_id' => $medewerker->id,
+            'datum' => now()->setYear($vorigJaar)->setMonth(11)->setDay(20)->toDateString(),
+            'minuten' => -90,
+            'type' => UrenMutatie::TYPE_OPNAME,
+            'status' => UrenMutatie::STATUS_DEFINITIEF,
+            'bron' => 'SEED',
+            'geboekt_op' => now(),
+        ]);
+        echo "✅ Mutaties voor {$vorigJaar} aangemaakt (opbouw/opname)\n";
+
+        // 4. Do NOT create baseline for current year → ensures HR rollover button appears
+        echo "\nℹ️ Geen baseline voor huidig jaar ({$huidigJaar}) aangemaakt zodat de rollover-knop zichtbaar is.\n";
+
+        // 5. Create one pending overuren (INGEDIEND) for HR dashboard testing
+        echo "\n📝 Creating 1 ingediend overuren voor dashboard...\n";
+        $vandaag = now();
+        Overuren::create([
+            'user_id' => $medewerker->id,
+            'datum' => $vandaag->toDateString(),
+            'minuten' => 120,
+            'reden' => 'Test indiening via seeder',
+            'week_nummer' => (int) $vandaag->format('W'),
+            'jaar' => (int) $vandaag->format('Y'),
+            'status' => 'INGEDIEND',
+            'ingediend_op' => $vandaag,
+        ]);
+        echo "✅ 1 ingediend overuren aangemaakt\n";
+
+        echo "\n✅ Database seeding completed!\n\n";
+        echo "📊 Summary:\n";
+        echo "   - 1 HR user (linda / Welkom123!)\n";
+        echo "   - 1 medewerker (jan / Welkom123!)\n";
+        echo "   - Baseline {$vorigJaar} = OPEN (start_saldo 10u)\n";
+        echo "   - 2x OPBOUW en 1x OPNAME mutaties in {$vorigJaar}\n";
+        echo "   - 1 ingediend overuren voor dashboard\n\n";
+
     }
 }

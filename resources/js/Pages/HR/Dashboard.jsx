@@ -7,7 +7,7 @@ import { theme } from '../../config/theme';
 import route from 'ziggy-js';
 import { Ziggy } from '../../ziggy';
 
-export default function HRDashboard({ statistieken, recente_indieningen }) {
+export default function HRDashboard({ statistieken, recente_indieningen, jaarActies }) {
     return (
         <Layout>
             <Head title="HR Dashboard" />
@@ -99,6 +99,51 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                     </div>
                 </Card>
             </div>
+
+            {/* Jaarbeheer acties */}
+            <Card>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div>
+                        <h2 className="text-lg font-bold" style={{ color: theme.colors.neutral[800] }}>
+                            Jaarbeheer
+                        </h2>
+                        {jaarActies && (
+                            <p className="text-xs mt-1" style={{ color: theme.colors.neutral[500] }}>
+                                Huidig jaar: {jaarActies.huidigJaar} • Vorig jaar: {jaarActies.vorigJaar}
+                            </p>
+                        )}
+                    </div>
+                    <div className="flex flex-col md:items-end gap-2 w-full md:w-auto">
+                        {/* Waarschuwing: ingediende (niet‑goedgekeurde) overuren in vorig jaar */}
+                        {jaarActies && jaarActies.pendingPrevYearCount > 0 && (
+                            <div className="text-xs px-3 py-2 rounded border" style={{
+                                backgroundColor: theme.colors.warning[50],
+                                color: theme.colors.warning[800],
+                                borderColor: theme.colors.warning[200]
+                            }}>
+                                Er zijn {jaarActies.pendingPrevYearCount} ingediende overuren in {jaarActies.vorigJaar} die eerst beoordeeld moeten worden.
+                            </div>
+                        )}
+
+                        {/* Eén knop: Sluit vorig jaar (indien open) + Start nieuw boekjaar */}
+                        {jaarActies && !jaarActies.baselineHuidigBestaat && (
+                            <Button
+                                variant={jaarActies.pendingPrevYearCount > 0 ? 'secondary' : 'primary'}
+                                size="sm"
+                                disabled={jaarActies.pendingPrevYearCount > 0}
+                                title={jaarActies.pendingPrevYearCount > 0 ? 'Niet beschikbaar: er staan nog ingediende overuren open in vorig jaar' : undefined}
+                                onClick={() => {
+                                    if (jaarActies.pendingPrevYearCount > 0) return;
+                                    // Gebruik directe URL i.p.v. Ziggy route helper om klikproblemen te voorkomen
+                                    router.post('/hr/jaar/rollover', { jaar: jaarActies.huidigJaar }, { preserveScroll: true });
+                                }}
+                            >
+                                Start nieuw boekjaar ({jaarActies.huidigJaar})
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </Card>
 
             {/* Recent Submissions */}
             <Card>
