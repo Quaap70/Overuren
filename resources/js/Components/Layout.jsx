@@ -8,6 +8,8 @@ import {
     ArrowRightOnRectangleIcon,
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
+import route from 'ziggy-js';
+import { Ziggy } from '../ziggy';
 
 export default function Layout({ children }) {
     const { auth } = usePage().props;
@@ -27,7 +29,9 @@ export default function Layout({ children }) {
 
     const fetchOngelezen = async () => {
         try {
-            const response = await fetch('/notificaties/ongelezen-count');
+            const response = await fetch(route('notificaties.unread-count', {}, false, Ziggy), {
+                headers: { 'Cache-Control': 'no-store' },
+            });
             const data = await response.json();
             setOngelezen(data.count);
         } catch (error) {
@@ -45,7 +49,7 @@ export default function Layout({ children }) {
             <nav className="border-b mb-8" style={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0' }}>
                 <div className="container mx-auto px-6 py-4">
                     <div className="flex justify-between items-center">
-                        <Link href={auth.user.is_hr ? '/hr/dashboard' : '/dashboard'} className="flex items-center gap-2">
+                        <Link href={auth.user.is_hr ? route('hr.dashboard', {}, false, Ziggy) : route('dashboard', {}, false, Ziggy)} className="flex items-center gap-2">
                             <ClockIcon className="h-6 w-6" style={{ color: '#64748B' }} />
                             <h1 className="text-xl font-semibold" style={{ color: '#1E293B' }}>
                                 Overuren Systeem
@@ -56,28 +60,28 @@ export default function Layout({ children }) {
                             {!auth.user.is_hr && (
                                 <>
                                     <Link
-                                        href="/dashboard"
+                                        href={route('dashboard', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900"
                                         style={{ color: '#64748B' }}
                                     >
                                         Dashboard
                                     </Link>
                                     <Link
-                                        href="/overuren"
+                                        href={route('overuren.index', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900"
                                         style={{ color: '#64748B' }}
                                     >
                                         Overuren
                                     </Link>
                                     <Link
-                                        href="/saldo"
+                                        href={route('saldo.index', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900"
                                         style={{ color: '#64748B' }}
                                     >
                                         Saldo
                                     </Link>
                                     <Link
-                                        href="/notificaties"
+                                        href={route('notificaties.index', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900 flex items-center gap-1.5 relative"
                                         style={{ color: ongelezen > 0 ? theme.colors.error[500] : theme.colors.neutral[500] }}
                                     >
@@ -101,28 +105,28 @@ export default function Layout({ children }) {
                             {auth.user.is_hr && (
                                 <>
                                     <Link
-                                        href="/hr/dashboard"
+                                        href={route('hr.dashboard', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900"
                                         style={{ color: '#64748B' }}
                                     >
                                         Dashboard
                                     </Link>
                                     <Link
-                                        href="/hr/te-beoordelen"
+                                        href={route('hr.te-beoordelen', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900"
                                         style={{ color: '#64748B' }}
                                     >
                                         Te Beoordelen
                                     </Link>
                                     <Link
-                                        href="/hr/medewerkers"
+                                        href={route('hr.medewerkers', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900"
                                         style={{ color: '#64748B' }}
                                     >
                                         Medewerkers
                                     </Link>
                                     <Link
-                                        href="/notificaties"
+                                        href={route('notificaties.index', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900 flex items-center gap-1.5 relative"
                                         style={{ color: ongelezen > 0 ? theme.colors.error[500] : theme.colors.neutral[500] }}
                                     >
@@ -153,14 +157,14 @@ export default function Layout({ children }) {
                                     </p>
                                 </div>
                                 <Link
-                                    href="/profiel"
+                                    href={route('profiel', {}, false, Ziggy)}
                                     className="p-2 rounded-lg transition-colors hover:bg-slate-100"
                                     title="Mijn Profiel"
                                 >
                                     <UserCircleIcon className="h-5 w-5" style={{ color: '#64748B' }} />
                                 </Link>
                                 <Link
-                                    href="/logout"
+                                    href={route('logout', {}, false, Ziggy)}
                                     method="post"
                                     as="button"
                                     className="p-2 rounded-lg transition-colors hover:bg-slate-100"

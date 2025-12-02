@@ -7,6 +7,8 @@ import Input from '../../../Components/Input';
 import ConfirmModal from '../../../Components/ConfirmModal';
 import { ArrowLeftIcon, KeyIcon } from '@heroicons/react/24/outline';
 import { theme } from '../../../config/theme';
+import route from 'ziggy-js';
+import { Ziggy } from '../../../ziggy';
 
 export default function GebruikerBewerken({ gebruiker, afdelingen }) {
     const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -38,7 +40,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
         }
 
         // Submit via transform callback
-        put(`/hr/gebruikers/${gebruiker.id}`, {
+        put(route('hr.gebruikers.update', { user: gebruiker.id }, false, Ziggy), {
             preserveState: true,
             transform: (data) => ({
                 ...data,
@@ -49,7 +51,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
 
     const handlePasswordReset = (e) => {
         e.preventDefault();
-        passwordForm.post(`/hr/gebruikers/${gebruiker.id}/wachtwoord-reset`, {
+        passwordForm.post(route('hr.gebruikers.wachtwoord-reset', { user: gebruiker.id }, false, Ziggy), {
             preserveScroll: true,
             onSuccess: () => {
                 passwordForm.reset();
@@ -63,8 +65,8 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
     };
 
     const confirmToggleActive = () => {
-        const action = gebruiker.is_active ? 'deactiveren' : 'activeren';
-        router.post(`/hr/gebruikers/${gebruiker.id}/${action}`, {}, {
+        const routeName = gebruiker.is_active ? 'hr.gebruikers.deactiveren' : 'hr.gebruikers.activeren';
+        router.post(route(routeName, { user: gebruiker.id }, false, Ziggy), {}, {
             preserveScroll: true,
             onFinish: () => setToggleActiveConfirm(false),
         });
@@ -75,7 +77,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
             <Head title={`${gebruiker.voornaam} ${gebruiker.achternaam} Bewerken`} />
 
             <div className="mb-6">
-                <Link href="/hr/medewerkers">
+                <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                     <Button variant="secondary">
                         <ArrowLeftIcon className="w-4 h-4 inline mr-2" />
                         Terug naar Medewerkers
@@ -316,7 +318,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                 <Button type="submit" disabled={processing}>
                                     Wijzigingen Opslaan
                                 </Button>
-                                <Link href="/hr/medewerkers">
+                                <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                                     <Button type="button" variant="secondary">
                                         Annuleren
                                     </Button>

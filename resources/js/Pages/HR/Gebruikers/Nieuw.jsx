@@ -6,6 +6,8 @@ import Button from '../../../Components/Button';
 import Input from '../../../Components/Input';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { theme } from '../../../config/theme';
+import route from 'ziggy-js';
+import { Ziggy } from '../../../ziggy';
 
 export default function GebruikerNieuw({ afdelingen }) {
     const [saldoEenheid, setSaldoEenheid] = useState('minuten');
@@ -36,7 +38,7 @@ export default function GebruikerNieuw({ afdelingen }) {
         setData('overgedragen_saldo', saldoInMinuten);
 
         // Submit via transform callback
-        post('/hr/gebruikers', {
+        post(route('hr.gebruikers.store', {}, false, Ziggy), {
             preserveState: true,
             transform: (data) => ({
                 ...data,
@@ -50,7 +52,7 @@ export default function GebruikerNieuw({ afdelingen }) {
             <Head title="Nieuwe Gebruiker" />
 
             <div className="mb-6">
-                <Link href="/hr/medewerkers">
+                <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                     <Button variant="secondary">
                         <ArrowLeftIcon className="w-4 h-4 inline mr-2" />
                         Terug naar Medewerkers
@@ -326,7 +328,7 @@ export default function GebruikerNieuw({ afdelingen }) {
                         <Button type="submit" disabled={processing}>
                             Gebruiker Toevoegen
                         </Button>
-                        <Link href="/hr/medewerkers">
+                        <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                             <Button type="button" variant="secondary">
                                 Annuleren
                             </Button>

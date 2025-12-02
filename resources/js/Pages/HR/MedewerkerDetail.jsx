@@ -2,6 +2,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
+import route from 'ziggy-js';
+import { Ziggy } from '../../ziggy';
 
 export default function MedewerkerDetail({ medewerker, recente_overuren, saldo }) {
     const formatMinutesToHoursMinutes = (minuten) => {
@@ -26,7 +28,7 @@ export default function MedewerkerDetail({ medewerker, recente_overuren, saldo }
         const reden = prompt('Reden voor aanpassing:');
 
         if (minuten && reden) {
-            router.post(`/hr/medewerkers/${medewerker.id}/saldo`, {
+            router.post(route('hr.saldo.aanpassen', { user: medewerker.id }, false, Ziggy), {
                 minuten: parseInt(minuten),
                 reden,
             }, {
@@ -41,7 +43,7 @@ export default function MedewerkerDetail({ medewerker, recente_overuren, saldo }
 
             {/* Header */}
             <div className="mb-6">
-                <Link href="/hr/medewerkers">
+                <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                     <Button variant="secondary" className="mb-4">
                         ← Terug naar Medewerkers
                     </Button>

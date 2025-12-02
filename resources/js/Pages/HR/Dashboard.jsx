@@ -4,6 +4,8 @@ import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import { ClockIcon, CalendarIcon, UsersIcon, CheckCircleIcon, XCircleIcon, ChartBarIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { theme } from '../../config/theme';
+import route from 'ziggy-js';
+import { Ziggy } from '../../ziggy';
 
 export default function HRDashboard({ statistieken, recente_indieningen }) {
     return (
@@ -104,7 +106,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                     <h2 className="text-lg font-bold" style={{ color: theme.colors.neutral[800] }}>
                         Recente Indieningen
                     </h2>
-                    <Link href="/hr/te-beoordelen">
+                    <Link href={route('hr.te-beoordelen', {}, false, Ziggy)}>
                         <Button variant="primary" size="sm">Alles Bekijken</Button>
                     </Link>
                 </div>
@@ -139,7 +141,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                                         variant="primary"
                                         size="sm"
                                         onClick={() => {
-                                            router.post(`/hr/uren/${indiening.id}/goedkeuren`, {}, {
+                                            router.post(route('hr.goedkeuren', { overuren: indiening.id }, false, Ziggy), {}, {
                                                 preserveScroll: true,
                                             });
                                         }}
@@ -152,7 +154,7 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
                                         onClick={() => {
                                             const reden = prompt('Reden voor afkeuring:');
                                             if (reden) {
-                                                router.post(`/hr/uren/${indiening.id}/afkeuren`, {
+                                                router.post(route('hr.afkeuren', { overuren: indiening.id }, false, Ziggy), {
                                                     reden
                                                 }, {
                                                     preserveScroll: true,
@@ -175,13 +177,13 @@ export default function HRDashboard({ statistieken, recente_indieningen }) {
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <Link href="/hr/medewerkers" className="block">
+                <Link href={route('hr.medewerkers', {}, false, Ziggy)} className="block">
                     <Button variant="primary" size="md" className="w-full">
                         <UsersIcon className="w-5 h-5 inline mr-2" />
                         Medewerkers Beheer
                     </Button>
                 </Link>
-                <Link href="/hr/te-beoordelen" className="block">
+                <Link href={route('hr.te-beoordelen', {}, false, Ziggy)} className="block">
                     <Button variant="secondary" size="md" className="w-full">
                         <ChartBarIcon className="w-5 h-5 inline mr-2" />
                         Te Beoordelen
