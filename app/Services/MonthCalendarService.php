@@ -80,10 +80,25 @@ class MonthCalendarService
 
         foreach ($overuren as $o) {
             $day = (int) Carbon::parse($o->datum)->day;
+            $min = (int) $o->minuten;
+            $isNegativeApproved = ($o->status === 'GOEDGEKEURD' && $min < 0);
+
+            if ($isNegativeApproved) {
+                // Behandel goedgekeurde negatieve overuren als opnames voor kalenderweergave
+                $days[$day]['opnames'][] = [
+                    'id' => $o->id,
+                    'datum' => Carbon::parse($o->datum)->toDateString(),
+                    'minuten' => abs($min),
+                    'type' => 'OPNAME',
+                    'reden' => $o->reden,
+                ];
+                continue;
+            }
+
             $item = [
                 'id' => $o->id,
                 'datum' => Carbon::parse($o->datum)->toDateString(),
-                'minuten' => (int) $o->minuten,
+                'minuten' => $min,
                 'reden' => $o->reden,
             ];
             switch ($o->status) {
@@ -100,7 +115,6 @@ class MonthCalendarService
                     $days[$day]['afgekeurd'][] = $item;
                     break;
                 default:
-                    // Onbekende status negeren
                     break;
             }
         }
@@ -118,8 +132,11 @@ class MonthCalendarService
             $days[$day]['opnames'][] = [
                 'id' => $m->id,
                 'datum' => Carbon::parse($m->datum)->toDateString(),
-                'minuten' => (int) $m->minuten,
+                // Sla positieve minuten op voor UI‑weergave en totaalsom (opnames zijn negatief in bron)
+                'minuten' => abs((int) $m->minuten),
                 'type' => $m->type,
+                // Reden is niet altijd aanwezig op mutaties; UI toont dan een fallbacklabel
+                'reden' => null,
             ];
         }
 

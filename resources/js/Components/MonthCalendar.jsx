@@ -48,33 +48,73 @@ export default function MonthCalendar({ data, basePath = '/dashboard' }) {
     goTo(y, m);
   };
 
-  const dayBadge = (text, color) => (
-    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold mr-1" style={{ backgroundColor: color, color: '#1F2937' }}>{text}</span>
+  const dayBadge = (text, color, title) => (
+    <span
+      className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold mr-1"
+      style={{ backgroundColor: color, color: '#1F2937' }}
+      title={title}
+    >
+      {text}
+    </span>
   );
 
   const dayCell = (day) => {
     if (!day) return <div className="h-24 border bg-white" style={{ borderColor: '#E5E7EB' }} />;
     const bucket = days?.[day] || { concept: [], ingediend: [], goedgekeurd: [], afgekeurd: [], opnames: [] };
 
-    // Totals per status in uren (afgerond), met 2 spaties tussen letter en waarde
-    const sumMinutes = (arr) => (arr || []).reduce((acc, it) => acc + (typeof it?.minuten === 'number' ? Math.max(0, it.minuten) : 0), 0);
-    const sumAbsMinutes = (arr) => (arr || []).reduce((acc, it) => acc + (typeof it?.minuten === 'number' ? Math.abs(it.minuten) : 0), 0);
-    const toHours = (mins) => Math.round(mins / 60);
+    // Totals per status in minuten → weergeven als H:MM (bijv. 0:45 of 2:20)
+    const toNum = (v) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    };
+    const sumMinutes = (arr) => (arr || []).reduce((acc, it) => acc + Math.max(0, toNum(it?.minuten)), 0);
+    const sumAbsMinutes = (arr) => (arr || []).reduce((acc, it) => acc + Math.abs(toNum(it?.minuten)), 0);
+    const fmtHMM = (mins) => {
+      const m = Math.max(0, Math.round(mins));
+      const h = Math.floor(m / 60);
+      const mm = String(m % 60).padStart(2, '0');
+      return `${h}:${mm}`;
+    };
 
-    const conceptH = toHours(sumMinutes(bucket.concept));
-    const ingediendH = toHours(sumMinutes(bucket.ingediend));
-    const goedgekeurdH = toHours(sumMinutes(bucket.goedgekeurd));
-    const afgekeurdH = toHours(sumMinutes(bucket.afgekeurd));
-    const opnamesH = toHours(sumAbsMinutes(bucket.opnames));
+    const conceptM = sumMinutes(bucket.concept);
+    const ingediendM = sumMinutes(bucket.ingediend);
+    const goedgekeurdM = sumMinutes(bucket.goedgekeurd);
+    const afgekeurdM = sumMinutes(bucket.afgekeurd);
+    const opnamesM = sumAbsMinutes(bucket.opnames);
+
+    // Tooltips (reden tonen per item)
+    const tooltipFromItems = (items, fallbackLabel = '') => {
+      if (!items || items.length === 0) return undefined;
+      try {
+        return items
+          .map((it) => {
+            const m = Math.abs(toNum(it?.minuten));
+            const h = Math.floor(m / 60);
+            const mm = String(m % 60).padStart(2, '0');
+            const tijd = `${h}:${mm}`;
+            const reden = (it?.reden && String(it.reden).trim().length > 0) ? it.reden : fallbackLabel;
+            return `${tijd} – ${reden ?? ''}`.trim();
+          })
+          .join('\n');
+      } catch (e) {
+        return undefined;
+      }
+    };
+
+    const tipCon = tooltipFromItems(bucket.concept, 'Concept');
+    const tipIng = tooltipFromItems(bucket.ingediend, 'Ingediend');
+    const tipGoed = tooltipFromItems(bucket.goedgekeurd, 'Goedgekeurd');
+    const tipAfk = tooltipFromItems(bucket.afgekeurd, 'Afgekeurd');
+    const tipOpn = tooltipFromItems(bucket.opnames, 'Opname');
     return (
       <div className="h-24 border p-1 overflow-hidden" style={{ borderColor: '#E5E7EB', backgroundColor: '#FFFFFF' }}>
         <div className="text-xs font-semibold mb-1" style={{ color: '#374151' }}>{day}</div>
         <div className="space-x-1 whitespace-nowrap overflow-hidden text-ellipsis">
-          {bucket.concept?.length > 0 && dayBadge(`C  ${conceptH}`, '#E5E7EB')}
-          {bucket.ingediend?.length > 0 && dayBadge(`I  ${ingediendH}`, '#FDE68A')}
-          {bucket.goedgekeurd?.length > 0 && dayBadge(`G  ${goedgekeurdH}`, '#BBF7D0')}
-          {bucket.afgekeurd?.length > 0 && dayBadge(`A  ${afgekeurdH}`, '#FCA5A5')}
-          {bucket.opnames?.length > 0 && dayBadge(`O  ${opnamesH}`, '#E9D5FF')}
+          {bucket.concept?.length > 0 && dayBadge(`Con: ${fmtHMM(conceptM)}`, '#E5E7EB', tipCon)}
+          {bucket.ingediend?.length > 0 && dayBadge(`Ing: ${fmtHMM(ingediendM)}`, '#FDE68A', tipIng)}
+          {bucket.goedgekeurd?.length > 0 && dayBadge(`Goed: ${fmtHMM(goedgekeurdM)}`, '#BBF7D0', tipGoed)}
+          {bucket.afgekeurd?.length > 0 && dayBadge(`Afk: ${fmtHMM(afgekeurdM)}`, '#FCA5A5', tipAfk)}
+          {bucket.opnames?.length > 0 && dayBadge(`Opn: ${fmtHMM(opnamesM)}`, '#93C5FD', tipOpn)}
         </div>
       </div>
     );
@@ -113,12 +153,12 @@ export default function MonthCalendar({ data, basePath = '/dashboard' }) {
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-2 mt-3 text-xs" style={{ color: '#6B7280' }}>
-        <span>Legenda (letter  +  uren):</span>
-        {dayBadge('C  Concept', '#E5E7EB')}
-        {dayBadge('I  Ingediend', '#FDE68A')}
-        {dayBadge('G  Goedgekeurd', '#BBF7D0')}
-        {dayBadge('A  Afgekeurd', '#FCA5A5')}
-        {dayBadge('O  Opname', '#E9D5FF')}
+        <span>Legenda:</span>
+        {dayBadge('Con: Concept', '#E5E7EB')}
+        {dayBadge('Ing: Ingediend', '#FDE68A')}
+        {dayBadge('Goed: Goedgekeurd', '#BBF7D0')}
+        {dayBadge('Afk: Afgekeurd', '#FCA5A5')}
+        {dayBadge('Opn: Opname', '#93C5FD')}
       </div>
     </div>
   );
