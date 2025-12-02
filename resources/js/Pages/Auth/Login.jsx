@@ -55,7 +55,7 @@ export default function Login() {
                             type="text"
                             value={data.username}
                             onChange={e => setData('username', e.target.value)}
-                            placeholder="jan1"
+                            placeholder="jan"
                             error={errors.username}
                             required
                         />
@@ -108,7 +108,7 @@ export default function Login() {
                                 <strong style={{ color: theme.colors.neutral[700] }}>HR:</strong> linda / Welkom123!
                             </p>
                             <p style={{ color: theme.colors.neutral[500] }}>
-                                <strong style={{ color: theme.colors.neutral[700] }}>Medewerker:</strong> jan1 / Welkom123!
+                                <strong style={{ color: theme.colors.neutral[700] }}>Medewerker:</strong> jan / Welkom123!
                             </p>
                         </div>
                     </div>

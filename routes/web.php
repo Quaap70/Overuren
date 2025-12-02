@@ -71,6 +71,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/uren/{overuren}/afkeuren', [HRController::class, 'afkeuren'])->name('afkeuren');
         Route::post('/medewerkers/{user}/saldo', [HRController::class, 'saldoAanpassen'])->name('saldo.aanpassen');
 
+        // Jaarbeheer (baseline/start_saldo) acties
+        Route::post('/jaar/start', [HRController::class, 'startJaar'])->name('jaar.start');
+        Route::post('/jaar/sluiten', [HRController::class, 'sluitJaar'])->name('jaar.sluiten');
+        Route::post('/jaar/rollover', [HRController::class, 'rollover'])->name('jaar.rollover');
+
         // Gebruikersbeheer routes
         Route::get('/gebruikers/nieuw', [HRController::class, 'gebruikerNieuw'])->name('gebruikers.nieuw');
         Route::post('/gebruikers', [HRController::class, 'gebruikerStore'])->name('gebruikers.store');

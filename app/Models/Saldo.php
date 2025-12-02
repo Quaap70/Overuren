@@ -51,7 +51,7 @@ class Saldo extends Model
      *
      * @var string
      */
-    protected $table = 'saldo';
+    protected $table = 'saldo_cache';
 
     /**
      * Get the user that owns the balance

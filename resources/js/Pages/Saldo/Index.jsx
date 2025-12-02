@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
-import { CurrencyDollarIcon, PlusIcon, MinusIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { CurrencyDollarIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
 
 export default function SaldoIndex({ saldo }) {
     const formatMinutesToHoursMinutes = (minuten) => {
@@ -85,19 +85,7 @@ export default function SaldoIndex({ saldo }) {
                 </Card>
             </div>
 
-            {/* Info Section */}
-            <Card className="mt-6">
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#2D3748' }}>
-                    <InformationCircleIcon className="w-6 h-6" /> Informatie
-                </h2>
-                <div className="space-y-2" style={{ color: '#718096' }}>
-                    <p>• Je saldo wordt automatisch bijgewerkt wanneer overuren worden goedgekeurd</p>
-                    <p>• <strong>Overgedragen saldo:</strong> komt van het vorige jaar</p>
-                    <p>• <strong>Opgebouwd dit jaar:</strong> goedgekeurde overuren (positief)</p>
-                    <p>• <strong>Opgenomen:</strong> uren die je hebt opgenomen (negatief)</p>
-                    <p>• <strong>Huidig saldo:</strong> overgedragen + opgebouwd - opgenomen</p>
-                </div>
-            </Card>
+            {/* Info Section verwijderd op verzoek */}
         </Layout>
     );
 }
