@@ -18,6 +18,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
         role: gebruiker.role || 'MEDEWERKER',
         afdeling: gebruiker.afdeling || '',
         startdatum: gebruiker.startdatum || '',
+        overgedragen_saldo: gebruiker.overgedragen_saldo || 0,
     });
 
     const passwordForm = useForm({
@@ -224,7 +225,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                 </div>
 
                                 {/* Startdatum */}
-                                <div className="md:col-span-2">
+                                <div>
                                     <label className="block text-sm font-medium mb-2" style={{ color: '#2D3748' }}>
                                         Startdatum *
                                     </label>
@@ -240,6 +241,29 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                             {errors.startdatum}
                                         </p>
                                     )}
+                                </div>
+
+                                {/* Overgedragen Saldo */}
+                                <div>
+                                    <label className="block text-sm font-medium mb-2" style={{ color: '#2D3748' }}>
+                                        Overgedragen Saldo (minuten)
+                                    </label>
+                                    <Input
+                                        type="number"
+                                        value={data.overgedragen_saldo}
+                                        onChange={(e) => setData('overgedragen_saldo', e.target.value)}
+                                        error={errors.overgedragen_saldo}
+                                        placeholder="Bijv. 480 voor 8 uur"
+                                        step="5"
+                                    />
+                                    {errors.overgedragen_saldo && (
+                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
+                                            {errors.overgedragen_saldo}
+                                        </p>
+                                    )}
+                                    <p className="text-xs mt-1" style={{ color: '#718096' }}>
+                                        Pas het overgedragen saldo aan voor dit jaar
+                                    </p>
                                 </div>
                             </div>
 

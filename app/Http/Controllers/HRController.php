@@ -346,9 +346,10 @@ class HRController extends Controller
             'role' => 'required|in:MEDEWERKER,HR',
             'afdeling' => "required|in:{$afdelingen}",
             'startdatum' => 'required|date',
+            'overgedragen_saldo' => 'nullable|integer',
         ]);
 
-        User::create([
+        $user = User::create([
             'username' => $validated['username'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
@@ -361,6 +362,15 @@ class HRController extends Controller
             'must_change_password' => true,
         ]);
 
+        // Als er een overgedragen saldo is opgegeven, maak/update het saldo
+        if (isset($validated['overgedragen_saldo']) && $validated['overgedragen_saldo'] != 0) {
+            $huidigJaar = now()->year;
+            $saldo = $this->saldoService->getOrCreateSaldo($user->id, $huidigJaar);
+            $saldo->overgedragen_saldo = $validated['overgedragen_saldo'];
+            $saldo->laatst_bijgewerkt = now();
+            $saldo->save();
+        }
+
         return redirect()->route('hr.medewerkers')->with('success', 'Gebruiker succesvol aangemaakt. De gebruiker moet het wachtwoord wijzigen bij eerste login.');
     }
 
@@ -369,6 +379,9 @@ class HRController extends Controller
      */
     public function gebruikerBewerken(User $user)
     {
+        $huidigJaar = now()->year;
+        $saldo = $this->saldoService->getOrCreateSaldo($user->id, $huidigJaar);
+
         return Inertia::render('HR/Gebruikers/Bewerken', [
             'gebruiker' => [
                 'id' => $user->id,
@@ -380,6 +393,7 @@ class HRController extends Controller
                 'afdeling' => $user->afdeling,
                 'startdatum' => $user->startdatum?->format('Y-m-d'),
                 'is_active' => $user->is_active,
+                'overgedragen_saldo' => $saldo->overgedragen_saldo,
             ],
             'afdelingen' => config('afdelingen.lijst'),
         ]);
@@ -399,9 +413,26 @@ class HRController extends Controller
             'role' => 'required|in:MEDEWERKER,HR',
             'afdeling' => "required|in:{$afdelingen}",
             'startdatum' => 'required|date',
+            'overgedragen_saldo' => 'nullable|integer',
         ]);
 
-        $user->update($validated);
+        $user->update([
+            'email' => $validated['email'],
+            'voornaam' => $validated['voornaam'],
+            'achternaam' => $validated['achternaam'],
+            'role' => $validated['role'],
+            'afdeling' => $validated['afdeling'],
+            'startdatum' => $validated['startdatum'],
+        ]);
+
+        // Update overgedragen saldo als deze is meegegeven
+        if (isset($validated['overgedragen_saldo'])) {
+            $huidigJaar = now()->year;
+            $saldo = $this->saldoService->getOrCreateSaldo($user->id, $huidigJaar);
+            $saldo->overgedragen_saldo = $validated['overgedragen_saldo'];
+            $saldo->laatst_bijgewerkt = now();
+            $saldo->save();
+        }
 
         return redirect()->route('hr.medewerkers')->with('success', 'Gebruiker succesvol bijgewerkt');
     }
