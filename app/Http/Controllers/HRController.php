@@ -9,6 +9,7 @@ use App\Models\UrenMutatie;
 use App\Models\UrenBaseline;
 use App\Models\Notificatie;
 use App\Services\SaldoService;
+use App\Services\MonthCalendarService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -16,50 +17,18 @@ use Inertia\Inertia;
 class HRController extends Controller
 {
     public function __construct(
-        private SaldoService $saldoService
+        private SaldoService $saldoService,
+        private MonthCalendarService $monthCalendarService,
     ) {}
 
     /**
      * HR Dashboard
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $huidigJaar = now()->year;
+        $huidigeMaand = now()->month;
         $vorigJaar = $huidigJaar - 1;
-
-        // Pending approvals count
-        $teBeoordelenCount = Overuren::where('status', 'INGEDIEND')->count();
-
-        // This week submissions
-        $dezeWeekStart = now()->startOfWeek();
-        $dezeWeekCount = Overuren::where('ingediend_op', '>=', $dezeWeekStart)->count();
-
-        // Active employees count
-        $medewerkersCount = User::where('role', 'MEDEWERKER')
-            ->where('is_active', true)
-            ->count();
-
-        // Total approved hours this year
-        $totaalMinuten = Overuren::where('status', 'GOEDGEKEURD')
-            ->where('jaar', $huidigJaar)
-            ->sum('minuten');
-
-        // Recent submissions
-        $recenteIndieningen = Overuren::where('status', 'INGEDIEND')
-            ->with('user:id,voornaam,achternaam')
-            ->orderBy('ingediend_op', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(fn ($o) => [
-                'id' => $o->id,
-                'medewerker' => $o->user->full_name,
-                'medewerker_id' => $o->user->id,
-                'datum' => $o->datum->format('Y-m-d'),
-                'minuten' => $o->minuten,
-                'formatted' => $o->formatted_time,
-                'reden' => $o->reden,
-                'ingediend_op' => $o->ingediend_op?->format('Y-m-d H:i'),
-            ]);
 
         // Jaaracties (HR) status
         $baselineHuidigBestaat = UrenBaseline::where('jaar', $huidigJaar)->exists();
@@ -71,14 +40,82 @@ class HRController extends Controller
             ->where('jaar', $vorigJaar)
             ->count();
 
+        // Medewerker selectie (live search)
+        $zoek = (string) $request->query('zoek', '');
+        $commit = (bool) $request->boolean('commit', false);
+        $medewerkerId = $request->integer('medewerker');
+        $jaar = (int) ($request->query('year', $huidigJaar));
+        $maand = (int) ($request->query('month', $huidigeMaand));
+
+        $medewerkerQuery = User::query()
+            ->where('role', 'MEDEWERKER')
+            ->where('is_active', true);
+        if ($zoek !== '') {
+            $medewerkerQuery->where(function ($q) use ($zoek) {
+                $q->where('voornaam', 'like', "%{$zoek}%")
+                    ->orWhere('achternaam', 'like', "%{$zoek}%")
+                    ->orWhere('username', 'like', "%{$zoek}%")
+                    ->orWhere('email', 'like', "%{$zoek}%");
+
+                // Extra: match "voornaam achternaam" of "achternaam voornaam" wanneer beide worden getypt
+                $parts = preg_split('/\s+/', trim($zoek));
+                if (is_array($parts) && count($parts) >= 2) {
+                    $first = $parts[0];
+                    $last = $parts[count($parts) - 1];
+                    $q->orWhere(function ($qq) use ($first, $last) {
+                        $qq->where('voornaam', 'like', "%{$first}%")
+                           ->where('achternaam', 'like', "%{$last}%");
+                    })->orWhere(function ($qq) use ($first, $last) {
+                        $qq->where('achternaam', 'like', "%{$first}%")
+                           ->where('voornaam', 'like', "%{$last}%");
+                    });
+                }
+            });
+        }
+        $medewerkerOptions = $medewerkerQuery
+            ->orderBy('achternaam')
+            ->orderBy('voornaam')
+            ->limit(50)
+            ->get(['id', 'voornaam', 'achternaam', 'afdeling'])
+            ->map(fn ($u) => [
+                'id' => $u->id,
+                'naam' => $u->full_name,
+                'afdeling' => $u->afdeling,
+            ]);
+
+        // If Enter committed from client with a typed name, try exact match first (case-insensitive)
+        if (!$medewerkerId && $commit && $zoek !== '' && $medewerkerOptions->count() > 0) {
+            $exact = $medewerkerOptions->first(function ($opt) use ($zoek) {
+                return mb_strtolower($opt['naam']) === mb_strtolower($zoek);
+            });
+            if ($exact) {
+                $medewerkerId = $exact['id'];
+            }
+        }
+
+        // Auto-select when there is exactly one match and no explicit medewerker is chosen yet (fallback)
+        if (!$medewerkerId && $zoek !== '' && $medewerkerOptions->count() === 1) {
+            $medewerkerId = $medewerkerOptions->first()['id'];
+        }
+
+        $calendar = null;
+        $selectedMedewerker = null;
+        if ($medewerkerId) {
+            $exists = User::where('id', $medewerkerId)->where('role', 'MEDEWERKER')->exists();
+            if ($exists) {
+                $calendar = $this->monthCalendarService->getUserMonth($medewerkerId, $jaar, $maand);
+                $user = User::find($medewerkerId, ['id', 'voornaam', 'achternaam', 'afdeling']);
+                if ($user) {
+                    $selectedMedewerker = [
+                        'id' => $user->id,
+                        'naam' => $user->full_name,
+                        'afdeling' => $user->afdeling,
+                    ];
+                }
+            }
+        }
+
         return Inertia::render('HR/Dashboard', [
-            'statistieken' => [
-                'te_beoordelen' => $teBeoordelenCount,
-                'deze_week' => $dezeWeekCount,
-                'medewerkers' => $medewerkersCount,
-                'totaal_uren' => round($totaalMinuten / 60),
-            ],
-            'recente_indieningen' => $recenteIndieningen,
             'jaarActies' => [
                 'huidigJaar' => $huidigJaar,
                 'vorigJaar' => $vorigJaar,
@@ -86,6 +123,15 @@ class HRController extends Controller
                 'openVorigJaarCount' => $openVorigJaarCount,
                 'pendingPrevYearCount' => $pendingPrevYearCount,
             ],
+            'filters' => [
+                'medewerker' => $medewerkerId,
+                'zoek' => $zoek,
+                'year' => $jaar,
+                'month' => $maand,
+            ],
+            'medewerkerOptions' => $medewerkerOptions,
+            'calendar' => $calendar,
+            'selectedMedewerker' => $selectedMedewerker,
         ]);
     }
 

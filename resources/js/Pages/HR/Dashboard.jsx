@@ -1,13 +1,213 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
-import { ClockIcon, CalendarIcon, UsersIcon, CheckCircleIcon, XCircleIcon, ChartBarIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { UsersIcon } from '@heroicons/react/24/outline';
 import { theme } from '../../config/theme';
 import route from 'ziggy-js';
 import { Ziggy } from '../../ziggy';
+import MonthCalendar from '../../Components/MonthCalendar';
 
-export default function HRDashboard({ statistieken, recente_indieningen, jaarActies }) {
+export default function HRDashboard({ jaarActies, filters, medewerkerOptions, calendar, selectedMedewerker }) {
+    // Type-to-select (combobox) state
+    const [query, setQuery] = useState(filters?.zoek || '');
+    const [openList, setOpenList] = useState(false);
+    const listRef = useRef(null);
+    const inputRef = useRef(null);
+    const [highlightedIndex, setHighlightedIndex] = useState(0);
+    const [selectedCandidateId, setSelectedCandidateId] = useState(null);
+
+    // Keep query in sync when filters.zoek changes from server (e.g., back/forward nav)
+    useEffect(() => {
+        setQuery(filters?.zoek || '');
+    }, [filters?.zoek]);
+    const onSelectMedewerker = (id) => {
+        const params = new URLSearchParams(window.location.search);
+        if (id) params.set('medewerker', id);
+        else params.delete('medewerker');
+        // Bij expliciete selectie: verwijder zoekterm om verwarring te voorkomen
+        params.delete('zoek');
+        // reset to current month/year when changing medewerker
+        const today = new Date();
+        params.set('year', params.get('year') || today.getFullYear());
+        params.set('month', params.get('month') || (today.getMonth() + 1));
+        router.visit(`/hr/dashboard?${params.toString()}`, { preserveScroll: true, preserveState: true });
+    };
+
+    // Debounced search to update server options while preserving current selection
+    useEffect(() => {
+        const handle = setTimeout(() => {
+            const params = new URLSearchParams(window.location.search);
+            if (query && query.trim().length > 0) params.set('zoek', query.trim()); else params.delete('zoek');
+            router.visit(`/hr/dashboard?${params.toString()}`,
+                { preserveScroll: true, preserveState: true, only: ['medewerkerOptions', 'filters'] }
+            );
+        }, 300);
+        return () => clearTimeout(handle);
+    }, [query]);
+
+    // When options refresh, (re)set highlighted and candidate
+    useEffect(() => {
+        if (openList && query.trim().length > 0 && Array.isArray(medewerkerOptions) && medewerkerOptions.length > 0) {
+            setHighlightedIndex(0);
+            setSelectedCandidateId(medewerkerOptions[0].id);
+        } else {
+            setSelectedCandidateId(null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [medewerkerOptions]);
+
+    // removed: old onInputChange (replaced below with version that hides list when empty)
+
+    const goMonth = (year, month) => {
+        const params = new URLSearchParams(window.location.search);
+        params.set('year', year);
+        params.set('month', month);
+        router.visit(`/hr/dashboard?${params.toString()}`, { preserveScroll: true, preserveState: true });
+    };
+
+    const onKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            // Activate the current highlighted/selected candidate
+            if (openList && Array.isArray(medewerkerOptions) && medewerkerOptions.length > 0) {
+                const id = selectedCandidateId ?? medewerkerOptions[highlightedIndex]?.id ?? medewerkerOptions[0].id;
+                onSelectMedewerker(id);
+                setOpenList(false);
+                e.preventDefault();
+            } else {
+                // List closed: if we already have a candidate, activate it.
+                if (selectedCandidateId) {
+                    onSelectMedewerker(selectedCandidateId);
+                    setOpenList(false);
+                    e.preventDefault();
+                } else if (query.trim().length > 0) {
+                    // Try to resolve from current options by exact/startsWith/includes
+                    let idToUse = null;
+                    if (Array.isArray(medewerkerOptions) && medewerkerOptions.length > 0) {
+                        const lower = query.trim().toLowerCase();
+                        const exact = medewerkerOptions.find(o => (o.naam || '').toLowerCase() === lower);
+                        const starts = exact || medewerkerOptions.find(o => (o.naam || '').toLowerCase().startsWith(lower));
+                        const includes = starts || medewerkerOptions.find(o => (o.naam || '').toLowerCase().includes(lower));
+                        if (includes) idToUse = includes.id;
+                    }
+                    if (idToUse) {
+                        onSelectMedewerker(idToUse);
+                        setOpenList(false);
+                        e.preventDefault();
+                    } else {
+                        // Fall back to search-only navigation; server will auto-select if single match
+                        const params = new URLSearchParams(window.location.search);
+                        params.set('zoek', query.trim());
+                        params.delete('medewerker');
+                        // Zet commit=1 zodat server bij exact match (full name) kan resolven
+                        params.set('commit', '1');
+                        setOpenList(false);
+                        router.visit(`/hr/dashboard?${params.toString()}`, { preserveScroll: true, preserveState: true });
+                        e.preventDefault();
+                    }
+                } else if (filters?.medewerker) {
+                    // No candidate; keep current selection (refresh)
+                    const params = new URLSearchParams(window.location.search);
+                    setOpenList(false);
+                    router.visit(`/hr/dashboard?${params.toString()}`, { preserveScroll: true, preserveState: true });
+                    e.preventDefault();
+                }
+            }
+        } else if (e.key === 'Tab') {
+            // Tab selects current highlighted suggestion into the input, but does not navigate
+            if (openList && Array.isArray(medewerkerOptions) && medewerkerOptions.length > 0) {
+                e.preventDefault();
+                const choice = medewerkerOptions[highlightedIndex] ?? medewerkerOptions[0];
+                if (choice) {
+                    setQuery(choice.naam);
+                    setSelectedCandidateId(choice.id);
+                    setOpenList(false);
+                    // Place caret at end on next tick
+                    requestAnimationFrame(() => {
+                        if (inputRef.current) {
+                            const el = inputRef.current;
+                            el.focus();
+                            el.setSelectionRange(el.value.length, el.value.length);
+                        }
+                    });
+                }
+            }
+        } else if (e.key === 'Escape') {
+            setOpenList(false);
+        } else if (e.key === 'ArrowDown') {
+            if (openList && Array.isArray(medewerkerOptions) && medewerkerOptions.length > 0) {
+                e.preventDefault();
+                const next = (highlightedIndex + 1) % medewerkerOptions.length;
+                setHighlightedIndex(next);
+                setSelectedCandidateId(medewerkerOptions[next].id);
+                scrollActiveIntoView(next);
+            }
+        } else if (e.key === 'ArrowUp') {
+            if (openList && Array.isArray(medewerkerOptions) && medewerkerOptions.length > 0) {
+                e.preventDefault();
+                const next = (highlightedIndex - 1 + medewerkerOptions.length) % medewerkerOptions.length;
+                setHighlightedIndex(next);
+                setSelectedCandidateId(medewerkerOptions[next].id);
+                scrollActiveIntoView(next);
+            }
+        }
+    };
+
+    const onInputChange = (e) => {
+        const val = e.target.value ?? '';
+        setQuery(val);
+        // Toon de lijst alleen als er een zoekterm is
+        if (val.trim().length === 0) {
+            setOpenList(false);
+            setHighlightedIndex(0);
+            setSelectedCandidateId(null);
+        } else {
+            setOpenList(true);
+            // Probeer direct lokaal een match te vinden op basis van huidige opties
+            if (Array.isArray(medewerkerOptions) && medewerkerOptions.length > 0) {
+                const lower = val.toLowerCase();
+                let idx = medewerkerOptions.findIndex(o => (o.naam || '').toLowerCase().startsWith(lower));
+                if (idx === -1) {
+                    idx = medewerkerOptions.findIndex(o => (o.naam || '').toLowerCase().includes(lower));
+                }
+                if (idx >= 0) {
+                    setHighlightedIndex(idx);
+                    setSelectedCandidateId(medewerkerOptions[idx].id);
+                    scrollActiveIntoView(idx);
+                } else {
+                    setHighlightedIndex(0);
+                    setSelectedCandidateId(null);
+                }
+            }
+        }
+    };
+
+    const clearSelection = () => {
+        // Wis medewerker-selectie en zoekterm, en sluit de lijst
+        onSelectMedewerker('');
+        setQuery('');
+        setOpenList(false);
+        setHighlightedIndex(0);
+        setSelectedCandidateId(null);
+        // Zet ook de zoekquery in de URL weg zodat opties leeg kunnen zijn
+        const params = new URLSearchParams(window.location.search);
+        params.delete('zoek');
+        router.visit(`/hr/dashboard?${params.toString()}`, { preserveScroll: true, preserveState: true, only: ['medewerkerOptions', 'filters'] });
+        // Focus terug naar input voor snelle verdere invoer
+        requestAnimationFrame(() => inputRef.current?.focus());
+    };
+
+    // Ensure the active option is visible when navigating with arrows
+    const scrollActiveIntoView = (index) => {
+        const listEl = listRef.current;
+        if (!listEl) return;
+        const item = listEl.querySelector(`[data-index="${index}"]`);
+        if (item && typeof item.scrollIntoView === 'function') {
+            item.scrollIntoView({ block: 'nearest' });
+        }
+    };
+
     return (
         <Layout>
             <Head title="HR Dashboard" />
@@ -17,88 +217,104 @@ export default function HRDashboard({ statistieken, recente_indieningen, jaarAct
                     HR Dashboard
                 </h1>
                 <p className="text-sm" style={{ color: theme.colors.neutral[500] }}>
-                    Overzicht van alle overuren en medewerkers
+                    Maandkalender per medewerker en jaarbeheer
                 </p>
             </div>
 
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <Card>
-                    <div className="flex items-center gap-4">
-                        <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ backgroundColor: theme.colors.warning[100] }}
-                        >
-                            <ClockIcon className="w-6 h-6" style={{ color: theme.colors.warning[600] }} />
-                        </div>
-                        <div>
-                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
-                                Te Beoordelen
-                            </h3>
-                            <p className="text-2xl font-bold" style={{ color: theme.colors.neutral[800] }}>
-                                {statistieken?.te_beoordelen || 0}
-                            </p>
-                        </div>
+            {/* Kalender + filters */}
+            <Card className="mb-6">
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                    <div className="w-full md:w-1/2 relative">
+                        <label className="text-xs block mb-1" style={{ color: theme.colors.neutral[600] }}>Medewerker</label>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={query}
+                            onChange={onInputChange}
+                            onFocus={() => setOpenList(true)}
+                            onKeyDown={onKeyDown}
+                            placeholder="Type om te zoeken en selecteer met Enter..."
+                            className="w-full px-3 py-2 rounded border"
+                            style={{ borderColor: theme.colors.neutral[300] }}
+                            role="combobox"
+                            aria-expanded={openList}
+                            aria-controls="medewerker-suggesties"
+                            aria-autocomplete="list"
+                        />
+                        {/* Clear selection/button */}
+                        {Number(filters?.medewerker) > 0 && (
+                            <button
+                                type="button"
+                                onClick={clearSelection}
+                                className="absolute right-2 top-8 text-sm px-2 py-0.5 rounded"
+                                title="Reset selectie"
+                                style={{ color: theme.colors.neutral[500] }}
+                            >
+                                ×
+                            </button>
+                        )}
+                        {/* Suggestion list */}
+                        {(() => {
+                            const showList = openList && (query?.trim()?.length > 0) && Array.isArray(medewerkerOptions) && (medewerkerOptions.length > 0);
+                            return showList ? (
+                            <ul
+                                id="medewerker-suggesties"
+                                ref={listRef}
+                                role="listbox"
+                                className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded border bg-white shadow"
+                                style={{ borderColor: theme.colors.neutral[200] }}
+                            >
+                                {medewerkerOptions.map((o, idx) => (
+                                    <li
+                                        key={o.id}
+                                        role="option"
+                                        aria-selected={highlightedIndex === idx}
+                                        data-index={idx}
+                                        className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${highlightedIndex === idx ? 'bg-gray-100' : ''}`}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onMouseEnter={() => { setHighlightedIndex(idx); setSelectedCandidateId(o.id); }}
+                                        onClick={() => { onSelectMedewerker(o.id); setOpenList(false); }}
+                                    >
+                                        {o.naam} <span className="text-xs text-gray-400">({o.afdeling})</span>
+                                    </li>
+                                ))}
+                            </ul>
+                            ) : null;
+                        })()}
                     </div>
-                </Card>
+                </div>
 
-                <Card>
-                    <div className="flex items-center gap-4">
-                        <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ backgroundColor: theme.colors.info[100] }}
-                        >
-                            <CalendarIcon className="w-6 h-6" style={{ color: theme.colors.info[600] }} />
-                        </div>
-                        <div>
-                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
-                                Deze Week
-                            </h3>
-                            <p className="text-2xl font-bold" style={{ color: theme.colors.neutral[800] }}>
-                                {statistieken?.deze_week || 0}
-                            </p>
-                        </div>
-                    </div>
-                </Card>
-
-                <Card>
-                    <div className="flex items-center gap-4">
-                        <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ backgroundColor: theme.colors.primary[100] }}
-                        >
-                            <UsersIcon className="w-6 h-6" style={{ color: theme.colors.primary[600] }} />
-                        </div>
-                        <div>
-                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
-                                Medewerkers
-                            </h3>
-                            <p className="text-2xl font-bold" style={{ color: theme.colors.neutral[800] }}>
-                                {statistieken?.medewerkers || 0}
-                            </p>
-                        </div>
-                    </div>
-                </Card>
-
-                <Card>
-                    <div className="flex items-center gap-4">
-                        <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ backgroundColor: theme.colors.success[100] }}
-                        >
-                            <ClockIcon className="w-6 h-6" style={{ color: theme.colors.success[600] }} />
-                        </div>
-                        <div>
-                            <h3 className="text-xs font-medium mb-1" style={{ color: theme.colors.neutral[500] }}>
-                                Totaal Uren
-                            </h3>
-                            <p className="text-2xl font-bold" style={{ color: theme.colors.neutral[800] }}>
-                                {statistieken?.totaal_uren || 0}u
-                            </p>
-                        </div>
-                    </div>
-                </Card>
-            </div>
+                <div className="mt-4">
+                    {filters?.medewerker ? (
+                        <>
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="text-sm font-medium" style={{ color: theme.colors.neutral[700] }}>
+                                    {selectedMedewerker ? (
+                                        <>
+                                            Kalender: <span className="font-semibold">{selectedMedewerker.naam}</span>{' '}
+                                            <span className="text-xs px-2 py-0.5 rounded ml-1" style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}>
+                                                {selectedMedewerker.afdeling}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        'Kalender'
+                                    )}
+                                </div>
+                                {calendar?.calendar && (
+                                    <div className="text-xs" style={{ color: theme.colors.neutral[500] }}>
+                                        {String(calendar.calendar.year)}-{String(calendar.calendar.month).padStart(2, '0')}
+                                    </div>
+                                )}
+                            </div>
+                            <MonthCalendar data={calendar} basePath="/hr/dashboard" />
+                        </>
+                    ) : (
+                        <p className="text-sm p-4 rounded border" style={{ color: theme.colors.neutral[600], borderColor: theme.colors.neutral[200] }}>
+                            Selecteer eerst een medewerker om de kalender te tonen.
+                        </p>
+                    )}
+                </div>
+            </Card>
 
             {/* Jaarbeheer acties */}
             <Card>
@@ -144,97 +360,6 @@ export default function HRDashboard({ statistieken, recente_indieningen, jaarAct
                     </div>
                 </div>
             </Card>
-
-            {/* Recent Submissions */}
-            <Card>
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-bold" style={{ color: theme.colors.neutral[800] }}>
-                        Recente Indieningen
-                    </h2>
-                    <Link href={route('hr.te-beoordelen', {}, false, Ziggy)}>
-                        <Button variant="primary" size="sm">Alles Bekijken</Button>
-                    </Link>
-                </div>
-
-                {recente_indieningen && recente_indieningen.length > 0 ? (
-                    <div className="space-y-3">
-                        {recente_indieningen.map((indiening) => (
-                            <div
-                                key={indiening.id}
-                                className="flex justify-between items-center p-4 rounded-lg border transition-all"
-                                style={{
-                                    backgroundColor: theme.colors.neutral[50],
-                                    borderColor: theme.colors.neutral[200]
-                                }}
-                            >
-                                <div>
-                                    <p className="font-bold text-sm" style={{ color: theme.colors.neutral[800] }}>
-                                        {indiening.medewerker}
-                                    </p>
-                                    <p className="text-xs mt-1" style={{ color: theme.colors.neutral[600] }}>
-                                        {new Date(indiening.datum).toLocaleDateString('nl-NL')} •{' '}
-                                        {indiening.formatted}
-                                    </p>
-                                    {indiening.reden && (
-                                        <p className="text-xs italic mt-1" style={{ color: theme.colors.neutral[500] }}>
-                                            "{indiening.reden}"
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={() => {
-                                            router.post(route('hr.goedkeuren', { overuren: indiening.id }, false, Ziggy), {}, {
-                                                preserveScroll: true,
-                                            });
-                                        }}
-                                    >
-                                        <CheckCircleIcon className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                        variant="danger"
-                                        size="sm"
-                                        onClick={() => {
-                                            const reden = prompt('Reden voor afkeuring:');
-                                            if (reden) {
-                                                router.post(route('hr.afkeuren', { overuren: indiening.id }, false, Ziggy), {
-                                                    reden
-                                                }, {
-                                                    preserveScroll: true,
-                                                });
-                                            }
-                                        }}
-                                    >
-                                        <XCircleIcon className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-center py-8 text-sm" style={{ color: theme.colors.neutral[500] }}>
-                        Geen nieuwe indieningen
-                    </p>
-                )}
-            </Card>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <Link href={route('hr.medewerkers', {}, false, Ziggy)} className="block">
-                    <Button variant="primary" size="md" className="w-full">
-                        <UsersIcon className="w-5 h-5 inline mr-2" />
-                        Medewerkers Beheer
-                    </Button>
-                </Link>
-                <Link href={route('hr.te-beoordelen', {}, false, Ziggy)} className="block">
-                    <Button variant="secondary" size="md" className="w-full">
-                        <ChartBarIcon className="w-5 h-5 inline mr-2" />
-                        Te Beoordelen
-                    </Button>
-                </Link>
-            </div>
         </Layout>
     );
 }
