@@ -36,24 +36,15 @@ class SaldoService
      */
     public function recalculateSaldo(int $userId, int $jaar): Saldo
     {
-        $goedgekeurdeUren = Overuren::where('user_id', $userId)
+        $approvedTotal = Overuren::where('user_id', $userId)
             ->where('jaar', $jaar)
             ->where('status', 'GOEDGEKEURD')
-            ->get();
-
-        // Bereken overuren saldo (alleen positieve waarden)
-        $overurenSaldo = $goedgekeurdeUren
-            ->where('minuten', '>', 0)
             ->sum('minuten');
 
-        // Bereken opgenomen saldo (absoluut getal van negatieve waarden)
-        $opgenomenSaldo = abs($goedgekeurdeUren
-            ->where('minuten', '<', 0)
-            ->sum('minuten'));
-
         $saldo = $this->getOrCreateSaldo($userId, $jaar);
-        $saldo->overuren_saldo = $overurenSaldo;
-        $saldo->opgenomen_saldo = $opgenomenSaldo;
+        // Zet overuren_saldo gelijk aan totaal goedgekeurde minuten (kan negatief zijn)
+        // en laat opgenomen_saldo zoals die al in de database staat (historisch gebruikt/afgeboekt)
+        $saldo->overuren_saldo = $approvedTotal;
         $saldo->laatst_bijgewerkt = now();
         $saldo->save();
 

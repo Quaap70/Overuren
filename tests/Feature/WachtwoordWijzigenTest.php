@@ -11,6 +11,9 @@ beforeEach(function () {
         'password' => Hash::make('OudWachtwoord123!'),
         'must_change_password' => false,
     ]);
+    // Dynamische afdeling uit config voor gebruik in POSTs
+    $afdelingen = (array) config('afdelingen.lijst', []);
+    $this->afd1 = $afdelingen[0] ?? 'Algemeen';
 });
 
 test('user with must_change_password is redirected to change password page', function () {
@@ -112,7 +115,7 @@ test('newly created user has must_change_password set to true', function () {
         'voornaam' => 'New',
         'achternaam' => 'User',
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Productie',
+        'afdeling' => $this->afd1,
         'startdatum' => '2025-11-30',
     ]);
 

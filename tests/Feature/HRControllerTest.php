@@ -44,17 +44,21 @@ test('HR can search medewerkers by name', function () {
 });
 
 test('HR can filter medewerkers by afdeling', function () {
+    $afdelingen = (array) config('afdelingen.lijst', []);
+    $afd1 = $afdelingen[0] ?? 'Algemeen';
+    $afd2 = $afdelingen[1] ?? $afd1;
+
     User::factory()->create([
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Productie'
+        'afdeling' => $afd1,
     ]);
 
     User::factory()->create([
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Montage'
+        'afdeling' => $afd2,
     ]);
 
-    $response = $this->actingAs($this->hr)->get('/hr/medewerkers?afdeling=Productie');
+    $response = $this->actingAs($this->hr)->get('/hr/medewerkers?afdeling=' . urlencode($afd1));
 
     $response->assertOk();
     $response->assertInertia(fn ($page) =>

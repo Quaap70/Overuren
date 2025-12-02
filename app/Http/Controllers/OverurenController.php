@@ -63,7 +63,8 @@ class OverurenController extends Controller
             'datum' => 'required|date',
             'minuten' => 'required|integer',
             'reden' => 'nullable|string|max:1000',
-            'status' => 'required|in:CONCEPT,INGEDIEND',
+            // Status mag worden meegegeven; default is CONCEPT als niet opgegeven
+            'status' => 'nullable|in:CONCEPT,INGEDIEND',
         ]);
 
         // Validate minutes
@@ -88,8 +89,8 @@ class OverurenController extends Controller
             ]);
         }
 
-        // Status is now always present because it's required in validation
-        $status = $validated['status'];
+        // Status default naar CONCEPT als niet meegegeven
+        $status = $validated['status'] ?? 'CONCEPT';
 
         // Create entry
         $overuren = Overuren::create([
