@@ -174,11 +174,20 @@ export default function Profiel({ user, afdelingen }) {
                                         <select
                                             value={profileForm.data.afdeling}
                                             onChange={(e) => profileForm.setData('afdeling', e.target.value)}
-                                            className="w-full px-4 py-2 rounded-md"
+                                            className="w-full px-4 py-2 rounded-md transition-all"
                                             style={{
-                                                border: `2px solid ${theme.colors.primary[300]}`,
+                                                border: `2px solid ${theme.colors.neutral[200]}`,
                                                 backgroundColor: '#FFFFFF',
                                                 color: theme.colors.neutral[800],
+                                                outline: 'none',
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor = theme.colors.primary[500];
+                                                e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.primary[100]}`;
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor = theme.colors.neutral[200];
+                                                e.currentTarget.style.boxShadow = 'none';
                                             }}
                                             required
                                         >
