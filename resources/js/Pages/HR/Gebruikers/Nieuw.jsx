@@ -1,4 +1,4 @@
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import Layout from '../../../Components/Layout';
 import Card from '../../../Components/Card';
@@ -26,22 +26,23 @@ export default function GebruikerNieuw({ afdelingen }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Reken om naar minuten als eenheid 'uren' is VOOR we submitten
+        // Reken om naar minuten als eenheid 'uren' is
         let saldoInMinuten = parseInt(data.overgedragen_saldo) || 0;
         if (saldoEenheid === 'uren' && saldoInMinuten !== 0) {
             saldoInMinuten = saldoInMinuten * 60;
         }
 
-        // Update de form data eerst
-        setData('overgedragen_saldo', saldoInMinuten);
+        // Gebruik router.post om direct getransformeerde data te sturen
+        const submitData = {
+            ...data,
+            overgedragen_saldo: saldoInMinuten,
+        };
 
-        // Submit via transform callback
-        post('/hr/gebruikers', {
-            preserveState: true,
-            transform: (data) => ({
-                ...data,
-                overgedragen_saldo: saldoInMinuten,
-            }),
+        router.post('/hr/gebruikers', submitData, {
+            preserveState: false,
+            onSuccess: () => {
+                // Navigate to medewerkers page on success
+            },
         });
     };
 
@@ -274,42 +275,46 @@ export default function GebruikerNieuw({ afdelingen }) {
                             <label className="block text-sm font-medium mb-2" style={{ color: '#2D3748' }}>
                                 Overgedragen Saldo
                             </label>
-                            <div className="flex gap-2">
-                                <Input
-                                    type="number"
-                                    value={data.overgedragen_saldo}
-                                    onChange={(e) => setData('overgedragen_saldo', e.target.value)}
-                                    error={errors.overgedragen_saldo}
-                                    placeholder={saldoEenheid === 'uren' ? 'Bijv. 8' : 'Bijv. 480'}
-                                    step={saldoEenheid === 'uren' ? '0.5' : '5'}
-                                    className="flex-1"
-                                />
-                                <select
-                                    value={saldoEenheid}
-                                    onChange={(e) => setSaldoEenheid(e.target.value)}
-                                    className="transition-all"
-                                    style={{
-                                        border: `2px solid ${theme.colors.neutral[200]}`,
-                                        backgroundColor: '#FFFFFF',
-                                        color: theme.colors.neutral[800],
-                                        outline: 'none',
-                                        minWidth: '120px',
-                                        padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
-                                        fontSize: theme.typography.fontSize.sm,
-                                        borderRadius: theme.borderRadius.md,
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = theme.colors.primary[500];
-                                        e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.primary[100]}`;
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = theme.colors.neutral[200];
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                >
-                                    <option value="minuten">Minuten</option>
-                                    <option value="uren">Uren</option>
-                                </select>
+                            <div className="flex gap-2 items-start">
+                                <div style={{ flex: '1' }}>
+                                    <Input
+                                        type="number"
+                                        value={data.overgedragen_saldo}
+                                        onChange={(e) => setData('overgedragen_saldo', e.target.value)}
+                                        error={errors.overgedragen_saldo}
+                                        placeholder={saldoEenheid === 'uren' ? 'Bijv. 8' : 'Bijv. 480'}
+                                        step={saldoEenheid === 'uren' ? '0.5' : '5'}
+                                    />
+                                </div>
+                                <div style={{ width: '140px', paddingTop: '28px' }}>
+                                    <select
+                                        value={saldoEenheid}
+                                        onChange={(e) => setSaldoEenheid(e.target.value)}
+                                        className="w-full transition-all"
+                                        style={{
+                                            border: `2px solid ${theme.colors.neutral[200]}`,
+                                            backgroundColor: '#FFFFFF',
+                                            color: theme.colors.neutral[800],
+                                            outline: 'none',
+                                            padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
+                                            fontSize: theme.typography.fontSize.sm,
+                                            borderRadius: theme.borderRadius.md,
+                                            boxSizing: 'border-box',
+                                            height: '42px',
+                                        }}
+                                        onFocus={(e) => {
+                                            e.currentTarget.style.borderColor = theme.colors.primary[500];
+                                            e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.primary[100]}`;
+                                        }}
+                                        onBlur={(e) => {
+                                            e.currentTarget.style.borderColor = theme.colors.neutral[200];
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        <option value="minuten">Minuten</option>
+                                        <option value="uren">Uren</option>
+                                    </select>
+                                </div>
                             </div>
                             {errors.overgedragen_saldo && (
                                 <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
