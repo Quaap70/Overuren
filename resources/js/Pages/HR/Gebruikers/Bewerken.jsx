@@ -7,6 +7,8 @@ import Input from '../../../Components/Input';
 import ConfirmModal from '../../../Components/ConfirmModal';
 import { ArrowLeftIcon, KeyIcon } from '@heroicons/react/24/outline';
 import { theme } from '../../../config/theme';
+import route from 'ziggy-js';
+import { Ziggy } from '../../../ziggy';
 
 export default function GebruikerBewerken({ gebruiker, afdelingen }) {
     const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -43,7 +45,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
             overgedragen_saldo: saldoInMinuten,
         };
 
-        router.put(`/hr/gebruikers/${gebruiker.id}`, submitData, {
+        router.put(route('hr.gebruikers.update', { user: gebruiker.id }, false, Ziggy), submitData, {
             preserveState: false,
             onSuccess: () => {
                 // Navigate to medewerkers page on success
@@ -53,7 +55,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
 
     const handlePasswordReset = (e) => {
         e.preventDefault();
-        passwordForm.post(`/hr/gebruikers/${gebruiker.id}/wachtwoord-reset`, {
+        passwordForm.post(route('hr.gebruikers.wachtwoord-reset', { user: gebruiker.id }, false, Ziggy), {
             preserveScroll: true,
             onSuccess: () => {
                 passwordForm.reset();
@@ -67,8 +69,8 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
     };
 
     const confirmToggleActive = () => {
-        const action = gebruiker.is_active ? 'deactiveren' : 'activeren';
-        router.post(`/hr/gebruikers/${gebruiker.id}/${action}`, {}, {
+        const routeName = gebruiker.is_active ? 'hr.gebruikers.deactiveren' : 'hr.gebruikers.activeren';
+        router.post(route(routeName, { user: gebruiker.id }, false, Ziggy), {}, {
             preserveScroll: true,
             onFinish: () => setToggleActiveConfirm(false),
         });
@@ -79,7 +81,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
             <Head title={`${gebruiker.voornaam} ${gebruiker.achternaam} Bewerken`} />
 
             <div className="mb-6">
-                <Link href="/hr/medewerkers">
+                <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                     <Button variant="secondary">
                         <ArrowLeftIcon className="w-4 h-4 inline mr-2" />
                         Terug naar Medewerkers
@@ -125,11 +127,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                         error={errors.email}
                                         required
                                     />
-                                    {errors.email && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.email}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Voornaam */}
@@ -144,11 +141,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                         error={errors.voornaam}
                                         required
                                     />
-                                    {errors.voornaam && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.voornaam}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Achternaam */}
@@ -163,11 +155,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                         error={errors.achternaam}
                                         required
                                     />
-                                    {errors.achternaam && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.achternaam}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Role */}
@@ -184,6 +171,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                             backgroundColor: '#FFFFFF',
                                             color: '#2D3748',
                                             outline: 'none',
+                                            height: '44px',
                                         }}
                                         onFocus={(e) => {
                                             e.currentTarget.style.borderColor = '#8B5CF6';
@@ -219,6 +207,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                             backgroundColor: '#FFFFFF',
                                             color: '#2D3748',
                                             outline: 'none',
+                                            height: '44px',
                                         }}
                                         onFocus={(e) => {
                                             e.currentTarget.style.borderColor = '#8B5CF6';
@@ -256,11 +245,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                         error={errors.startdatum}
                                         required
                                     />
-                                    {errors.startdatum && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.startdatum}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Overgedragen Saldo */}
@@ -268,52 +252,46 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                     <label className="block text-sm font-medium mb-2" style={{ color: '#2D3748' }}>
                                         Overgedragen Saldo
                                     </label>
-                                    <div className="flex gap-2 items-start">
-                                        <div style={{ flex: '1' }}>
-                                            <Input
-                                                type="number"
-                                                value={data.overgedragen_saldo}
-                                                onChange={(e) => setData('overgedragen_saldo', e.target.value)}
-                                                error={errors.overgedragen_saldo}
-                                                placeholder={saldoEenheid === 'uren' ? 'Bijv. 8' : 'Bijv. 480'}
-                                                step={saldoEenheid === 'uren' ? '0.5' : '5'}
-                                            />
-                                        </div>
-                                        <div style={{ width: '140px', paddingTop: '28px' }}>
-                                            <select
-                                                value={saldoEenheid}
-                                                onChange={(e) => setSaldoEenheid(e.target.value)}
-                                                className="w-full transition-all"
-                                                style={{
-                                                    border: `2px solid ${theme.colors.neutral[200]}`,
-                                                    backgroundColor: '#FFFFFF',
-                                                    color: theme.colors.neutral[800],
-                                                    outline: 'none',
-                                                    padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
-                                                    fontSize: theme.typography.fontSize.sm,
-                                                    borderRadius: theme.borderRadius.md,
-                                                    boxSizing: 'border-box',
-                                                    height: '42px',
-                                                }}
-                                                onFocus={(e) => {
-                                                    e.currentTarget.style.borderColor = theme.colors.primary[500];
-                                                    e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.primary[100]}`;
-                                                }}
-                                                onBlur={(e) => {
-                                                    e.currentTarget.style.borderColor = theme.colors.neutral[200];
-                                                    e.currentTarget.style.boxShadow = 'none';
-                                                }}
-                                            >
-                                                <option value="minuten">Minuten</option>
-                                                <option value="uren">Uren</option>
-                                            </select>
-                                        </div>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="number"
+                                            value={data.overgedragen_saldo}
+                                            onChange={(e) => setData('overgedragen_saldo', e.target.value)}
+                                            error={errors.overgedragen_saldo}
+                                            placeholder={saldoEenheid === 'uren' ? 'Bijv. 8' : 'Bijv. 480'}
+                                            step={saldoEenheid === 'uren' ? '0.5' : '5'}
+                                            className="flex-1"
+                                        />
+                                        <select
+                                            value={saldoEenheid}
+                                            onChange={(e) => setSaldoEenheid(e.target.value)}
+                                            className="transition-all"
+                                            style={{
+                                                border: `2px solid ${theme.colors.neutral[200]}`,
+                                                backgroundColor: '#FFFFFF',
+                                                color: theme.colors.neutral[800],
+                                                outline: 'none',
+                                                minWidth: '120px',
+                                                padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
+                                                fontSize: theme.typography.fontSize.sm,
+                                                borderRadius: theme.borderRadius.md,
+                                                // Zorg dat de hoogte gelijk is aan het Input component
+                                                height: '44px',
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor = theme.colors.primary[500];
+                                                e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.primary[100]}`;
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor = theme.colors.neutral[200];
+                                                e.currentTarget.style.boxShadow = 'none';
+                                            }}
+                                        >
+                                            <option value="minuten">Minuten</option>
+                                            <option value="uren">Uren</option>
+                                        </select>
                                     </div>
-                                    {errors.overgedragen_saldo && (
-                                        <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                            {errors.overgedragen_saldo}
-                                        </p>
-                                    )}
+                                    {/* Input component already renders its own error when provided via error prop */}
                                     <p className="text-xs mt-1" style={{ color: '#718096' }}>
                                         Pas het overgedragen saldo aan voor dit jaar
                                     </p>
@@ -324,7 +302,7 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                 <Button type="submit" disabled={processing}>
                                     Wijzigingen Opslaan
                                 </Button>
-                                <Link href="/hr/medewerkers">
+                                <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                                     <Button type="button" variant="secondary">
                                         Annuleren
                                     </Button>
@@ -395,11 +373,6 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                             error={passwordForm.errors.new_password}
                                             required
                                         />
-                                        {passwordForm.errors.new_password && (
-                                            <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                                {passwordForm.errors.new_password}
-                                            </p>
-                                        )}
                                     </div>
 
                                     <div>

@@ -16,8 +16,9 @@ class SaldoFactory extends Factory
             'user_id' => User::factory(),
             'jaar' => now()->year,
             'overgedragen_saldo' => fake()->randomElement([-1200, -600, 0, 600, 1200, 1800, 2400]),
-            'gebruikt_saldo' => 0,
-            'huidig_saldo' => 0,
+            // Nieuwe kolomnamen na migratie
+            'opgenomen_saldo' => 0,
+            'overuren_saldo' => 0,
             'laatst_bijgewerkt' => now(),
         ];
     }

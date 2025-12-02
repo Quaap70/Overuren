@@ -21,6 +21,9 @@ class Saldo extends Model
         'opgenomen_saldo',
         'overuren_saldo',
         'laatst_bijgewerkt',
+        // Backward-compatible virtual attributes used in tests/fixtures
+        'huidig_saldo',
+        'gebruikt_saldo',
     ];
 
     /**
@@ -56,6 +59,44 @@ class Saldo extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Backward-compatible accessor: huidig_saldo (computed)
+     * huidig_saldo = overgedragen_saldo + overuren_saldo - opgenomen_saldo
+     */
+    public function getHuidigSaldoAttribute(): int
+    {
+        $overgedragen = (int) ($this->attributes['overgedragen_saldo'] ?? 0);
+        $overuren = (int) ($this->attributes['overuren_saldo'] ?? 0);
+        $opgenomen = (int) ($this->attributes['opgenomen_saldo'] ?? 0);
+
+        return $overgedragen + $overuren - $opgenomen;
+    }
+
+    /**
+     * Backward-compatible mutator: allow setting huidig_saldo on fixtures/tests.
+     * We infer overuren_saldo so that the computed huidig_saldo matches the provided value.
+     */
+    public function setHuidigSaldoAttribute($value): void
+    {
+        $target = (int) $value;
+        $overgedragen = (int) ($this->attributes['overgedragen_saldo'] ?? 0);
+        $opgenomen = (int) ($this->attributes['opgenomen_saldo'] ?? 0);
+        $this->attributes['overuren_saldo'] = $target - $overgedragen + $opgenomen;
+    }
+
+    /**
+     * Backward-compatible accessor/mutator for gebruikt_saldo → opgenomen_saldo
+     */
+    public function getGebruiktSaldoAttribute(): int
+    {
+        return (int) ($this->attributes['opgenomen_saldo'] ?? 0);
+    }
+
+    public function setGebruiktSaldoAttribute($value): void
+    {
+        $this->attributes['opgenomen_saldo'] = (int) $value;
     }
 
     /**

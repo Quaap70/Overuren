@@ -4,6 +4,8 @@ import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import { PlusIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { theme } from '../../config/theme';
+import route from 'ziggy-js';
+import { Ziggy } from '../../ziggy';
 
 export default function Dashboard({ saldo }) {
     const formatMinutesToHoursMinutes = (minuten) => {
@@ -55,19 +57,19 @@ export default function Dashboard({ saldo }) {
                         Snelle Acties
                     </h2>
                     <div className="space-y-3">
-                        <Link href="/overuren" className="block">
+                        <Link href={route('overuren.index', {}, false, Ziggy)} className="block">
                             <Button variant="primary" size="md" className="w-full">
                                 <PlusIcon className="w-5 h-5 inline mr-2" />
                                 Nieuwe Uren Invoeren
                             </Button>
                         </Link>
-                        <Link href="/overuren" className="block">
+                        <Link href={route('overuren.index', {}, false, Ziggy)} className="block">
                             <Button variant="secondary" size="md" className="w-full">
                                 <ChartBarIcon className="w-5 h-5 inline mr-2" />
                                 Mijn Overzicht
                             </Button>
                         </Link>
-                        <Link href="/saldo" className="block">
+                        <Link href={route('saldo.index', {}, false, Ziggy)} className="block">
                             <Button variant="secondary" size="md" className="w-full">
                                 <CurrencyDollarIcon className="w-5 h-5 inline mr-2" />
                                 Bekijk Saldo Details

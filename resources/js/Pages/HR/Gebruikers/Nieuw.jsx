@@ -6,6 +6,8 @@ import Button from '../../../Components/Button';
 import Input from '../../../Components/Input';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { theme } from '../../../config/theme';
+import route from 'ziggy-js';
+import { Ziggy } from '../../../ziggy';
 
 export default function GebruikerNieuw({ afdelingen }) {
     const [saldoEenheid, setSaldoEenheid] = useState('minuten');
@@ -38,7 +40,7 @@ export default function GebruikerNieuw({ afdelingen }) {
             overgedragen_saldo: saldoInMinuten,
         };
 
-        router.post('/hr/gebruikers', submitData, {
+        router.post(route('hr.gebruikers.store', {}, false, Ziggy), submitData, {
             preserveState: false,
             onSuccess: () => {
                 // Navigate to medewerkers page on success
@@ -51,7 +53,7 @@ export default function GebruikerNieuw({ afdelingen }) {
             <Head title="Nieuwe Gebruiker" />
 
             <div className="mb-6">
-                <Link href="/hr/medewerkers">
+                <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                     <Button variant="secondary">
                         <ArrowLeftIcon className="w-4 h-4 inline mr-2" />
                         Terug naar Medewerkers
@@ -78,11 +80,6 @@ export default function GebruikerNieuw({ afdelingen }) {
                                 error={errors.username}
                                 required
                             />
-                            {errors.username && (
-                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                    {errors.username}
-                                </p>
-                            )}
                         </div>
 
                         {/* Email */}
@@ -97,11 +94,6 @@ export default function GebruikerNieuw({ afdelingen }) {
                                 error={errors.email}
                                 required
                             />
-                            {errors.email && (
-                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                    {errors.email}
-                                </p>
-                            )}
                         </div>
 
                         {/* Password */}
@@ -191,6 +183,7 @@ export default function GebruikerNieuw({ afdelingen }) {
                                     backgroundColor: '#FFFFFF',
                                     color: '#2D3748',
                                     outline: 'none',
+                                    height: '44px',
                                 }}
                                 onFocus={(e) => {
                                     e.currentTarget.style.borderColor = '#8B5CF6';
@@ -226,6 +219,7 @@ export default function GebruikerNieuw({ afdelingen }) {
                                     backgroundColor: '#FFFFFF',
                                     color: '#2D3748',
                                     outline: 'none',
+                                    height: '44px',
                                 }}
                                 onFocus={(e) => {
                                     e.currentTarget.style.borderColor = '#8B5CF6';
@@ -263,11 +257,6 @@ export default function GebruikerNieuw({ afdelingen }) {
                                 error={errors.startdatum}
                                 required
                             />
-                            {errors.startdatum && (
-                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                    {errors.startdatum}
-                                </p>
-                            )}
                         </div>
 
                         {/* Overgedragen Saldo */}
@@ -275,52 +264,46 @@ export default function GebruikerNieuw({ afdelingen }) {
                             <label className="block text-sm font-medium mb-2" style={{ color: '#2D3748' }}>
                                 Overgedragen Saldo
                             </label>
-                            <div className="flex gap-2 items-start">
-                                <div style={{ flex: '1' }}>
-                                    <Input
-                                        type="number"
-                                        value={data.overgedragen_saldo}
-                                        onChange={(e) => setData('overgedragen_saldo', e.target.value)}
-                                        error={errors.overgedragen_saldo}
-                                        placeholder={saldoEenheid === 'uren' ? 'Bijv. 8' : 'Bijv. 480'}
-                                        step={saldoEenheid === 'uren' ? '0.5' : '5'}
-                                    />
-                                </div>
-                                <div style={{ width: '140px', paddingTop: '28px' }}>
-                                    <select
-                                        value={saldoEenheid}
-                                        onChange={(e) => setSaldoEenheid(e.target.value)}
-                                        className="w-full transition-all"
-                                        style={{
-                                            border: `2px solid ${theme.colors.neutral[200]}`,
-                                            backgroundColor: '#FFFFFF',
-                                            color: theme.colors.neutral[800],
-                                            outline: 'none',
-                                            padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
-                                            fontSize: theme.typography.fontSize.sm,
-                                            borderRadius: theme.borderRadius.md,
-                                            boxSizing: 'border-box',
-                                            height: '42px',
-                                        }}
-                                        onFocus={(e) => {
-                                            e.currentTarget.style.borderColor = theme.colors.primary[500];
-                                            e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.primary[100]}`;
-                                        }}
-                                        onBlur={(e) => {
-                                            e.currentTarget.style.borderColor = theme.colors.neutral[200];
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
-                                    >
-                                        <option value="minuten">Minuten</option>
-                                        <option value="uren">Uren</option>
-                                    </select>
-                                </div>
+                            <div className="flex gap-2">
+                                <Input
+                                    type="number"
+                                    value={data.overgedragen_saldo}
+                                    onChange={(e) => setData('overgedragen_saldo', e.target.value)}
+                                    error={errors.overgedragen_saldo}
+                                    placeholder={saldoEenheid === 'uren' ? 'Bijv. 8' : 'Bijv. 480'}
+                                    step={saldoEenheid === 'uren' ? '0.5' : '5'}
+                                    className="flex-1"
+                                />
+                                <select
+                                    value={saldoEenheid}
+                                    onChange={(e) => setSaldoEenheid(e.target.value)}
+                                    className="transition-all"
+                                    style={{
+                                        border: `2px solid ${theme.colors.neutral[200]}`,
+                                        backgroundColor: '#FFFFFF',
+                                        color: theme.colors.neutral[800],
+                                        outline: 'none',
+                                        minWidth: '120px',
+                                        padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
+                                        fontSize: theme.typography.fontSize.sm,
+                                        borderRadius: theme.borderRadius.md,
+                                        // Zorg dat de hoogte gelijk is aan het Input component
+                                        height: '44px',
+                                    }}
+                                    onFocus={(e) => {
+                                        e.currentTarget.style.borderColor = theme.colors.primary[500];
+                                        e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.primary[100]}`;
+                                    }}
+                                    onBlur={(e) => {
+                                        e.currentTarget.style.borderColor = theme.colors.neutral[200];
+                                        e.currentTarget.style.boxShadow = 'none';
+                                    }}
+                                >
+                                    <option value="minuten">Minuten</option>
+                                    <option value="uren">Uren</option>
+                                </select>
                             </div>
-                            {errors.overgedragen_saldo && (
-                                <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
-                                    {errors.overgedragen_saldo}
-                                </p>
-                            )}
+                            {/* Input component already renders its own error when provided via error prop */}
                             <p className="text-xs mt-1" style={{ color: '#718096' }}>
                                 Stel het beginsaldo in voor bestaande overuren (optioneel)
                             </p>
@@ -331,7 +314,7 @@ export default function GebruikerNieuw({ afdelingen }) {
                         <Button type="submit" disabled={processing}>
                             Gebruiker Toevoegen
                         </Button>
-                        <Link href="/hr/medewerkers">
+                        <Link href={route('hr.medewerkers', {}, false, Ziggy)}>
                             <Button type="button" variant="secondary">
                                 Annuleren
                             </Button>

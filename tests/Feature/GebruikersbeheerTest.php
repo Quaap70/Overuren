@@ -9,6 +9,10 @@ use Tests\TestCase;
 beforeEach(function () {
     $this->hrUser = User::factory()->hr()->create();
     $this->employee = User::factory()->medewerker()->create();
+    // Dynamische afdelingen uit config, met veilige fallback
+    $afdelingen = (array) config('afdelingen.lijst', []);
+    $this->afd1 = $afdelingen[0] ?? 'Algemeen';
+    $this->afd2 = $afdelingen[1] ?? $this->afd1;
 });
 
 test('hr can view new user form', function () {
@@ -33,7 +37,7 @@ test('hr can create new employee', function () {
         'voornaam' => 'Test',
         'achternaam' => 'Gebruiker',
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Productie',
+        'afdeling' => $this->afd1,
         'startdatum' => '2025-11-30',
     ]);
 
@@ -45,7 +49,7 @@ test('hr can create new employee', function () {
         'voornaam' => 'Test',
         'achternaam' => 'Gebruiker',
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Productie',
+        'afdeling' => $this->afd1,
         'is_active' => true,
     ]);
 });
@@ -61,7 +65,8 @@ test('hr can create new hr user', function () {
         'voornaam' => 'HR',
         'achternaam' => 'Medewerker',
         'role' => 'HR',
-        'afdeling' => 'HR',
+        // Gebruik een geldige afdeling uit config (maakt niet uit voor rol)
+        'afdeling' => $this->afd1,
         'startdatum' => '2025-11-30',
     ]);
 
@@ -84,7 +89,7 @@ test('hr cannot create user with duplicate username', function () {
         'voornaam' => 'Test',
         'achternaam' => 'Gebruiker',
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Productie',
+        'afdeling' => $this->afd1,
         'startdatum' => '2025-11-30',
     ]);
 
@@ -102,7 +107,7 @@ test('hr cannot create user with duplicate email', function () {
         'voornaam' => 'Test',
         'achternaam' => 'Gebruiker',
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Productie',
+        'afdeling' => $this->afd1,
         'startdatum' => '2025-11-30',
     ]);
 
@@ -130,7 +135,7 @@ test('hr cannot create user with mismatched password confirmation', function () 
         'voornaam' => 'Test',
         'achternaam' => 'Gebruiker',
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Productie',
+        'afdeling' => $this->afd1,
         'startdatum' => '2025-11-30',
     ]);
 
@@ -158,7 +163,7 @@ test('hr can update user details', function () {
         'voornaam' => 'Updated',
         'achternaam' => 'Name',
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Montage',
+        'afdeling' => $this->afd2,
         'startdatum' => '2024-01-01',
     ]);
 
@@ -169,7 +174,7 @@ test('hr can update user details', function () {
         'email' => 'updated@overuren.nl',
         'voornaam' => 'Updated',
         'achternaam' => 'Name',
-        'afdeling' => 'Montage',
+        'afdeling' => $this->afd2,
     ]);
 });
 
@@ -181,7 +186,8 @@ test('hr can change user role from medewerker to hr', function () {
         'voornaam' => $this->employee->voornaam,
         'achternaam' => $this->employee->achternaam,
         'role' => 'HR',
-        'afdeling' => 'HR',
+        // Gebruik geldige afdeling
+        'afdeling' => $this->afd1,
         'startdatum' => $this->employee->startdatum,
     ]);
 
@@ -283,7 +289,7 @@ test('employee cannot create new user', function () {
         'voornaam' => 'Test',
         'achternaam' => 'Gebruiker',
         'role' => 'MEDEWERKER',
-        'afdeling' => 'Productie',
+        'afdeling' => $this->afd1,
         'startdatum' => '2025-11-30',
     ]);
 

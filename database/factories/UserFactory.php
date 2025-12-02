@@ -30,7 +30,14 @@ class UserFactory extends Factory
             'voornaam' => fake()->firstName(),
             'achternaam' => fake()->lastName(),
             'role' => 'MEDEWERKER',
-            'afdeling' => fake()->randomElement(['Productie', 'Montage', 'Onderhoud', 'Logistiek']),
+            // Gebruik afdelingen dynamisch vanuit config, met veilige fallback
+            'afdeling' => function () {
+                $lijst = (array) config('afdelingen.lijst', []);
+                if (empty($lijst)) {
+                    $lijst = ['Algemeen'];
+                }
+                return fake()->randomElement($lijst);
+            },
             'startdatum' => fake()->dateTimeBetween('-5 years', 'now'),
             'is_active' => true,
             'remember_token' => Str::random(10),
@@ -44,6 +51,17 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'role' => 'HR',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a regular employee (MEDEWERKER).
+     * Added to keep tests compatible that call ->medewerker().
+     */
+    public function medewerker(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'MEDEWERKER',
         ]);
     }
 

@@ -54,6 +54,14 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
+            // Deel validatiefouten expliciet met de frontend
+            'errors' => function () use ($request) {
+                $errors = $request->session()->get('errors');
+                if ($errors) {
+                    return $errors->getBag('default')->getMessages();
+                }
+                return (object) [];
+            },
         ];
     }
 }

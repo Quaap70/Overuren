@@ -5,6 +5,8 @@ import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import { MagnifyingGlassIcon, PlusIcon, PencilIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { theme } from '../../config/theme';
+import route from 'ziggy-js';
+import { Ziggy } from '../../ziggy';
 
 export default function Medewerkers({ medewerkers, filters }) {
     const [searchTerm, setSearchTerm] = useState(filters?.zoek || '');
@@ -14,7 +16,7 @@ export default function Medewerkers({ medewerkers, filters }) {
     useEffect(() => {
         const timer = setTimeout(() => {
             if (searchTerm !== (filters?.zoek || '') || selectedAfdeling !== (filters?.afdeling || '')) {
-                router.get('/hr/medewerkers', {
+                router.get(route('hr.medewerkers', {}, false, Ziggy), {
                     zoek: searchTerm,
                     afdeling: selectedAfdeling,
                 }, {
@@ -43,7 +45,7 @@ export default function Medewerkers({ medewerkers, filters }) {
                         Beheer medewerkers en hun overuren saldo
                     </p>
                 </div>
-                <Link href="/hr/gebruikers/nieuw">
+                <Link href={route('hr.gebruikers.nieuw', {}, false, Ziggy)}>
                     <Button variant="primary" size="md">
                         <PlusIcon className="w-5 h-5 inline mr-2" />
                         Nieuwe Gebruiker
@@ -68,7 +70,8 @@ export default function Medewerkers({ medewerkers, filters }) {
                             style={{
                                 borderColor: theme.colors.neutral[200],
                                 backgroundColor: '#FFFFFF',
-                                color: theme.colors.neutral[800]
+                                color: theme.colors.neutral[800],
+                                height: '44px',
                             }}
                         />
                     </div>
@@ -79,7 +82,8 @@ export default function Medewerkers({ medewerkers, filters }) {
                         style={{
                             borderColor: theme.colors.neutral[200],
                             backgroundColor: '#FFFFFF',
-                            color: theme.colors.neutral[800]
+                            color: theme.colors.neutral[800],
+                            height: '44px',
                         }}
                     >
                         <option value="">Alle afdelingen</option>
@@ -155,13 +159,13 @@ export default function Medewerkers({ medewerkers, filters }) {
                                     </div>
 
                                     <div className="flex gap-2">
-                                        <Link href={`/hr/medewerkers/${medewerker.id}`}>
+                                        <Link href={route('hr.medewerker.detail', { user: medewerker.id }, false, Ziggy)}>
                                             <Button variant="primary" size="sm">
                                                 <EyeIcon className="w-4 h-4 inline mr-1.5" />
                                                 Bekijken
                                             </Button>
                                         </Link>
-                                        <Link href={`/hr/gebruikers/${medewerker.id}/bewerken`}>
+                                        <Link href={route('hr.gebruikers.bewerken', { user: medewerker.id }, false, Ziggy)}>
                                             <Button variant="secondary" size="sm">
                                                 <PencilIcon className="w-4 h-4 inline mr-1.5" />
                                                 Bewerken
