@@ -139,6 +139,16 @@ export default function Medewerkers({ medewerkers, filters }) {
                                         <div className="flex items-center gap-8 pt-3 border-t" style={{ borderColor: theme.colors.neutral[200] }}>
                                             <div>
                                                 <span className="text-xs block mb-1" style={{ color: theme.colors.neutral[500] }}>
+                                                    Overgenomen Saldo
+                                                </span>
+                                                <span className="text-base font-bold" style={{
+                                                    color: medewerker.overgedragen_saldo >= 0 ? theme.colors.success[600] : theme.colors.error[600]
+                                                }}>
+                                                    {medewerker.formatted_overgedragen_saldo}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs block mb-1" style={{ color: theme.colors.neutral[500] }}>
                                                     Huidig Saldo
                                                 </span>
                                                 <span className="text-base font-bold" style={{

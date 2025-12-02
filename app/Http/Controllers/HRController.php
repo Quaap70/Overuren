@@ -111,6 +111,10 @@ class HRController extends Controller
                 'is_active' => $m->is_active,
                 'huidig_saldo' => $m->saldo->first()?->totaal_saldo ?? 0,
                 'formatted_saldo' => $m->saldo->first()?->formatted_saldo ?? '0u 0m',
+                'overgedragen_saldo' => $m->saldo->first()?->overgedragen_saldo ?? 0,
+                'formatted_overgedragen_saldo' => $m->saldo->first()
+                    ? $this->formatMinutesToHoursMinutes($m->saldo->first()->overgedragen_saldo)
+                    : '0u 0m',
             ]);
 
         return Inertia::render('HR/Medewerkers', [
@@ -472,5 +476,16 @@ class HRController extends Controller
         ]);
 
         return back()->with('success', 'Wachtwoord succesvol gereset. De gebruiker moet het wachtwoord wijzigen bij volgende login.');
+    }
+
+    /**
+     * Format minutes to hours and minutes
+     */
+    private function formatMinutesToHoursMinutes(int $minuten): string
+    {
+        $uren = floor(abs($minuten) / 60);
+        $mins = abs($minuten) % 60;
+        $sign = $minuten < 0 ? '-' : '';
+        return "{$sign}{$uren}u {$mins}m";
     }
 }
