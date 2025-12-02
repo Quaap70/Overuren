@@ -27,7 +27,8 @@ class UserSeeder extends Seeder
         ['voornaam' => 'Piet', 'achternaam' => 'Vos'],
     ];
 
-    private const AFDELINGEN = ['HR', 'Zakelijk', 'Particulier', 'Schade', 'ICT'];
+    // Afdelingen worden nu uit config gehaald: config('afdelingen.lijst')
+    // private const AFDELINGEN = ['HR', 'Zakelijk', 'Particulier', 'Schade', 'ICT'];
 
     private const REDENEN = [
         'Spoedklus klant',
@@ -78,7 +79,7 @@ class UserSeeder extends Seeder
 //                'voornaam' => $naam['voornaam'],
 //                'achternaam' => $naam['achternaam'],
 //                'role' => 'MEDEWERKER',
-//                'afdeling' => self::AFDELINGEN[array_rand(self::AFDELINGEN)],
+//                'afdeling' => config('afdelingen.lijst')[array_rand(config('afdelingen.lijst'))],
 //                'startdatum' => sprintf('2020-%02d-01', rand(1, 12)),
 //                'is_active' => true,
 //            ]);
