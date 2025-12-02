@@ -162,11 +162,20 @@ export default function GebruikerNieuw({ afdelingen }) {
                             <select
                                 value={data.role}
                                 onChange={(e) => setData('role', e.target.value)}
-                                className="w-full px-4 py-2 rounded-md"
+                                className="w-full px-4 py-2 rounded-md transition-all"
                                 style={{
-                                    border: '2px solid #D4A5FF',
+                                    border: '2px solid #E2E8F0',
                                     backgroundColor: '#FFFFFF',
                                     color: '#2D3748',
+                                    outline: 'none',
+                                }}
+                                onFocus={(e) => {
+                                    e.currentTarget.style.borderColor = '#8B5CF6';
+                                    e.currentTarget.style.boxShadow = '0 0 0 3px #EDE9FE';
+                                }}
+                                onBlur={(e) => {
+                                    e.currentTarget.style.borderColor = '#E2E8F0';
+                                    e.currentTarget.style.boxShadow = 'none';
                                 }}
                                 required
                             >
@@ -188,11 +197,20 @@ export default function GebruikerNieuw({ afdelingen }) {
                             <select
                                 value={data.afdeling}
                                 onChange={(e) => setData('afdeling', e.target.value)}
-                                className="w-full px-4 py-2 rounded-md"
+                                className="w-full px-4 py-2 rounded-md transition-all"
                                 style={{
-                                    border: '2px solid #D4A5FF',
+                                    border: '2px solid #E2E8F0',
                                     backgroundColor: '#FFFFFF',
                                     color: '#2D3748',
+                                    outline: 'none',
+                                }}
+                                onFocus={(e) => {
+                                    e.currentTarget.style.borderColor = '#8B5CF6';
+                                    e.currentTarget.style.boxShadow = '0 0 0 3px #EDE9FE';
+                                }}
+                                onBlur={(e) => {
+                                    e.currentTarget.style.borderColor = '#E2E8F0';
+                                    e.currentTarget.style.boxShadow = 'none';
                                 }}
                                 required
                             >
