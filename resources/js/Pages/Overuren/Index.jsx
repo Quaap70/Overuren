@@ -224,6 +224,7 @@ export default function OverurenIndex({ overuren, filters }) {
                                 error={errors.minuten}
                                 required
                                 min="5"
+                                max="720"
                                 step="5"
                             />
                         </div>
