@@ -563,7 +563,7 @@ test('medewerkers lijst toont overgedragen saldo en huidig saldo correct', funct
         'jaar' => $huidigJaar,
         'overgedragen_saldo' => 1200, // 20 uur
         'overuren_saldo' => 300,      // +5 uur
-        'opgenomen_saldo' => -180,    // -3 uur
+        'opgenomen_saldo' => 180,     // 3 uur opgenomen (positief, wordt afgetrokken in formule)
         'laatst_bijgewerkt' => now(),
     ]);
 
