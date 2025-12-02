@@ -342,7 +342,7 @@ class HRController extends Controller
             'voornaam' => 'required|string|max:255',
             'achternaam' => 'required|string|max:255',
             'role' => 'required|in:MEDEWERKER,HR',
-            'afdeling' => 'required|string|max:255',
+            'afdeling' => 'required|in:Zakelijk,Particulier,Schade,ICT,HR',
             'startdatum' => 'required|date',
         ]);
 
@@ -393,7 +393,7 @@ class HRController extends Controller
             'voornaam' => 'required|string|max:255',
             'achternaam' => 'required|string|max:255',
             'role' => 'required|in:MEDEWERKER,HR',
-            'afdeling' => 'required|string|max:255',
+            'afdeling' => 'required|in:Zakelijk,Particulier,Schade,ICT,HR',
             'startdatum' => 'required|date',
         ]);
 

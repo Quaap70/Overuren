@@ -7,7 +7,7 @@ import Input from '../Components/Input';
 import { UserIcon, KeyIcon, PencilIcon } from '@heroicons/react/24/outline';
 import { theme } from '../config/theme';
 
-export default function Profiel({ user }) {
+export default function Profiel({ user, afdelingen }) {
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -171,13 +171,24 @@ export default function Profiel({ user }) {
                                         <label className="block text-sm font-medium mb-2" style={{ color: theme.colors.neutral[700] }}>
                                             Afdeling *
                                         </label>
-                                        <Input
-                                            type="text"
+                                        <select
                                             value={profileForm.data.afdeling}
                                             onChange={(e) => profileForm.setData('afdeling', e.target.value)}
-                                            error={profileForm.errors.afdeling}
+                                            className="w-full px-4 py-2 rounded-md"
+                                            style={{
+                                                border: `2px solid ${theme.colors.primary[300]}`,
+                                                backgroundColor: '#FFFFFF',
+                                                color: theme.colors.neutral[800],
+                                            }}
                                             required
-                                        />
+                                        >
+                                            <option value="">-- Selecteer afdeling --</option>
+                                            {afdelingen && afdelingen.map((afd) => (
+                                                <option key={afd} value={afd}>
+                                                    {afd}
+                                                </option>
+                                            ))}
+                                        </select>
                                         {profileForm.errors.afdeling && (
                                             <p className="text-sm mt-1" style={{ color: theme.colors.error[600] }}>
                                                 {profileForm.errors.afdeling}
