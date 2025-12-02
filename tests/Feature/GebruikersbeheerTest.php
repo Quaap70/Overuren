@@ -570,17 +570,16 @@ test('medewerkers lijst toont overgedragen saldo en huidig saldo correct', funct
     $response = $this->get('/hr/medewerkers');
 
     $response->assertOk();
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/Medewerkers')
-            ->has('medewerkers.data', fn ($medewerkers) =>
-                $medewerkers->where('id', $user->id)
-                    ->where('overgedragen_saldo', 1200)
-                    ->where('formatted_overgedragen_saldo', '20u 0m')
-                    ->where('huidig_saldo', 1320) // 1200 + 300 - 180
-                    ->where('formatted_saldo', '22u 0m')
-                    ->etc()
-            )
-    );
+
+    // Controleer dat de data correct is in de response
+    $medewerkerData = $response->viewData('page')['props']['medewerkers']['data'];
+    $foundUser = collect($medewerkerData)->firstWhere('id', $user->id);
+
+    expect($foundUser)->not->toBeNull();
+    expect($foundUser['overgedragen_saldo'])->toBe(1200);
+    expect($foundUser['formatted_overgedragen_saldo'])->toBe('20u 0m');
+    expect($foundUser['huidig_saldo'])->toBe(1320); // 1200 + 300 - 180
+    expect($foundUser['formatted_saldo'])->toBe('22u 0m');
 });
 
 test('medewerkers lijst toont negatief overgedragen saldo correct', function () {
@@ -603,15 +602,14 @@ test('medewerkers lijst toont negatief overgedragen saldo correct', function () 
     $response = $this->get('/hr/medewerkers');
 
     $response->assertOk();
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/Medewerkers')
-            ->has('medewerkers.data', fn ($medewerkers) =>
-                $medewerkers->where('id', $user->id)
-                    ->where('overgedragen_saldo', -480)
-                    ->where('formatted_overgedragen_saldo', '-8u 0m')
-                    ->etc()
-            )
-    );
+
+    // Controleer dat de data correct is in de response
+    $medewerkerData = $response->viewData('page')['props']['medewerkers']['data'];
+    $foundUser = collect($medewerkerData)->firstWhere('id', $user->id);
+
+    expect($foundUser)->not->toBeNull();
+    expect($foundUser['overgedragen_saldo'])->toBe(-480);
+    expect($foundUser['formatted_overgedragen_saldo'])->toBe('-8u 0m');
 });
 
 test('medewerkers lijst toont correct geformatteerd overgedragen saldo met minuten', function () {
@@ -634,15 +632,14 @@ test('medewerkers lijst toont correct geformatteerd overgedragen saldo met minut
     $response = $this->get('/hr/medewerkers');
 
     $response->assertOk();
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/Medewerkers')
-            ->has('medewerkers.data', fn ($medewerkers) =>
-                $medewerkers->where('id', $user->id)
-                    ->where('overgedragen_saldo', 1337)
-                    ->where('formatted_overgedragen_saldo', '22u 17m')
-                    ->etc()
-            )
-    );
+
+    // Controleer dat de data correct is in de response
+    $medewerkerData = $response->viewData('page')['props']['medewerkers']['data'];
+    $foundUser = collect($medewerkerData)->firstWhere('id', $user->id);
+
+    expect($foundUser)->not->toBeNull();
+    expect($foundUser['overgedragen_saldo'])->toBe(1337);
+    expect($foundUser['formatted_overgedragen_saldo'])->toBe('22u 17m');
 });
 
 test('nieuwe gebruiker zonder overgedragen saldo toont 0u 0m', function () {
@@ -656,15 +653,14 @@ test('nieuwe gebruiker zonder overgedragen saldo toont 0u 0m', function () {
     $response = $this->get('/hr/medewerkers');
 
     $response->assertOk();
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/Medewerkers')
-            ->has('medewerkers.data', fn ($medewerkers) =>
-                $medewerkers->where('id', $user->id)
-                    ->where('overgedragen_saldo', 0)
-                    ->where('formatted_overgedragen_saldo', '0u 0m')
-                    ->where('huidig_saldo', 0)
-                    ->where('formatted_saldo', '0u 0m')
-                    ->etc()
-            )
-    );
+
+    // Controleer dat de data correct is in de response
+    $medewerkerData = $response->viewData('page')['props']['medewerkers']['data'];
+    $foundUser = collect($medewerkerData)->firstWhere('id', $user->id);
+
+    expect($foundUser)->not->toBeNull();
+    expect($foundUser['overgedragen_saldo'])->toBe(0);
+    expect($foundUser['formatted_overgedragen_saldo'])->toBe('0u 0m');
+    expect($foundUser['huidig_saldo'])->toBe(0);
+    expect($foundUser['formatted_saldo'])->toBe('0u 0m');
 });
