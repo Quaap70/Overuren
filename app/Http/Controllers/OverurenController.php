@@ -109,16 +109,12 @@ class OverurenController extends Controller
                 ->where('is_active', true)
                 ->get();
 
-            $isOpname = $validated['minuten'] < 0;
-            $typeText = $isOpname ? 'Opname' : 'Overuren';
-            $typeTextLower = strtolower($typeText);
-
             foreach ($hrUsers as $hr) {
                 Notificatie::create([
                     'user_id' => $hr->id,
                     'type' => 'INFO',
-                    'titel' => "Nieuwe {$typeTextLower} ingediend",
-                    'bericht' => "{$request->user()->full_name} heeft {$typeTextLower} ingediend voor {$validated['datum']}",
+                    'titel' => "Nieuwe uren ingediend",
+                    'bericht' => "{$request->user()->full_name} heeft uren ingediend voor {$validated['datum']}",
                     'gerelateerd_id' => $overuren->id,
                 ]);
             }
@@ -173,16 +169,12 @@ class OverurenController extends Controller
                     ->where('is_active', true)
                     ->get();
 
-                $isOpname = $overuren->minuten < 0;
-                $typeText = $isOpname ? 'Opname' : 'Overuren';
-                $typeTextLower = strtolower($typeText);
-
                 foreach ($hrUsers as $hr) {
                     Notificatie::create([
                         'user_id' => $hr->id,
                         'type' => 'INFO',
-                        'titel' => "{$typeText} opnieuw ingediend",
-                        'bericht' => "{$request->user()->full_name} heeft {$typeTextLower} opnieuw ingediend voor {$overuren->datum->format('Y-m-d')}",
+                        'titel' => "Uren opnieuw ingediend",
+                        'bericht' => "{$request->user()->full_name} heeft uren opnieuw ingediend voor {$overuren->datum->format('Y-m-d')}",
                         'gerelateerd_id' => $overuren->id,
                     ]);
                 }

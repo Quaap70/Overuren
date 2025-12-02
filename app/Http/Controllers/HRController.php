@@ -156,6 +156,7 @@ class HRController extends Controller
 
         return Inertia::render('HR/TeBeoordelen', [
             'indieningen' => $indieningen,
+            'highlight' => $request->highlight,
             'filters' => [
                 'medewerker' => $request->medewerker,
             ],

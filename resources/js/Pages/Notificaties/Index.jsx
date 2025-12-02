@@ -71,6 +71,18 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
         });
     };
 
+    const handleNotificatieClick = (notificatie) => {
+        // Als de notificatie een gerelateerd overuren verzoek heeft, ga naar Te Beoordelen
+        if (notificatie.gerelateerd_id && notificatie.overuren) {
+            // Markeer als gelezen
+            if (!notificatie.gelezen) {
+                markAsRead(notificatie.id);
+            }
+            // Navigeer naar Te Beoordelen met highlight
+            router.visit(`/hr/te-beoordelen?highlight=${notificatie.gerelateerd_id}`);
+        }
+    };
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const now = new Date();
@@ -145,12 +157,13 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
                             return (
                             <div
                                 key={notificatie.id}
-                                className="p-4 rounded-lg border-2 transition-all"
+                                className="p-4 rounded-lg border-2 transition-all cursor-pointer hover:shadow-md"
                                 style={{
                                     backgroundColor: notificatie.gelezen ? '#F7FAFC' : '#FFFFFF',
                                     borderColor: notificatie.gelezen ? '#E2E8F0' : getTypeColor(notificatie.type),
                                     opacity: notificatie.gelezen ? 0.7 : 1,
                                 }}
+                                onClick={() => handleNotificatieClick(notificatie)}
                             >
                                 <div className="flex justify-between items-start">
                                     <div className="flex-1">
@@ -191,24 +204,13 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
                                                         <ArrowUpCircleIcon className="w-4 h-4" /> Overuren
                                                     </span>
                                                 )}
-                                                {!notificatie.gelezen && (
-                                                    <span
-                                                        className="px-2 py-1 rounded-full text-xs font-semibold"
-                                                        style={{
-                                                            backgroundColor: '#D4A5FF',
-                                                            color: '#2D3748'
-                                                        }}
-                                                    >
-                                                        NIEUW
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
                                         <p className="mb-3" style={{ color: '#2D3748' }}>
                                             {notificatie.bericht}
                                         </p>
                                     </div>
-                                    <div className="flex gap-2 ml-4">
+                                    <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
                                         {!notificatie.gelezen && (
                                             <Button
                                                 variant="success"

@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Layout from '../../Components/Layout';
 import Card from '../../Components/Card';
 import Button from '../../Components/Button';
@@ -7,9 +7,16 @@ import ConfirmModal from '../../Components/ConfirmModal';
 import InputModal from '../../Components/InputModal';
 import { CheckCircleIcon, XCircleIcon, ArrowUpCircleIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline';
 
-export default function TeBeoordelen({ indieningen }) {
+export default function TeBeoordelen({ indieningen, highlight }) {
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null });
     const [rejectModal, setRejectModal] = useState({ isOpen: false, id: null });
+    const highlightRef = useRef(null);
+
+    useEffect(() => {
+        if (highlight && highlightRef.current) {
+            highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [highlight]);
 
     const handleGoedkeuren = (id) => {
         setConfirmModal({ isOpen: true, id });
@@ -55,10 +62,12 @@ export default function TeBeoordelen({ indieningen }) {
                     <div className="space-y-3">
                         {indieningen.data.map((indiening) => {
                             const isOpname = indiening.minuten < 0;
+                            const isHighlighted = highlight && parseInt(highlight) === indiening.id;
                             return (
                                 <div
                                     key={indiening.id}
-                                    className="p-4 rounded-lg border-2 transition-all hover:border-slate-300"
+                                    ref={isHighlighted ? highlightRef : null}
+                                    className={`p-4 rounded-lg border-2 transition-all hover:border-slate-300 ${isHighlighted ? 'ring-4 ring-yellow-300' : ''}`}
                                     style={{
                                         backgroundColor: isOpname ? '#FFF5F5' : '#F0FFF4',
                                         borderColor: isOpname ? '#FFB3BA' : '#B8E6D1',
