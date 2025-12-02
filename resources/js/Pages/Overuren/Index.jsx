@@ -335,7 +335,7 @@ export default function OverurenIndex({ overuren, filters }) {
                                             </p>
                                         </div>
                                         <div className="flex gap-2 ml-4">
-                                            {(uur.status === 'CONCEPT' || uur.status === 'AFGEKEURD') && (
+                                            {uur.status === 'CONCEPT' && (
                                                 <>
                                                     <Button
                                                         variant="secondary"
@@ -344,25 +344,21 @@ export default function OverurenIndex({ overuren, filters }) {
                                                     >
                                                         <PencilIcon className="w-4 h-4" />
                                                     </Button>
-                                                    {uur.status === 'CONCEPT' && (
-                                                        <Button
-                                                            variant="success"
-                                                            className="px-3 py-1 text-sm"
-                                                            onClick={() => handleSubmitForApproval(uur.id)}
-                                                        >
-                                                            <CheckIcon className="w-4 h-4 inline mr-1" /> Indienen
-                                                        </Button>
-                                                    )}
+                                                    <Button
+                                                        variant="success"
+                                                        className="px-3 py-1 text-sm"
+                                                        onClick={() => handleSubmitForApproval(uur.id)}
+                                                    >
+                                                        <CheckIcon className="w-4 h-4 inline mr-1" /> Indienen
+                                                    </Button>
+                                                    <Button
+                                                        variant="danger"
+                                                        className="px-3 py-1 text-sm"
+                                                        onClick={() => handleDelete(uur.id)}
+                                                    >
+                                                        <TrashIcon className="w-4 h-4" />
+                                                    </Button>
                                                 </>
-                                            )}
-                                            {uur.status === 'CONCEPT' && (
-                                                <Button
-                                                    variant="danger"
-                                                    className="px-3 py-1 text-sm"
-                                                    onClick={() => handleDelete(uur.id)}
-                                                >
-                                                    <TrashIcon className="w-4 h-4" />
-                                                </Button>
                                             )}
                                         </div>
                                     </div>
