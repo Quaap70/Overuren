@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
     // Notificaties routes
     Route::prefix('notificaties')->name('notificaties.')->group(function () {
         Route::get('/', [NotificatieController::class, 'index'])->name('index');
+        Route::get('/{notificatie}/goto', [NotificatieController::class, 'goToTarget'])->name('goto');
         Route::post('/{notificatie}/gelezen', [NotificatieController::class, 'markAsRead'])->name('mark-read');
         Route::post('/alles-gelezen', [NotificatieController::class, 'markAllAsRead'])->name('mark-all-read');
         Route::delete('/gelezen', [NotificatieController::class, 'destroyAllRead'])->name('destroy-all-read');

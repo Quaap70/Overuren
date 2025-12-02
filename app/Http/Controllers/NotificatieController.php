@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notificatie;
+use App\Models\Overuren;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -23,6 +24,7 @@ class NotificatieController extends Controller
             'notificaties' => $notificaties,
             'ongelezen_count' => $request->user()->notificaties()->where('gelezen', false)->count(),
             'gelezen_count' => $request->user()->notificaties()->where('gelezen', true)->count(),
+            'is_hr' => $request->user()->role === 'HR',
         ]);
     }
 
@@ -90,5 +92,42 @@ class NotificatieController extends Controller
         return response()->json([
             'count' => $request->user()->notificaties()->where('gelezen', false)->count(),
         ]);
+    }
+
+    /**
+     * Deep-link a notification to its target page
+     * - Marks as read
+     * - If HR and related overuren exists → redirect to HR Te-beoordelen with highlight & medewerker filter
+     * - Otherwise redirect back
+     */
+    public function goToTarget(Notificatie $notificatie, Request $request)
+    {
+        // Ensure user owns this notification
+        if ($notificatie->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        // Mark as read (idempotent)
+        if (!$notificatie->gelezen) {
+            $notificatie->gelezen = true;
+            $notificatie->save();
+        }
+
+        $user = $request->user();
+
+        // If HR and notification refers to an Overuren entry, redirect to review page
+        if ($user->role === 'HR' && $notificatie->gerelateerd_id) {
+            $overuren = Overuren::find($notificatie->gerelateerd_id);
+            if ($overuren) {
+                $query = http_build_query([
+                    'highlight' => $overuren->id,
+                    'medewerker' => $overuren->user_id,
+                ]);
+                return redirect("/hr/te-beoordelen?{$query}");
+            }
+        }
+
+        // Default: go back to notifications index
+        return redirect()->route('notificaties.index');
     }
 }
