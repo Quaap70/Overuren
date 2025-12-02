@@ -10,6 +10,7 @@ import { ArrowLeftIcon, KeyIcon } from '@heroicons/react/24/outline';
 export default function GebruikerBewerken({ gebruiker, afdelingen }) {
     const [showPasswordReset, setShowPasswordReset] = useState(false);
     const [toggleActiveConfirm, setToggleActiveConfirm] = useState(false);
+    const [saldoEenheid, setSaldoEenheid] = useState('minuten');
 
     const { data, setData, put, errors, processing } = useForm({
         email: gebruiker.email || '',
@@ -28,7 +29,16 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(`/hr/gebruikers/${gebruiker.id}`);
+
+        // Reken om naar minuten als eenheid 'uren' is
+        const submitData = { ...data };
+        if (saldoEenheid === 'uren' && submitData.overgedragen_saldo) {
+            submitData.overgedragen_saldo = submitData.overgedragen_saldo * 60;
+        }
+
+        put(`/hr/gebruikers/${gebruiker.id}`, {
+            data: submitData,
+        });
     };
 
     const handlePasswordReset = (e) => {
@@ -246,16 +256,42 @@ export default function GebruikerBewerken({ gebruiker, afdelingen }) {
                                 {/* Overgedragen Saldo */}
                                 <div>
                                     <label className="block text-sm font-medium mb-2" style={{ color: '#2D3748' }}>
-                                        Overgedragen Saldo (minuten)
+                                        Overgedragen Saldo
                                     </label>
-                                    <Input
-                                        type="number"
-                                        value={data.overgedragen_saldo}
-                                        onChange={(e) => setData('overgedragen_saldo', e.target.value)}
-                                        error={errors.overgedragen_saldo}
-                                        placeholder="Bijv. 480 voor 8 uur"
-                                        step="5"
-                                    />
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="number"
+                                            value={data.overgedragen_saldo}
+                                            onChange={(e) => setData('overgedragen_saldo', e.target.value)}
+                                            error={errors.overgedragen_saldo}
+                                            placeholder={saldoEenheid === 'uren' ? 'Bijv. 8' : 'Bijv. 480'}
+                                            step={saldoEenheid === 'uren' ? '0.5' : '5'}
+                                            className="flex-1"
+                                        />
+                                        <select
+                                            value={saldoEenheid}
+                                            onChange={(e) => setSaldoEenheid(e.target.value)}
+                                            className="px-4 py-2 rounded-md transition-all"
+                                            style={{
+                                                border: '2px solid #E2E8F0',
+                                                backgroundColor: '#FFFFFF',
+                                                color: '#2D3748',
+                                                outline: 'none',
+                                                minWidth: '120px',
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor = '#8B5CF6';
+                                                e.currentTarget.style.boxShadow = '0 0 0 3px #EDE9FE';
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor = '#E2E8F0';
+                                                e.currentTarget.style.boxShadow = 'none';
+                                            }}
+                                        >
+                                            <option value="minuten">Minuten</option>
+                                            <option value="uren">Uren</option>
+                                        </select>
+                                    </div>
                                     {errors.overgedragen_saldo && (
                                         <p className="text-sm mt-1" style={{ color: '#E53E3E' }}>
                                             {errors.overgedragen_saldo}
