@@ -26,7 +26,7 @@ class ProfielController extends Controller
                 'startdatum' => auth()->user()->startdatum?->format('Y-m-d'),
                 'role' => auth()->user()->role,
             ],
-            'afdelingen' => ['Zakelijk', 'Particulier', 'Schade', 'ICT', 'HR'],
+            'afdelingen' => config('afdelingen.lijst'),
         ]);
     }
 
@@ -125,10 +125,12 @@ class ProfielController extends Controller
             abort(403, 'Alleen HR mag persoonlijke gegevens wijzigen.');
         }
 
+        $afdelingen = implode(',', config('afdelingen.lijst'));
+
         $validated = $request->validate([
             'voornaam' => 'required|string|max:255',
             'achternaam' => 'required|string|max:255',
-            'afdeling' => 'required|in:Zakelijk,Particulier,Schade,ICT,HR',
+            'afdeling' => "required|in:{$afdelingen}",
         ]);
 
         $user->update($validated);

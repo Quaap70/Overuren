@@ -326,7 +326,7 @@ class HRController extends Controller
     public function gebruikerNieuw()
     {
         return Inertia::render('HR/Gebruikers/Nieuw', [
-            'afdelingen' => ['Zakelijk', 'Particulier', 'Schade', 'ICT', 'HR'],
+            'afdelingen' => config('afdelingen.lijst'),
         ]);
     }
 
@@ -335,6 +335,8 @@ class HRController extends Controller
      */
     public function gebruikerStore(Request $request)
     {
+        $afdelingen = implode(',', config('afdelingen.lijst'));
+
         $validated = $request->validate([
             'username' => 'required|string|unique:users,username|max:255',
             'email' => 'required|email|unique:users,email|max:255',
@@ -342,7 +344,7 @@ class HRController extends Controller
             'voornaam' => 'required|string|max:255',
             'achternaam' => 'required|string|max:255',
             'role' => 'required|in:MEDEWERKER,HR',
-            'afdeling' => 'required|in:Zakelijk,Particulier,Schade,ICT,HR',
+            'afdeling' => "required|in:{$afdelingen}",
             'startdatum' => 'required|date',
         ]);
 
@@ -379,7 +381,7 @@ class HRController extends Controller
                 'startdatum' => $user->startdatum?->format('Y-m-d'),
                 'is_active' => $user->is_active,
             ],
-            'afdelingen' => ['Zakelijk', 'Particulier', 'Schade', 'ICT', 'HR'],
+            'afdelingen' => config('afdelingen.lijst'),
         ]);
     }
 
@@ -388,12 +390,14 @@ class HRController extends Controller
      */
     public function gebruikerUpdate(Request $request, User $user)
     {
+        $afdelingen = implode(',', config('afdelingen.lijst'));
+
         $validated = $request->validate([
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'voornaam' => 'required|string|max:255',
             'achternaam' => 'required|string|max:255',
             'role' => 'required|in:MEDEWERKER,HR',
-            'afdeling' => 'required|in:Zakelijk,Particulier,Schade,ICT,HR',
+            'afdeling' => "required|in:{$afdelingen}",
             'startdatum' => 'required|date',
         ]);
 
