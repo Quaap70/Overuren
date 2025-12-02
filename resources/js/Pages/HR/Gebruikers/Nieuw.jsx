@@ -5,6 +5,7 @@ import Card from '../../../Components/Card';
 import Button from '../../../Components/Button';
 import Input from '../../../Components/Input';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { theme } from '../../../config/theme';
 
 export default function GebruikerNieuw({ afdelingen }) {
     const [saldoEenheid, setSaldoEenheid] = useState('minuten');
@@ -25,14 +26,22 @@ export default function GebruikerNieuw({ afdelingen }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Reken om naar minuten als eenheid 'uren' is
-        const submitData = { ...data };
-        if (saldoEenheid === 'uren' && submitData.overgedragen_saldo) {
-            submitData.overgedragen_saldo = submitData.overgedragen_saldo * 60;
+        // Reken om naar minuten als eenheid 'uren' is VOOR we submitten
+        let saldoInMinuten = parseInt(data.overgedragen_saldo) || 0;
+        if (saldoEenheid === 'uren' && saldoInMinuten !== 0) {
+            saldoInMinuten = saldoInMinuten * 60;
         }
 
+        // Update de form data eerst
+        setData('overgedragen_saldo', saldoInMinuten);
+
+        // Submit via transform callback
         post('/hr/gebruikers', {
-            data: submitData,
+            preserveState: true,
+            transform: (data) => ({
+                ...data,
+                overgedragen_saldo: saldoInMinuten,
+            }),
         });
     };
 
@@ -278,20 +287,23 @@ export default function GebruikerNieuw({ afdelingen }) {
                                 <select
                                     value={saldoEenheid}
                                     onChange={(e) => setSaldoEenheid(e.target.value)}
-                                    className="px-4 py-2 rounded-md transition-all"
+                                    className="transition-all"
                                     style={{
-                                        border: '2px solid #E2E8F0',
+                                        border: `2px solid ${theme.colors.neutral[200]}`,
                                         backgroundColor: '#FFFFFF',
-                                        color: '#2D3748',
+                                        color: theme.colors.neutral[800],
                                         outline: 'none',
                                         minWidth: '120px',
+                                        padding: `${theme.spacing[3]} ${theme.spacing[4]}`,
+                                        fontSize: theme.typography.fontSize.sm,
+                                        borderRadius: theme.borderRadius.md,
                                     }}
                                     onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = '#8B5CF6';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px #EDE9FE';
+                                        e.currentTarget.style.borderColor = theme.colors.primary[500];
+                                        e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.primary[100]}`;
                                     }}
                                     onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = '#E2E8F0';
+                                        e.currentTarget.style.borderColor = theme.colors.neutral[200];
                                         e.currentTarget.style.boxShadow = 'none';
                                     }}
                                 >
