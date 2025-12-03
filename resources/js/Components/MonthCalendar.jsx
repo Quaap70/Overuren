@@ -80,7 +80,7 @@ export default function MonthCalendar({ data, basePath = '/dashboard' }) {
     const ingediendM = sumMinutes(bucket.ingediend);
     const goedgekeurdM = sumMinutes(bucket.goedgekeurd);
     const afgekeurdM = sumMinutes(bucket.afgekeurd);
-    const opnamesM = sumAbsMinutes(bucket.opnames);
+    const opnamesM = sumAbsMinutes(bucket.opnames); // / 2;
 
     // Tooltips (reden tonen per item)
     const tooltipFromItems = (items, fallbackLabel = '') => {

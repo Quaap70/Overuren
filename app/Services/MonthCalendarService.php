@@ -75,7 +75,7 @@ class MonthCalendarService
         // Overuren by status within the month
         $overuren = Overuren::query()
             ->where('user_id', $userId)
-            ->whereBetween('datum', [$start->toDateString(), $end->toDateString()])
+            ->whereBetween('datum', [$start->toDateTimeString(), $end->toDateTimeString()])
             ->get(['id', 'datum', 'minuten', 'status', 'reden']);
 
         foreach ($overuren as $o) {
@@ -87,7 +87,7 @@ class MonthCalendarService
                 // Behandel goedgekeurde negatieve overuren als opnames voor kalenderweergave
                 $days[$day]['opnames'][] = [
                     'id' => $o->id,
-                    'datum' => Carbon::parse($o->datum)->toDateString(),
+                    $day = (int) Carbon::parse($o->datum)->toDateString(),
                     'minuten' => abs($min),
                     'type' => 'OPNAME',
                     'reden' => $o->reden,
@@ -123,7 +123,7 @@ class MonthCalendarService
         $opnames = UrenMutatie::query()
             ->where('user_id', $userId)
             ->definitief()
-            ->whereBetween('datum', [$start->toDateString(), $end->toDateString()])
+            ->whereBetween('datum', [$start->toDateTimeString(), $end->toDateTimeString()])
             ->where('minuten', '<', 0)
             ->get(['id', 'datum', 'minuten', 'type']);
 
