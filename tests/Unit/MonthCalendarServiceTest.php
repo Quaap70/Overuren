@@ -16,6 +16,9 @@ beforeEach(function () {
     $this->saldoService = app(SaldoService::class);
     $this->year = 2025; // fixed year for deterministic assertions
     $this->month = 3;   // March has 31 days, week starts Monday (ISO)
+
+    $this->hrUser = User::factory()->create(['role' => 'HR']);
+    $this->actingAs($this->hrUser);
 });
 
 test('returns visible=false when year not started (no baseline)', function () {

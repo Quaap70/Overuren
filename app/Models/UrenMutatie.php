@@ -51,4 +51,10 @@ class UrenMutatie extends Model
     {
         return $query->whereYear('datum', $jaar);
     }
+
+    public function redenOveruur()
+    {
+        return $this->belongsTo(Overuren::class, 'bron_id');
+    }
+
 }

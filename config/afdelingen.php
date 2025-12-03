@@ -12,8 +12,9 @@ return [
     */
 
     'lijst' => [
-        'Zakelijk',
+        'Administratie',
         'Particulier',
+        'Zakelijk',
         'Schade',
         'ICT',
         'HR',

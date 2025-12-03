@@ -306,7 +306,7 @@ export default function HRDashboard({ jaarActies, filters, medewerkerOptions, ca
                                     </div>
                                 )}
                             </div>
-                            <MonthCalendar data={calendar} basePath="/hr/dashboard" />
+                            <MonthCalendar title="Month Calender"  data={calendar} basePath="/hr/dashboard" />
                         </>
                     ) : (
                         <p className="text-sm p-4 rounded border" style={{ color: theme.colors.neutral[600], borderColor: theme.colors.neutral[200] }}>

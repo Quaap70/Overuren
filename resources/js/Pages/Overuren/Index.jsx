@@ -57,13 +57,6 @@ export default function OverurenIndex({ overuren, filters }) {
             status: finalStatus,
         };
 
-        console.log('=== FRONTEND DEBUG ===');
-        console.log('activeTab:', activeTab);
-        console.log('input minuten:', data.minuten);
-        console.log('final minuten:', finalMinuten);
-        console.log('submitData:', JSON.stringify(submitData, null, 2));
-        console.log('======================');
-
         if (editingId) {
             router.put(`/overuren/${editingId}`, submitData, {
                 preserveScroll: true,

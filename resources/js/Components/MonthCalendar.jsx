@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 export default function MonthCalendar({ data, basePath = '/dashboard' }) {
   if (!data) return null;
 
-  const { visible, calendar, days } = data;
+  const { loggedInUser, visible, calendar, days } = data;
   const { year, month, daysInMonth, firstWeekday } = calendar || {};
 
   const weeks = useMemo(() => {
@@ -67,8 +67,9 @@ export default function MonthCalendar({ data, basePath = '/dashboard' }) {
       const n = Number(v);
       return Number.isFinite(n) ? n : 0;
     };
-    const sumMinutes = (arr) => (arr || []).reduce((acc, it) => acc + Math.max(0, toNum(it?.minuten)), 0);
+
     const sumAbsMinutes = (arr) => (arr || []).reduce((acc, it) => acc + Math.abs(toNum(it?.minuten)), 0);
+
     const fmtHMM = (mins) => {
       const m = Math.max(0, Math.round(mins));
       const h = Math.floor(m / 60);
@@ -76,11 +77,11 @@ export default function MonthCalendar({ data, basePath = '/dashboard' }) {
       return `${h}:${mm}`;
     };
 
-    const conceptM = sumMinutes(bucket.concept);
-    const ingediendM = sumMinutes(bucket.ingediend);
-    const goedgekeurdM = sumMinutes(bucket.goedgekeurd);
-    const afgekeurdM = sumMinutes(bucket.afgekeurd);
-    const opnamesM = sumAbsMinutes(bucket.opnames); // / 2;
+    const conceptM = sumAbsMinutes(bucket.concept);
+    const ingediendM = sumAbsMinutes(bucket.ingediend);
+    const goedgekeurdM = sumAbsMinutes(bucket.goedgekeurd);
+    const afgekeurdM = sumAbsMinutes(bucket.afgekeurd);
+    const opnamesM = sumAbsMinutes(bucket.opnames);
 
     // Tooltips (reden tonen per item)
     const tooltipFromItems = (items, fallbackLabel = '') => {
@@ -109,12 +110,12 @@ export default function MonthCalendar({ data, basePath = '/dashboard' }) {
     return (
       <div className="h-24 border p-1 overflow-hidden" style={{ borderColor: '#E5E7EB', backgroundColor: '#FFFFFF' }}>
         <div className="text-xs font-semibold mb-1" style={{ color: '#374151' }}>{day}</div>
-        <div className="space-x-1 whitespace-nowrap overflow-hidden text-ellipsis">
-          {bucket.concept?.length > 0 && dayBadge(`Con: ${fmtHMM(conceptM)}`, '#E5E7EB', tipCon)}
-          {bucket.ingediend?.length > 0 && dayBadge(`Ing: ${fmtHMM(ingediendM)}`, '#FDE68A', tipIng)}
-          {bucket.goedgekeurd?.length > 0 && dayBadge(`Goed: ${fmtHMM(goedgekeurdM)}`, '#BBF7D0', tipGoed)}
-          {bucket.afgekeurd?.length > 0 && dayBadge(`Afk: ${fmtHMM(afgekeurdM)}`, '#FCA5A5', tipAfk)}
-          {bucket.opnames?.length > 0 && dayBadge(`Opn: ${fmtHMM(opnamesM)}`, '#93C5FD', tipOpn)}
+        <div className="space-x-1  overflow-hidden text-ellipsis">
+          {(bucket.concept?.length > 0 && loggedInUser !== 'HR') && dayBadge(`Concept: ${fmtHMM(conceptM)}`, '#E5E7EB', tipCon)}
+          {bucket.ingediend?.length > 0 && dayBadge(`Ingediend: ${fmtHMM(ingediendM)}`, '#FDE68A', tipIng)}
+          {bucket.goedgekeurd?.length > 0 && dayBadge(`Goedgekeurd: ${fmtHMM(goedgekeurdM)}`, '#BBF7D0', tipGoed)}
+          {bucket.afgekeurd?.length > 0 && dayBadge(`Afgekeurd: ${fmtHMM(afgekeurdM)}`, '#FCA5A5', tipAfk)}
+          {bucket.opnames?.length > 0 && dayBadge(`Opname: ${fmtHMM(opnamesM)}`, '#93C5FD', tipOpn)}
         </div>
       </div>
     );
@@ -154,11 +155,11 @@ export default function MonthCalendar({ data, basePath = '/dashboard' }) {
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-2 mt-3 text-xs" style={{ color: '#6B7280' }}>
         <span>Legenda:</span>
-        {dayBadge('Con: Concept', '#E5E7EB')}
-        {dayBadge('Ing: Ingediend', '#FDE68A')}
-        {dayBadge('Goed: Goedgekeurd', '#BBF7D0')}
-        {dayBadge('Afk: Afgekeurd', '#FCA5A5')}
-        {dayBadge('Opn: Opname', '#93C5FD')}
+        {dayBadge('Concept', '#E5E7EB')}
+        {dayBadge('Ingediend', '#FDE68A')}
+        {dayBadge('Goedgekeurd', '#BBF7D0')}
+        {dayBadge('Afgekeurd', '#FCA5A5')}
+        {dayBadge('Opname', '#93C5FD')}
       </div>
     </div>
   );

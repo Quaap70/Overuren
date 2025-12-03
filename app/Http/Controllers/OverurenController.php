@@ -33,7 +33,7 @@ class OverurenController extends Controller
         }
 
         $overuren = $query->orderBy('datum', 'desc')
-            ->paginate(50)
+            ->paginate(5)
             ->through(fn ($o) => [
                 'id' => $o->id,
                 'datum' => $o->datum->format('Y-m-d'),
@@ -141,6 +141,7 @@ class OverurenController extends Controller
         }
 
         $validated = $request->validate([
+            'datum' => 'required|date',
             'minuten' => 'sometimes|integer',
             'reden' => 'nullable|string|max:1000',
             'status' => 'sometimes|in:CONCEPT,INGEDIEND',
@@ -154,12 +155,18 @@ class OverurenController extends Controller
         }
 
         // Update fields
+        if (isset($validated['datum'])) {
+            $overuren->datum = $validated['datum'];
+        }
+
         if (isset($validated['minuten'])) {
             $overuren->minuten = $validated['minuten'];
         }
+
         if (array_key_exists('reden', $validated)) {
             $overuren->reden = $validated['reden'];
         }
+
         if (isset($validated['status'])) {
             $overuren->status = $validated['status'];
             if ($validated['status'] === 'INGEDIEND') {

@@ -26,6 +26,11 @@ class SeedScenarioCommand extends Command
         {--fresh : Voer migrate:fresh uit voor het seeden}
         {--start-saldo= : Startsaldo in minuten (alleen voor init-scenario, default 0)}';
 
+    // art app:seed-scenario --scenario=init --start_saldo=45000 --fresh
+    // art app:seed-scenario --scenario=rollover-ready --jaar=2025 --fresh
+    // art app:seed-scenario --scenario=started --jaar=2025 --fresh
+    // art app:seed-scenario --scenario=mid-year --jaar=2025 --fresh
+    // art app:seed-scenario --scenario=end-year --jaar=2025 --fresh
     /**
      * The console command description.
      */

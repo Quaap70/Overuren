@@ -133,12 +133,12 @@ export default function NotificatiesIndex({ notificaties, ongelezen_count, gelez
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    {ongelezen_count > 0 && (
+                    {ongelezen_count > 1 && (
                         <Button variant="secondary" onClick={markAllAsRead}>
                             <CheckIcon className="w-4 h-4 inline mr-1" /> Alles Gelezen
                         </Button>
                     )}
-                    {gelezen_count > 0 && (
+                    {gelezen_count > 1 && (
                         <Button variant="danger" onClick={deleteAllRead}>
                             <TrashIcon className="w-4 h-4 inline mr-1" /> Verwijder Gelezen
                         </Button>

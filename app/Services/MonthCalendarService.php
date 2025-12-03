@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Overuren;
+use App\Models\UrenBaseline;
 use App\Models\UrenMutatie;
 use Illuminate\Support\Carbon;
 
@@ -21,18 +22,20 @@ class MonthCalendarService
      */
     public function getUserMonth(int $userId, int $year, int $month): array
     {
+        $loggedInUser = auth()->user()->role;
+
         // Normalize month first
         $month = min(12, max(1, (int) $month));
 
         // Normalize year against user's available baselines
         $year = (int) $year;
-        $hasBaselineForYear = \App\Models\UrenBaseline::where('user_id', $userId)
+        $hasBaselineForYear = UrenBaseline::where('user_id', $userId)
             ->where('jaar', $year)
             ->exists();
 
         if ($year < 1970 || !$hasBaselineForYear) {
             // Snap to the latest available baseline year for this user (most useful default)
-            $latestBaselineYear = (int) (\App\Models\UrenBaseline::where('user_id', $userId)->max('jaar') ?? 0);
+            $latestBaselineYear = (int) (UrenBaseline::where('user_id', $userId)->max('jaar') ?? 0);
             if ($latestBaselineYear > 0) {
                 $year = $latestBaselineYear;
             } else {
@@ -78,16 +81,20 @@ class MonthCalendarService
             ->whereBetween('datum', [$start->toDateTimeString(), $end->toDateTimeString()])
             ->get(['id', 'datum', 'minuten', 'status', 'reden']);
 
+
         foreach ($overuren as $o) {
+
             $day = (int) Carbon::parse($o->datum)->day;
             $min = (int) $o->minuten;
             $isNegativeApproved = ($o->status === 'GOEDGEKEURD' && $min < 0);
+            $isNegativeDenied = ($o->status === 'AFGEKEURD' && $min < 0);
+            $isNegativePending = ($o->status === 'INGEDIEND' && $min < 0);
 
             if ($isNegativeApproved) {
                 // Behandel goedgekeurde negatieve overuren als opnames voor kalenderweergave
                 $days[$day]['opnames'][] = [
                     'id' => $o->id,
-                    $day = (int) Carbon::parse($o->datum)->toDateString(),
+                    $day = (int) Carbon::parse($o->datum)->toDateTimeString(),
                     'minuten' => abs($min),
                     'type' => 'OPNAME',
                     'reden' => $o->reden,
@@ -97,7 +104,7 @@ class MonthCalendarService
 
             $item = [
                 'id' => $o->id,
-                'datum' => Carbon::parse($o->datum)->toDateString(),
+                'datum' => Carbon::parse($o->datum)->toDateTimeString(),
                 'minuten' => $min,
                 'reden' => $o->reden,
             ];
@@ -106,12 +113,16 @@ class MonthCalendarService
                     $days[$day]['concept'][] = $item;
                     break;
                 case 'INGEDIEND':
+                    $isNegativePending ? $item['reden'] = "Opname: $o->reden" : $item['reden'] = "Overuren: $o->reden";
                     $days[$day]['ingediend'][] = $item;
                     break;
                 case 'GOEDGEKEURD':
+                    $item['reden'] = "Overuren: $o->reden";
                     $days[$day]['goedgekeurd'][] = $item;
                     break;
                 case 'AFGEKEURD':
+                    $item['minuten'] = abs($min);
+                    $isNegativeDenied ? $item['reden'] = "Opname: $o->reden" : $item['reden'] = "Overuren: $o->reden";
                     $days[$day]['afgekeurd'][] = $item;
                     break;
                 default:
@@ -125,22 +136,29 @@ class MonthCalendarService
             ->definitief()
             ->whereBetween('datum', [$start->toDateTimeString(), $end->toDateTimeString()])
             ->where('minuten', '<', 0)
-            ->get(['id', 'datum', 'minuten', 'type']);
+            ->with('redenOveruur:id,reden')
+            ->get(['id', 'datum', 'minuten', 'type', 'bron_id']);
 
         foreach ($opnames as $m) {
             $day = (int) Carbon::parse($m->datum)->day;
+
+            $reden = $m->redenOveruur?->reden
+                ? "Opname: {$m->redenOveruur->reden}"
+                : null;
+
             $days[$day]['opnames'][] = [
                 'id' => $m->id,
-                'datum' => Carbon::parse($m->datum)->toDateString(),
+                'datum' => Carbon::parse($m->datum)->toDateTimeString(),
                 // Sla positieve minuten op voor UI‑weergave en totaalsom (opnames zijn negatief in bron)
                 'minuten' => abs((int) $m->minuten),
                 'type' => $m->type,
                 // Reden is niet altijd aanwezig op mutaties; UI toont dan een fallbacklabel
-                'reden' => null,
+                'reden' => $reden,
             ];
         }
 
         return [
+            'loggedInUser' => $loggedInUser,
             'visible' => true,
             'calendar' => [
                 'year' => $year,

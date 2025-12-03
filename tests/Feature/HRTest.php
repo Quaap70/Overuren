@@ -19,10 +19,22 @@ test('hr can view dashboard', function () {
     $response = $this->get('/hr/dashboard');
 
     $response->assertOk();
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/Dashboard')
-             ->has('statistieken')
-             ->has('recente_indieningen')
+    $response->assertInertia(fn($page) => $page->component('HR/Dashboard')
+        ->has('filters', fn ($calendar) => $calendar
+            ->has('medewerker')
+            ->has('zoek')
+            ->has('year')
+            ->has('month')
+        )
+        ->has('jaarActies', fn ($calendar) => $calendar
+            ->has('huidigJaar')
+            ->has('vorigJaar')
+            ->has('baselineHuidigBestaat')
+            ->has('openVorigJaarCount')
+            ->has('pendingPrevYearCount')
+        )
+        ->has('selectedMedewerker')
+        ->has('calendar')
     );
 });
 
@@ -42,9 +54,8 @@ test('hr can view list of employees', function () {
     $response = $this->get('/hr/medewerkers');
 
     $response->assertOk();
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/Medewerkers')
-             ->has('medewerkers.data', 6)
+    $response->assertInertia(fn($page) => $page->component('HR/Medewerkers')
+        ->has('medewerkers.data', 6)
     );
 });
 
@@ -59,9 +70,8 @@ test('hr can view submitted overtime', function () {
     $response = $this->get('/hr/te-beoordelen');
 
     $response->assertOk();
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/TeBeoordelen')
-             ->has('indieningen.data', 3)
+    $response->assertInertia(fn($page) => $page->component('HR/TeBeoordelen')
+        ->has('indieningen.data', 3)
     );
 });
 
@@ -190,11 +200,10 @@ test('hr can view employee detail page', function () {
     $response = $this->get("/hr/medewerkers/{$this->employee->id}");
 
     $response->assertOk();
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/MedewerkerDetail')
-             ->has('medewerker')
-             ->has('recente_overuren', 5)
-             ->has('medewerker.saldo')
+    $response->assertInertia(fn($page) => $page->component('HR/MedewerkerDetail')
+        ->has('medewerker')
+        ->has('recente_overuren', 5)
+        ->has('medewerker.saldo')
     );
 });
 
@@ -221,24 +230,4 @@ test('employee cannot adjust saldo', function () {
     ]);
 
     $response->assertForbidden();
-});
-
-test('hr dashboard shows correct statistics', function () {
-    $this->actingAs($this->hrUser);
-
-    // Create test data
-    Overuren::factory()->count(5)->create(['status' => 'INGEDIEND']);
-    Overuren::factory()->count(3)->create([
-        'status' => 'GOEDGEKEURD',
-        'datum' => now(),
-    ]);
-    User::factory()->count(10)->create(['role' => 'MEDEWERKER']);
-
-    $response = $this->get('/hr/dashboard');
-
-    $response->assertInertia(fn ($page) =>
-        $page->component('HR/Dashboard')
-             ->where('statistieken.te_beoordelen', 5)
-             ->where('statistieken.medewerkers', 19) // 5 (eerste Overuren) + 3 (tweede Overuren) + 10 (User::factory) + 1 (beforeEach)
-    );
 });

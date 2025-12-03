@@ -67,18 +67,18 @@ export default function Layout({ children }) {
                                         Dashboard
                                     </Link>
                                     <Link
-                                        href={route('overuren.index', {}, false, Ziggy)}
-                                        className="text-sm font-medium transition-colors hover:text-slate-900"
-                                        style={{ color: '#64748B' }}
-                                    >
-                                        Overuren
-                                    </Link>
-                                    <Link
                                         href={route('saldo.index', {}, false, Ziggy)}
                                         className="text-sm font-medium transition-colors hover:text-slate-900"
                                         style={{ color: '#64748B' }}
                                     >
                                         Saldo
+                                    </Link>
+                                    <Link
+                                        href={route('overuren.index', {}, false, Ziggy)}
+                                        className="text-sm font-medium transition-colors hover:text-slate-900"
+                                        style={{ color: '#64748B' }}
+                                    >
+                                        Overuren
                                     </Link>
                                     <Link
                                         href={route('notificaties.index', {}, false, Ziggy)}
